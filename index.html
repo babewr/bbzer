@@ -1,0 +1,503 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Model Viewer with Light Direction Controls</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+  #splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #3498db;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease-out;
+  }
+  #splash-screen h1 {
+    color: white;
+    font-size: 3rem;
+    text-align: center;
+  }
+  #main-content {
+    display: none;
+    height: 100%;
+  }
+  #scene-container {
+    width: 100%;
+    height: 100%;
+  }
+  #upload-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+  }
+  #file-upload {
+    display: none;
+  }
+  #upload-btn {
+    background-color: #2ecc71;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  #upload-btn:hover {
+    background-color: #27ae60;
+  }
+  #light-controls, #animation-controls {
+    position: absolute;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+    z-index: 100;
+  }
+  #light-controls {
+    top: 20px;
+  }
+  #animation-controls {
+    bottom: 20px;
+  }
+  .control-group {
+    margin-bottom: 10px;
+  }
+  .control-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  .control-group input, .control-group select {
+    width: 100%;
+  }
+  #viewer-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    padding: 10px;
+    z-index: 100;
+  }
+  .control-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    margin: 0 5px;
+    padding: 5px;
+    font-size: 1.2rem;
+    color: #333;
+    transition: color 0.3s ease;
+  }
+  .control-btn:hover {
+    color: #3498db;
+  }
+  .control-btn.active {
+    color: #3498db;
+  }
+  .light-direction-control {
+    width: 100px;
+    height: 100px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    position: relative;
+    margin-top: 10px;
+  }
+  .light-direction-handle {
+    width: 10px;
+    height: 10px;
+    background-color: #3498db;
+    border-radius: 50%;
+    position: absolute;
+    top: 45px;
+    left: 45px;
+    cursor: move;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="splash-screen">
+    <h1>Welcome to 3D Model Viewer with Light Direction Controls</h1>
+  </div>
+
+  <div id="main-content">
+    <div id="scene-container"></div>
+
+    <div id="upload-container">
+      <input type="file" id="file-upload" accept=".glb,.gltf">
+      <button id="upload-btn">Upload 3D Model</button>
+    </div>
+
+    <div id="light-controls">
+      <div class="control-group">
+        <label for="ambient-intensity">Ambient Light Intensity</label>
+        <input type="range" id="ambient-intensity" min="0" max="2" step="0.1" value="0.5">
+      </div>
+      <div class="control-group">
+        <label for="warm-intensity">Warm Light Intensity</label>
+        <input type="range" id="warm-intensity" min="0" max="5" step="0.1" value="2">
+      </div>
+      <div class="control-group">
+        <label for="cool-intensity">Cool Light Intensity</label>
+        <input type="range" id="cool-intensity" min="0" max="5" step="0.1" value="2">
+      </div>
+      <div class="control-group">
+        <label for="rim-intensity">Rim Light Intensity</label>
+        <input type="range" id="rim-intensity" min="0" max="5" step="0.1" value="1.5">
+      </div>
+      <div class="control-group">
+        <label>Warm Light Direction</label>
+        <div id="warm-light-direction" class="light-direction-control">
+          <div class="light-direction-handle"></div>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Cool Light Direction</label>
+        <div id="cool-light-direction" class="light-direction-control">
+          <div class="light-direction-handle"></div>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Rim Light Direction</label>
+        <div id="rim-light-direction" class="light-direction-control">
+          <div class="light-direction-handle"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="animation-controls">
+      <div class="control-group">
+        <label for="animation-select">Select Animation</label>
+        <select id="animation-select"></select>
+      </div>
+      <div class="control-group">
+        <label for="animation-speed">Animation Speed</label>
+        <input type="range" id="animation-speed" min="0.1" max="2" step="0.1" value="1">
+      </div>
+      <div class="control-group">
+        <button id="play-pause-btn">Play/Pause</button>
+      </div>
+    </div>
+
+    <div id="viewer-controls">
+      <button class="control-btn active" id="orbit-btn" title="Orbit"><i class="fas fa-sync-alt"></i></button>
+      <button class="control-btn" id="pan-btn" title="Pan"><i class="fas fa-arrows-alt"></i></button>
+      <button class="control-btn" id="zoom-btn" title="Zoom"><i class="fas fa-search"></i></button>
+      <button class="control-btn" id="reset-btn" title="Reset View"><i class="fas fa-home"></i></button>
+    </div>
+  </div>
+
+  <script>
+    let scene, camera, renderer, controls, model;
+    let ambientLight, warmLight, coolLight, rimLight;
+    let currentControl = 'orbit';
+    let mixer, animations = [];
+    let animationSpeed = 1;
+    let clock = new THREE.Clock();
+    let isPlaying = true;
+    let shadowCatcher;
+
+    function init() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0x333333);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      document.getElementById('scene-container').appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.25;
+      controls.screenSpacePanning = false;
+      controls.maxPolarAngle = Math.PI / 2;
+
+      ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+
+      warmLight = new THREE.PointLight(0xffaa00, 2);
+      warmLight.position.set(5, 3, 2);
+      warmLight.castShadow = true;
+      scene.add(warmLight);
+
+      coolLight = new THREE.PointLight(0x0044ff, 2);
+      coolLight.position.set(-5, 3, 2);
+      coolLight.castShadow = true;
+      scene.add(coolLight);
+
+      rimLight = new THREE.PointLight(0xffffff, 1.5);
+      rimLight.position.set(0, 5, -5);
+      rimLight.castShadow = true;
+      scene.add(rimLight);
+
+      camera.position.z = 5;
+
+      // Create shadow catcher
+      const shadowPlaneGeometry = new THREE.PlaneGeometry(10, 10);
+      const shadowPlaneMaterial = new THREE.ShadowMaterial();
+      shadowPlaneMaterial.opacity = 0.5;
+      shadowCatcher = new THREE.Mesh(shadowPlaneGeometry, shadowPlaneMaterial);
+      shadowCatcher.rotation.x = -Math.PI / 2;
+      shadowCatcher.receiveShadow = true;
+      scene.add(shadowCatcher);
+
+      loadModel('https://modelviewer.dev/shared-assets/models/RobotExpressive.glb');
+
+      animate();
+      setupLightControls();
+      setupViewerControls();
+      setupAnimationControls();
+      setupLightDirectionControls();
+    }
+
+    function loadModel(url) {
+      const loader = new THREE.GLTFLoader();
+      loader.load(url, (gltf) => {
+        if (model) {
+          scene.remove(model);
+        }
+        model = gltf.scene;
+        scene.add(model);
+        
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        
+        // Elevate the model
+        const elevationHeight = size.y / 2;
+        model.position.set(-center.x, -center.y + elevationHeight, -center.z);
+        
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = camera.fov * (Math.PI / 180);
+        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+        camera.position.z = cameraZ * 1.5;
+        camera.updateProjectionMatrix();
+
+        model.rotation.y = Math.PI / 4;
+
+        model.traverse((node) => {
+          if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+          }
+        });
+
+        shadowCatcher.scale.set(size.x * 2, size.z * 2, 1);
+        shadowCatcher.position.y = -0.01;
+
+        mixer = new THREE.AnimationMixer(model);
+        animations = gltf.animations;
+        updateAnimationSelect();
+
+        resetView();
+      });
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      if (mixer && isPlaying) {
+        mixer.update(delta * animationSpeed);
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function setupLightControls() {
+      document.getElementById('ambient-intensity').addEventListener('input', (e) => {
+        ambientLight.intensity = parseFloat(e.target.value);
+      });
+
+      document.getElementById('warm-intensity').addEventListener('input', (e) => {
+        warmLight.intensity = parseFloat(e.target.value);
+      });
+
+      document.getElementById('cool-intensity').addEventListener('input', (e) => {
+        coolLight.intensity = parseFloat(e.target.value);
+      });
+
+      document.getElementById('rim-intensity').addEventListener('input', (e) => {
+        rimLight.intensity = parseFloat(e.target.value);
+      });
+    }
+
+    function setupViewerControls() {
+      const orbitBtn = document.getElementById('orbit-btn');
+      const panBtn = document.getElementById('pan-btn');
+      const zoomBtn = document.getElementById('zoom-btn');
+      const resetBtn = document.getElementById('reset-btn');
+
+      orbitBtn.addEventListener('click', () => setControlMode('orbit'));
+      panBtn.addEventListener('click', () => setControlMode('pan'));
+      zoomBtn.addEventListener('click', () => setControlMode('zoom'));
+      resetBtn.addEventListener('click', resetView);
+
+      function setControlMode(mode) {
+        currentControl = mode;
+        controls.enableRotate = mode === 'orbit';
+        controls.enablePan = mode === 'pan';
+        controls.enableZoom = mode === 'zoom';
+
+        [orbitBtn, panBtn, zoomBtn].forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`${mode}-btn`).classList.add('active');
+      }
+    }
+
+    function setupAnimationControls() {
+      const animationSelect = document.getElementById('animation-select');
+      const speedControl = document.getElementById('animation-speed');
+      const playPauseBtn = document.getElementById('play-pause-btn');
+
+      animationSelect.addEventListener('change', () => {
+        const selectedAnimation = animations[animationSelect.value];
+        if (selectedAnimation) {
+          const action = mixer.clipAction(selectedAnimation);
+          mixer.stopAllAction();
+          action.play();
+        }
+      });
+
+      speedControl.addEventListener('input', (e) => {
+        animationSpeed = parseFloat(e.target.value);
+      });
+
+      playPauseBtn.addEventListener('click', () => {
+        isPlaying = !isPlaying;
+        playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+      });
+    }
+
+    function updateAnimationSelect() {
+      const animationSelect = document.getElementById('animation-select');
+      animationSelect.innerHTML = '';
+      animations.forEach((animation, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = animation.name;
+        animationSelect.appendChild(option);
+      });
+
+      if (animations.length > 0) {
+        const action = mixer.clipAction(animations[0]);
+        action.play();
+      }
+    }
+
+    function resetView() {
+      if (model) {
+        const box = new THREE.Box3().setFromObject(model);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = camera.fov * (Math.PI / 180);
+        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+        camera.position.set(0, center.y, cameraZ * 1.5);
+        controls.target.copy(center);
+        camera.updateProjectionMatrix();
+        controls.update();
+      }
+    }
+
+    function setupLightDirectionControls() {
+      setupLightDirectionControl('warm-light-direction', warmLight);
+      setupLightDirectionControl('cool-light-direction', coolLight);
+      setupLightDirectionControl('rim-light-direction', rimLight);
+    }
+
+    function setupLightDirectionControl(controlId, light) {
+      const control = document.getElementById(controlId);
+      const handle = control.querySelector('.light-direction-handle');
+      let isDragging = false;
+
+      handle.addEventListener('mousedown', startDragging);
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', stopDragging);
+
+      function startDragging(e) {
+        isDragging = true;
+        drag(e);
+      }
+
+      function drag(e) {
+        if (!isDragging) return;
+
+        const rect = control.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const x = e.clientX - centerX;
+        const y = e.clientY - centerY;
+
+        const angle = Math.atan2(y, x);
+        const radius = Math.min(rect.width, rect.height) / 2 - 5;
+
+        const newX = Math.cos(angle) * radius;
+        const newY = Math.sin(angle) * radius;
+
+        handle.style.transform = `translate(${newX}px, ${newY}px)`;
+
+        // Update light position
+        const lightX = Math.cos(angle) * 5;
+        const lightZ = Math.sin(angle) * 5;
+        light.position.set(lightX, 3, lightZ);
+      }
+
+      function stopDragging() {
+        isDragging = false;
+      }
+    }
+
+    window.addEventListener('resize', onWindowResize, false);
+
+    setTimeout(() => {
+      document.getElementById('splash-screen').style.opacity = '0';
+      setTimeout(() => {
+        document.getElementById('splash-screen').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        init();
+      }, 500);
+    }, 3000);
+
+    const uploadBtn = document.getElementById('upload-btn');
+    const fileUpload = document.getElementById('file-upload');
+
+    uploadBtn.addEventListener('click', () => {
+      fileUpload.click();
+    });
+
+    fileUpload.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const objectURL = URL.createObjectURL(file);
+        loadModel(objectURL);
+      }
+    });
+  </script>
+</body>
+</html>
