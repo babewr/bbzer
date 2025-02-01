@@ -1,0 +1,240 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&display=swap');
+
+  :root {
+    --neon-blue: #00ffff;
+    --neon-pink: #ff00ff;
+    --deep-blue: #000033;
+    --cyber-black: #000011;
+    --neon-green: #00ff00;
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Orbitron', sans-serif;
+    background-color: var(--cyber-black);
+    color: var(--neon-blue);
+    overflow-x: hidden;
+  }
+
+  .cyber-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('cyber-melbourne-skyline.jpg') no-repeat center center;
+    background-size: cover;
+    filter: brightness(0.3);
+    z-index: -1;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  header {
+    background-color: rgba(0, 31, 63, 0.7);
+    padding: 20px 0;
+  }
+
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-family: 'Audiowide', cursive;
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+  }
+
+  .nav-links a {
+    color: var(--neon-blue);
+    text-decoration: none;
+    margin-left: 20px;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links a:hover {
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-pink);
+  }
+
+  h1 {
+    font-size: 3.5em;
+    text-align: center;
+    margin: 40px 0;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--neon-blue);
+    text-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+  }
+
+  .hero {
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  .hero p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+  }
+
+  .cta-button {
+    display: inline-block;
+    padding: 15px 30px;
+    background-color: var(--neon-pink);
+    color: var(--cyber-black);
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .cta-button:hover {
+    background-color: var(--neon-blue);
+    transform: scale(1.05);
+  }
+
+  .features {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 60px;
+  }
+
+  .feature {
+    flex-basis: 30%;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .feature-icon {
+    font-size: 3em;
+    margin-bottom: 20px;
+    color: var(--neon-pink);
+  }
+
+  footer {
+    background-color: rgba(0, 31, 63, 0.7);
+    color: var(--neon-blue);
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 60px;
+  }
+
+  @keyframes neon-glow {
+    0% {
+      text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
+    }
+    50% {
+      text-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue), 0 0 40px var(--neon-blue), 0 0 50px var(--neon-blue);
+    }
+    100% {
+      text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
+    }
+  }
+
+  .neon-text {
+    animation: neon-glow 2s ease-in-out infinite;
+  }
+
+  #wallet-connect {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--neon-pink);
+    color: var(--cyber-black);
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  #wallet-connect:hover {
+    background-color: var(--neon-blue);
+    transform: scale(1.05);
+  }
+</style>
+</head>
+<body>
+  <div class="cyber-bg"></div>
+  
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo neon-text">CyberAFL BluesCrypto</div>
+        <div class="nav-links">
+          <a href="#" class="neon-text">Home</a>
+          <a href="/marketplace" class="neon-text">Marketplace</a>
+          <a href="/about" class="neon-text">About</a>
+          <a href="/contact" class="neon-text">Contact</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1 class="neon-text">Welcome to CyberAFL BluesCrypto</h1>
+      <p>Experience the future of Australian Rules Football in the digital realm. Collect, trade, and play with your favorite CyberAFL players as unique NFTs on the Solana blockchain.</p>
+      <a href="/marketplace" class="cta-button neon-text">Enter the CyberAFL Arena</a>
+    </section>
+
+    <section class="features">
+      <div class="feature">
+        <div class="feature-icon">🏉</div>
+        <h2>Collect CyberPlayers</h2>
+        <p>Own unique digital representations of your favorite AFL stars, enhanced with cybernetic abilities.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">💱</div>
+        <h2>Trade on the BlockChain</h2>
+        <p>Buy, sell, and trade your CyberAFL NFTs securely on the Solana blockchain.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🎮</div>
+        <h2>Play CyberFooty</h2>
+        <p>Use your NFT collection to compete in virtual matches and tournaments.</p>
+      </div>
+    </section>
+  </main>
+
+  <a href="#" id="wallet-connect" class="neon-text">Connect Solana Wallet</a>
+
+  <footer>
+    <div class="container">
+      <p class="neon-text">&copy; 2077 CyberAFL BluesCrypto. All rights secured on the Solana blockchain.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Parallax effect for background
+    document.addEventListener('mousemove', (e) => {
+      const bg = document.querySelector('.cyber-bg');
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      bg.style.transform = `translate(-${x * 20}px, -${y * 20}px)`;
+    });
+
+    // Solana Wallet connection simulation
+    const walletConnect = document.getElementById('wallet-connect');
+    walletConnect.addEventListener('click', (e) => {
+      e.preventDefault();
+      walletConnect.textContent = 'Connecting Solana Wallet...';
+      setTimeout(() => {
+        walletConnect.textContent = 'Solana Wallet Connected';
+        walletConnect.style.backgroundColor = 'var(--neon-green)';
+      }, 2000);
+    });
+  </script>
+</body></html>
