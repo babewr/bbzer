@@ -1,0 +1,1077 @@
+<html>
+<head>
+  <title>Island Observer</title>
+  <style>
+    body { margin: 0; }
+    canvas { width: 100vw; height: 100vh; display: block; }
+    #ui {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      color: #fff;
+      font-family: monospace;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 5px;
+    }
+    #spawn-npc, .speed-btn {
+      background: #4CAF50;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-family: monospace;
+    }
+    #spawn-npc:hover, .speed-btn:hover {
+      background: #45a049;
+    }
+    .speed-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .speed-btn {
+      padding: 4px 8px;
+      margin: 0;
+    }
+    #speed-value {
+      min-width: 50px;
+      text-align: center;
+    }
+    #log-container {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      color: #fff;
+      font-family: monospace;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 5px;
+      max-height: 120px;
+      overflow-y: auto;
+      width: 300px;
+    }
+    .log-entry {
+      margin: 2px 0;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-size: 0.9em;
+      animation: fadeIn 0.5s ease-in;
+    }
+    .log-entry.monster {
+      background: rgba(255,0,0,0.3);
+    }
+    .log-entry.butterfly {
+      background: rgba(255,105,180,0.3);
+    }
+    .log-entry.peaceful {
+      background: rgba(100,149,237,0.3);
+    }
+    .log-entry.snake {
+      background: rgba(45,90,39,0.3);
+    }
+    .log-entry.tree {
+      background: rgba(139,69,19,0.3);
+    }
+    .log-entry.tentacle {
+      background: rgba(74,20,140,0.3);
+    }
+    .log-entry.star {
+      background: rgba(255,215,0,0.3);
+    }
+    .log-entry.flower {
+      background: rgba(255,105,180,0.3);
+    }
+    .log-entry.kappa {
+      background: rgba(70, 130, 180, 0.3);
+    }
+    .log-entry.unicorn {
+      background: rgba(255, 192, 203, 0.3);
+    }
+    .log-entry.slime {
+      background: rgba(0, 255, 136, 0.3);
+    }
+    .log-entry.eye {
+      background: rgba(74, 144, 226, 0.3);
+    }
+    .log-entry.worldender {
+      background: rgba(128,0,0,0.5);
+      font-weight: bold;
+      text-shadow: 0 0 3px #ff0000;
+    }
+    .log-entry.fins {
+      background: rgba(70, 130, 180, 0.4);
+    }
+    .log-entry.balloon {
+      background: rgba(255, 0, 0, 0.2);
+    }
+    .log-entry.crawler {
+      background: rgba(102, 51, 153, 0.3);
+    }
+    .log-entry.pity {
+      background: rgba(255, 153, 204, 0.3);
+    }
+    .log-entry.solar {
+      background: rgba(255, 140, 0, 0.3);
+    }
+    #npc-info {
+      position: fixed;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      color: #fff;
+      font-family: monospace;
+      background: rgba(0,0,0,0.5);
+      padding: 15px;
+      border-radius: 5px;
+      display: none;
+      min-width: 200px;
+    }
+    #npc-info h3 {
+      margin: 0 0 10px 0;
+      color: #4CAF50;
+    }
+    .inventory-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .equipment-slot {
+      margin-top: 10px;
+      padding: 5px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 3px;
+    }
+    .inventory-scroll {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    /* Monster Manual Styles */
+    #monster-manual-btn, #crafting-menu-btn {
+      position: fixed;
+      top: 10px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 0.9em;
+      border: none;
+      color: white;
+    }
+
+    #monster-manual-btn {
+      right: 10px;
+      background: #800000;
+    }
+
+    #monster-manual-btn:hover {
+      background: #600000;
+    }
+
+    #crafting-menu-btn {
+      right: 120px;
+      background: #4CAF50;
+    }
+
+    #crafting-menu-btn:hover {
+      background: #45a049;
+    }
+    #monster-manual {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.9);
+      color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+      font-family: monospace;
+      border: 2px solid #800000;
+    }
+    #monster-manual h2 {
+      color: #ff4444;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .monster-entry {
+      margin-bottom: 30px;
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 5px;
+      position: relative;
+    }
+    .monster-entry h3 {
+      color: #ff8888;
+      margin-top: 0;
+    }
+    .monster-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .monster-stat {
+      padding: 5px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 3px;
+    }
+    .monster-description {
+      margin: 10px 0;
+      line-height: 1.4;
+    }
+    .monster-drops {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(0,128,0,0.2);
+      border-radius: 5px;
+    }
+    .close-manual {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #ff4444;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+    .close-manual:hover {
+      color: #ff8888;
+    }
+    .view-model-btn {
+      background: #4CAF50;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-family: monospace;
+    }
+
+    .view-model-btn:hover {
+      background: #45a049;
+    }
+
+    #model-viewer {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.8);
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #4CAF50;
+      z-index: 1000;
+    }
+
+    #model-viewer canvas {
+      background: transparent;
+      border-radius: 5px;
+    }
+
+    #model-viewer .close-viewer {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #4CAF50;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+
+    .monster-controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #crafting-menu {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.9);
+      color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+      font-family: monospace;
+      border: 2px solid #4CAF50;
+      z-index: 1000;
+    }
+
+    #crafting-menu h2 {
+      color: #4CAF50;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .crafting-category {
+      margin-bottom: 30px;
+    }
+
+    .crafting-category h3 {
+      color: #81C784;
+      border-bottom: 1px solid #4CAF50;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+    }
+
+    .crafting-entry {
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+
+    .crafting-entry h4 {
+      color: #A5D6A7;
+      margin: 0 0 10px 0;
+    }
+
+    .recipe {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .ingredient {
+      background: rgba(76,175,80,0.2);
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    .stats {
+      color: #C8E6C9;
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+
+    .close-crafting {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #4CAF50;
+      font-size: 1.5em;
+      cursor: pointer;
+    }
+
+    .close-crafting:hover {
+      color: #81C784;
+    }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <div>Time: <span id="time">12:00</span></div>
+    <div>NPCs Active: <span id="npc-count">0</span></div>
+    <button id="spawn-npc">Spawn NPC</button>
+    <div class="speed-controls">
+      <button id="speed-down" class="speed-btn">-</button>
+      <span id="speed-value">1.00x</span>
+      <button id="speed-up" class="speed-btn">+</button>
+    </div>
+  </div>
+  <div id="log-container"></div>
+  <div id="npc-info">
+    <h3>NPC Inventory</h3>
+    <div class="inventory-scroll">
+      <div class="inventory-item">
+        <span>Webs:</span>
+        <span id="web-count">0</span>
+      </div>
+      <div class="inventory-item">
+        <span>Bones:</span>
+        <span id="bone-count">0</span>
+      </div>
+      <div class="inventory-item">
+        <span>Flowers:</span>
+        <span id="flower-count">0</span>
+      </div>
+      <div class="inventory-item">
+        <span>Wings:</span>
+        <span id="wing-count">0</span>
+      </div>
+      <div class="inventory-item">
+        <span>Shells:</span>
+        <span id="shell-count">0</span>
+      </div>
+      <div class="inventory-item">
+        <span>Scales:</span>
+        <span id="snake-count">0</span>
+      </div>
+      <div class="inventory-item">
+        <span>Stars:</span>
+        <span id="star-count">0</span>
+      </div>
+      <div class="inventory-item">
+        <span>Slime:</span>
+        <span id="slime-count">0</span>
+      </div>
+      <div class="inventory-item">
+        <span>Wood:</span>
+        <span id="wood-count">0</span>
+      </div>
+    </div>
+    <div class="equipment-slot">
+      <span>Shield:</span>
+      <span id="shield-type">None</span>
+    </div>
+    <div class="equipment-slot">
+      <span>Weapon:</span>
+      <span id="weapon-type">None</span>
+    </div>
+  </div>
+  <button id="crafting-menu-btn">Crafting Guide</button>
+  <button id="monster-manual-btn">Monster Manual</button>
+  <div id="crafting-menu">
+    <button class="close-crafting">&times;</button>
+    <h2>🛠️ Crafting Guide 🛠️</h2>
+    
+    <div class="crafting-category">
+      <h3>Defensive Equipment</h3>
+      <div class="crafting-entry">
+        <h4>Web Shield</h4>
+        <div class="recipe">
+          <div class="ingredient">3x Web</div>
+        </div>
+        <div class="stats">Protection: Medium<br>Special: Light & Flexible</div>
+      </div>
+      
+      <div class="crafting-entry">
+        <h4>Bone Shield</h4>
+        <div class="recipe">
+          <div class="ingredient">3x Bone</div>
+        </div>
+        <div class="stats">Protection: High<br>Special: Durable</div>
+      </div>
+      
+      <div class="crafting-entry">
+        <h4>Butterfly Shield</h4>
+        <div class="recipe">
+          <div class="ingredient">2x Wing</div>
+          <div class="ingredient">1x Flower</div>
+        </div>
+        <div class="stats">Protection: Medium<br>Special: Beautiful Design</div>
+      </div>
+    </div>
+
+    <div class="crafting-category">
+      <h3>Weapons</h3>
+      <div class="crafting-entry">
+        <h4>Snake Fang Dagger</h4>
+        <div class="recipe">
+          <div class="ingredient">3x Snake Scale</div>
+        </div>
+        <div class="stats">Power: 70%<br>Special: Poisoned Edge</div>
+      </div>
+      
+      <div class="crafting-entry">
+        <h4>Star Blade</h4>
+        <div class="recipe">
+          <div class="ingredient">3x Star</div>
+        </div>
+        <div class="stats">Power: 80%<br>Special: Celestial Power</div>
+      </div>
+      
+      <div class="crafting-entry">
+        <h4>Shell Blade</h4>
+        <div class="recipe">
+          <div class="ingredient">3x Shell</div>
+        </div>
+        <div class="stats">Power: 60%<br>Special: Water Affinity</div>
+      </div>
+      
+      <div class="crafting-entry">
+        <h4>Mind Blade</h4>
+        <div class="recipe">
+          <div class="ingredient">3x Mind</div>
+        </div>
+        <div class="stats">Power: 90%<br>Special: Psychic Damage</div>
+      </div>
+      
+      <div class="crafting-entry">
+        <h4>Slime Hammer</h4>
+        <div class="recipe">
+          <div class="ingredient">3x Slime</div>
+        </div>
+        <div class="stats">Power: 65%<br>Special: Sticky Impact</div>
+      </div>
+    </div>
+
+    <div class="crafting-category">
+      <h3>Structures</h3>
+      <div class="crafting-entry">
+        <h4>House</h4>
+        <div class="recipe">
+          <div class="ingredient">6x Wood</div>
+        </div>
+        <div class="stats">Provides shelter<br>Special: Safe haven from monsters</div>
+      </div>
+      
+      <div class="crafting-entry">
+        <h4>Dock</h4>
+        <div class="recipe">
+          <div class="ingredient">3x Wood</div>
+        </div>
+        <div class="stats">Required for boats<br>Special: Water access</div>
+      </div>
+    </div>
+
+    <div class="crafting-category">
+      <h3>Transportation</h3>
+      <div class="crafting-entry">
+        <h4>Web Boat</h4>
+        <div class="recipe">
+          <div class="ingredient">5x Web</div>
+        </div>
+        <div class="stats">Requires dock<br>Special: Light & Fast</div>
+      </div>
+      
+      <div class="crafting-entry">
+        <h4>Wooden Boat</h4>
+        <div class="recipe">
+          <div class="ingredient">3x Wood</div>
+        </div>
+        <div class="stats">Requires dock<br>Special: Sturdy & Reliable</div>
+      </div>
+    </div>
+  </div>
+  <div id="monster-manual">
+    <button class="close-manual">&times;</button>
+    <h2>🦇 Monster Manual 🦇</h2>
+    <div class="monster-entry">
+      <h3>Spider Monster</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Nocturnal Predator</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Very Fast</div>
+      </div>
+      <div class="monster-description">
+        A massive arachnid that emerges during the night to hunt. Known for wrapping its prey
+        in silk cocoons before retreating into the darkness.
+      </div>
+      <div class="monster-drops">
+        Drops: Web (Used for crafting Web Shield and Boat)<br>
+        Bone (Used for crafting Bone Shield)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="Monster">View Model</button>
+      </div>
+    </div>
+    
+    <div class="monster-entry">
+      <h3>Giant Butterfly</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Aerial Hunter</div>
+        <div class="monster-stat">Active: Day Only</div>
+        <div class="monster-stat">Speed: Fast</div>
+      </div>
+      <div class="monster-description">
+        A deceptively beautiful but deadly creature that swoops down from above to capture its prey.
+        Its colorful wings mask its predatory nature.
+      </div>
+      <div class="monster-drops">
+        Drops: Flower (Used for crafting Butterfly Shield)<br>
+        Wing (Used for crafting Butterfly Shield)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="Butterfly">View Model</button>
+      </div>
+    </div>
+    
+    <div class="monster-entry">
+      <h3>Snake Monster</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Terrestrial Hunter</div>
+        <div class="monster-stat">Active: Day Only</div>
+        <div class="monster-stat">Speed: Medium</div>
+      </div>
+      <div class="monster-description">
+        A massive serpent with gleaming fangs and scales. Strikes with lightning speed and
+        can navigate both land and shallow water.
+      </div>
+      <div class="monster-drops">
+        Drops: Snake Scales (Rare crafting material)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="SnakeMonster">View Model</button>
+      </div>
+    </div>
+    
+    <div class="monster-entry">
+      <h3>Tree Monster</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Natural Horror</div>
+        <div class="monster-stat">Active: Day & Night</div>
+        <div class="monster-stat">Speed: Slow</div>
+      </div>
+      <div class="monster-description">
+        An ancient tree that has come to life with malicious intent. Its branches can grab
+        and crush unwary victims.
+      </div>
+      <div class="monster-drops">
+        Drops: Wood (Used for crafting Boats)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="TreeMonster">View Model</button>
+      </div>
+    </div>
+    
+    <div class="monster-entry">
+      <h3>Tentacle Monster</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Aquatic Horror</div>
+        <div class="monster-stat">Active: Day & Night</div>
+        <div class="monster-stat">Speed: Variable</div>
+      </div>
+      <div class="monster-description">
+        A terrifying appendage from an ancient deep-sea creature. Reaches from the ocean depths
+        to drag victims beneath the waves.
+      </div>
+      <div class="monster-drops">
+        None - Victims disappear into the depths
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="TentacleMonster">View Model</button>
+      </div>
+    </div>
+    
+    <div class="monster-entry">
+      <h3>Peaceful Flyer</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Benevolent Being</div>
+        <div class="monster-stat">Active: Day Only</div>
+        <div class="monster-stat">Speed: Medium</div>
+      </div>
+      <div class="monster-description">
+        A gentle sky creature that means no harm. Drops valuable items as it peacefully circles
+        the island.
+      </div>
+      <div class="monster-drops">
+        Drops: Star (Rare crafting material)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="PeacefulFlyer">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Star Monster</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Celestial Entity</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Fast</div>
+      </div>
+      <div class="monster-description">
+        A mysterious stellar being that descends from the night sky. Uses beams of golden light
+        to lift its victims into the cosmos.
+      </div>
+      <div class="monster-drops">
+        Drops: Star (Rare crafting material)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="StarMonster">View Model</button>
+      </div>
+    </div>
+
+    <div class="monster-entry">
+      <h3>Giant Flower Monster</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Carnivorous Plant</div>
+        <div class="monster-stat">Active: Day Only</div>
+        <div class="monster-stat">Speed: Slow</div>
+      </div>
+      <div class="monster-description">
+        A massive carnivorous flower that lures prey with its beautiful appearance before
+        snapping shut with razor-sharp teeth. Can burrow into the ground to escape.
+      </div>
+      <div class="monster-drops">
+        Drops: Flower (Used for crafting Butterfly Shield)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="GiantFlowerMonster">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Kappa</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Water Yokai</div>
+        <div class="monster-stat">Active: Day & Night</div>
+        <div class="monster-stat">Speed: Fast in Water</div>
+      </div>
+      <div class="monster-description">
+        A mischievous water sprite from Japanese folklore that challenges travelers to
+        tests of strength and wit. Known for the water-filled bowl on its head and its
+        love of sumo wrestling.
+      </div>
+      <div class="monster-drops">
+        Drops: Star (Rare crafting material)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="Kappa">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Greater Crab</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Aquatic Predator</div>
+        <div class="monster-stat">Active: Day Only</div>
+        <div class="monster-stat">Speed: Fast in Shallows</div>
+      </div>
+      <div class="monster-description">
+        A massive crustacean that lurks in the shallow waters around the island. Uses its powerful
+        pincers to catch prey near the water's edge. Known for its sideways movement and
+        armored shell.
+      </div>
+      <div class="monster-drops">
+        Drops: Shell (Rare crafting material)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="GreaterCrab">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Unicorn Orb</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Celestial Being</div>
+        <div class="monster-stat">Active: Day & Night</div>
+        <div class="monster-stat">Speed: Fast</div>
+      </div>
+      <div class="monster-description">
+        A mystical crystalline sphere with a unicorn's horn that descends from the heavens.
+        Uses pure magical energy to transform those it deems worthy into celestial beings.
+      </div>
+      <div class="monster-drops">
+        Drops: Star (Rare crafting material)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="UnicornOrb">View Model</button>
+      </div>
+    </div>
+
+    <div class="monster-entry">
+      <h3>Slime Monster</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Cute Predator</div>
+        <div class="monster-stat">Active: Day & Night</div>
+        <div class="monster-stat">Speed: Medium</div>
+      </div>
+      <div class="monster-description">
+        An adorable gelatinous creature that bounces around the island. Despite its cute appearance,
+        it absorbs its prey into its gooey body, transforming them into more slime. Known for its
+        friendly smile and bouncy movements.
+      </div>
+      <div class="monster-drops">
+        Drops: Slime (Rare crafting material)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="SlimeMonster">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Amoeba Pup</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Friendly Microbe</div>
+        <div class="monster-stat">Active: Day & Night</div>
+        <div class="monster-stat">Speed: Medium</div>
+        <div class="monster-stat" style="color: #4CAF50">Special: Can become Islander</div>
+      </div>
+      <div class="monster-description">
+        A rare and friendly microscopic creature that approaches the island with curiosity. Unlike other
+        creatures, if an Amoeba Pup takes a liking to the island, it will join the community as a permanent
+        resident. Known for its translucent body, cute wobbling movement, and friendly personality.
+      </div>
+      <div class="monster-drops">
+        None - Becomes a permanent island resident instead!
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="AmoebaPup">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Control Sucker</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Psychic Predator</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Medium</div>
+        <div class="monster-stat" style="color: #ff4444">Weakness: Shields block mental control</div>
+      </div>
+      <div class="monster-description">
+        A mysterious creature that feeds on the consciousness of its victims. Uses psychic tentacles
+        to take control of unprotected minds. Shields can block its mental manipulation attempts.
+        Known for its ethereal purple glow and floating tentacles.
+      </div>
+      <div class="monster-drops">
+        Drops: Mental Essence (Rare crafting material)
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="PsychicSucker">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Mysterious Eye</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Enigmatic Observer</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Variable</div>
+        <div class="monster-stat" style="color: #4a90e2">Special: Non-hostile Observer</div>
+      </div>
+      <div class="monster-description">
+        A strange, disembodied eye that appears during the night to silently watch the island's inhabitants.
+        Unlike other creatures, it shows no interest in harming its subjects - only in studying them with
+        its unblinking gaze. Known for its ethereal blue iris and occasional unsettling blinks.
+      </div>
+      <div class="monster-drops">
+        None - Simply observes and departs
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="MysteriousEye">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>World Ender</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Cosmic Horror</div>
+        <div class="monster-stat">Active: Any Time</div>
+        <div class="monster-stat">Speed: Unstoppable</div>
+        <div class="monster-stat" style="color: #ff0000">Warning: Total Destruction</div>
+      </div>
+      <div class="monster-description">
+        A catastrophic entity of pure darkness that appears rarely (1% chance) to bring total 
+        destruction to the island. When it appears, nothing can stop it - it will systematically 
+        destroy every NPC on the island before returning to whatever dark dimension it came from. 
+        Its appearance marks the end of the current island civilization.
+      </div>
+      <div class="monster-drops" style="background: rgba(128,0,0,0.2);">
+        Drops: None - Only destruction remains
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="WorldEnder">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Giant Fins</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Sea Leviathan</div>
+        <div class="monster-stat">Active: Day & Night</div>
+        <div class="monster-stat">Speed: Steady</div>
+        <div class="monster-stat" style="color: #4a90e2">Special: Non-hostile Passerby</div>
+      </div>
+      <div class="monster-description">
+        A massive sea creature whose fins break the water's surface as it passes near the island.
+        While its true size and form remain a mystery, the sight of its fins cutting through the
+        waves is both awe-inspiring and terrifying. This peaceful giant seems content to simply
+        pass by, leaving only ripples in its wake.
+      </div>
+      <div class="monster-drops">
+        None - Simply passes by the island
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Death Balloon</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Harbinger of Fate</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Slow</div>
+        <div class="monster-stat" style="color: #ff4444">Special: Returns multiple times</div>
+      </div>
+      <div class="monster-description">
+        A mysterious striped balloon that appears in the night, bearing an unreadable note.
+        Those who see it multiple times are marked by fate. The balloon grows to enormous
+        size before claiming its chosen victim. To others, it appears as nothing more than
+        an ordinary balloon drifting in the night breeze.
+      </div>
+      <div class="monster-drops">
+        None - Takes only lives
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Ceiling Crawler</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Dimensional Horror</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Variable</div>
+        <div class="monster-stat" style="color: #ff4444">Special: Reality Distortion</div>
+      </div>
+      <div class="monster-description">
+        A massive entity that drags itself along an invisible ceiling above the island, 
+        distorting reality around it. As it moves, the very air seems to ripple and warp, 
+        and those below can hear its massive form sliding overhead. When it speaks, its voice
+        seems to emanate from the ground itself, as if the island were whispering ancient secrets.
+      </div>
+      <div class="monster-drops">
+        None - Reality normalizes upon its departure
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Pity Taster</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Empathic Predator</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Medium</div>
+        <div class="monster-stat" style="color: #ff99cc">Special: Targets the Suffering</div>
+      </div>
+      <div class="monster-description">
+        A peculiar entity that feeds on the essence of despair and melancholy. It seeks out those
+        with the least resources or equipment, offering a comforting embrace before consuming them.
+        Known for its gentle pink glow and ribbons of light that provide a peaceful end to its
+        chosen targets. Despite its seemingly benevolent nature, it remains a predator that
+        sustains itself on the misfortune of others.
+      </div>
+      <div class="monster-drops">
+        None - Feeds only on emotions and despair
+      </div>
+    </div>
+
+    <div class="monster-entry">
+      <h3>Clay Infector</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Metamorphic Entity</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Slow</div>
+        <div class="monster-stat" style="color: #8b4513">Special: Progressive Infection</div>
+      </div>
+      <div class="monster-description">
+        A living mass of ancient clay that seeks to reshape other beings in its image. It slowly
+        approaches its target and begins to coat them in layers of living clay. As the clay hardens,
+        it gradually transforms its victim into another clay being before absorbing them back into
+        itself. The process appears eerily beautiful, like watching a sculptor at work.
+      </div>
+      <div class="monster-drops">
+        None - Victims become one with the clay
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Solar Fabricator</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Celestial Constructor</div>
+        <div class="monster-stat">Active: Day Only</div>
+        <div class="monster-stat">Speed: Variable</div>
+        <div class="monster-stat" style="color: #ffa500">Special: Creates Light Objects</div>
+      </div>
+      <div class="monster-description">
+        A mesmerizing entity that harnesses sunlight to fabricate objects from pure light.
+        It hovers above its targets, collecting solar energy into droplets that solidify
+        into crystalline forms. These light constructs slowly descend and absorb their
+        targets, converting them into raw material for future fabrications.
+      </div>
+      <div class="monster-drops">
+        Drops: Solar Crystals (Rare crafting material)
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Pink Gas</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Aerial Infection</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Slow</div>
+        <div class="monster-stat" style="color: #ff69b4">Special: Infectious Transformation</div>
+      </div>
+      <div class="monster-description">
+        A mysterious cloud of sweet-smelling pink gas that transforms those it touches. Victims become
+        infused with the same rosy essence, spreading the infection to others nearby. When all have
+        been converted, the gas ascends, taking its transformed victims with it. Those affected report
+        feelings of strange contentment before dissolving into pink mist.
+      </div>
+      <div class="monster-drops">
+        None - Victims become one with the gas
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Storm Cube</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Atmospheric Anomaly</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Medium</div>
+        <div class="monster-stat" style="color: #4682b4">Special: Weather Manipulation</div>
+      </div>
+      <div class="monster-description">
+        A mysterious geometric entity that brings its own storm system wherever it travels.
+        Surrounds its victims in a localized tempest of wind, rain, and lightning before
+        carrying them away into the dark clouds above. The cube itself seems to be a focal
+        point for strange atmospheric phenomena, with storm clouds constantly swirling
+        around its perfectly geometrical form.
+      </div>
+      <div class="monster-drops">
+        None - Victims vanish into the storm
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="StormCube">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Empress Elemental</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Elemental Royalty</div>
+        <div class="monster-stat">Active: Day & Night</div>
+        <div class="monster-stat">Speed: Fast</div>
+        <div class="monster-stat" style="color: #ffd700">Special: Elemental Mastery</div>
+      </div>
+      <div class="monster-description">
+        A majestic being that embodies all four elements: fire, water, earth, and air.
+        Crowned with golden light, she cycles through each element as she hunts,
+        unleashing their powers in devastating combinations. Her very presence causes
+        the elements themselves to bow in reverence. Those caught in her path must face
+        the full spectrum of nature's fury before being claimed by their preferred element.
+      </div>
+      <div class="monster-drops">
+        None - Victims become one with the elements
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="EmpressElemental">View Model</button>
+      </div>
+    </div>
+    <div class="monster-entry">
+      <h3>Crimson Cache</h3>
+      <div class="monster-stats">
+        <div class="monster-stat">Type: Reality Fragment</div>
+        <div class="monster-stat">Active: Night Only</div>
+        <div class="monster-stat">Speed: Variable</div>
+        <div class="monster-stat" style="color: #8b0000">Special: Space Distortion</div>
+      </div>
+      <div class="monster-description">
+        A section of forbidden space that has broken free from its warehouse prison. This fragment of 
+        crimson reality warps and folds the area around it, creating impossible geometries as it 
+        moves. Those who encounter it find themselves drawn into a red-tinted pocket dimension from 
+        which there is no return. The very air seems to crack and peel where it passes, revealing 
+        glimpses of the terrible things that were meant to stay contained.
+      </div>
+      <div class="monster-drops">
+        None - Victims become part of the contained collection
+      </div>
+      <div class="monster-controls">
+        <button class="view-model-btn" data-monster="CrimsonCache">View Model</button>
+      </div>
+    </div>
+  </div>
+  <div id="model-viewer">
+    <button class="close-viewer">&times;</button>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
