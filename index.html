@@ -1,0 +1,137 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Linux Tower Defense</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="game-container">
+    <div class="nav-bar">
+      <div class="nav-group">
+        <a href="facts.html" class="nav-link glow-effect">
+          <span class="nav-icon">📚</span>
+          Fun Facts
+        </a>
+        <a href="gallery.html" class="nav-link glow-effect">
+          <span class="nav-icon">🎨</span>
+          Gallery
+        </a>
+      </div>
+      <div class="track-selector">
+        <select id="trackSelect" class="track-select">
+          <option value="default">Classic Track</option>
+          <option value="spiral">Spiral Track</option>
+          <option value="sierpinski">Sierpinski Triangle</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hud">
+      <div class="hud-group resources-group">
+        <div class="resources glass-panel">
+          <div class="resource-icon">💰</div>
+          <div class="resource-info">
+            <div class="resource-label">Credits</div>
+            <div class="resource-value" id="credits">60</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tower-selection glass-panel">
+        <div class="tower-grid">
+          <div class="tower" draggable="true" data-type="chrome" data-cost="40">
+            <div class="tower-frame">
+              <img src="/ChromeOS.png" alt="ChromeOS Tower" draggable="false">
+            </div>
+            <div class="tower-info">
+              <span class="tower-cost">40¢</span>
+              <div class="tower-stats">
+                <div class="stat">🎯 Range: Good</div>
+                <div class="stat">⚡ Speed: Fast</div>
+                <div class="stat">💥 Power: Medium</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tower" draggable="true" data-type="arch" data-cost="60">
+            <div class="tower-frame">
+              <img src="/ArchLinux.webp" alt="Arch Linux Tower" draggable="false">
+            </div>
+            <div class="tower-info">
+              <span class="tower-cost">60¢</span>
+              <div class="tower-stats">
+                <div class="stat">🎯 Range: Great</div>
+                <div class="stat">⚡ Speed: Medium</div>
+                <div class="stat">💥 Power: High</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tower" draggable="true" data-type="android" data-cost="75">
+            <div class="tower-frame">
+              <img src="/Android.webp" alt="Android Tower" draggable="false">
+            </div>
+            <div class="tower-info">
+              <span class="tower-cost">75¢</span>
+              <div class="tower-stats">
+                <div class="stat">🎯 Range: Very Good</div>
+                <div class="stat">⚡ Speed: Good</div>
+                <div class="stat">💥 Power: Strong</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tower" draggable="true" data-type="gentoo" data-cost="125">
+            <div class="tower-frame">
+              <img src="/Gentoo.png" alt="Gentoo Tower" draggable="false">
+            </div>
+            <div class="tower-info">
+              <span class="tower-cost">125¢</span>
+              <div class="tower-stats">
+                <div class="stat">🎯 Range: Extreme</div>
+                <div class="stat">⚡ Speed: Fastest</div>
+                <div class="stat">💥 Power: Ultimate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-group stats-group">
+        <div class="wave-info glass-panel">
+          <div class="stat-icon">🌊</div>
+          <div class="stat-info">
+            <div class="stat-label">Wave</div>
+            <div class="stat-value" id="wave">1</div>
+          </div>
+        </div>
+        <div class="health glass-panel">
+          <div class="stat-icon">❤️</div>
+          <div class="stat-info">
+            <div class="stat-label">Server Health</div>
+            <div class="stat-value" id="health">100</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-frame glass-panel">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+    <div class="placement-guide">Tap anywhere to place tower</div>
+  </div>
+  <script type="module" src="game.js"></script>
+  <div class="help-tooltip glass-panel">
+    <h3>Tower Groups</h3>
+    <ul class="shortcut-list">
+      <li>Select towers <span class="shortcut-key">Click</span></li>
+      <li>Multi-select <span class="shortcut-key">Shift+Click</span></li>
+      <li>Create group <span class="shortcut-key">Ctrl+1-9</span></li>
+      <li>Select group <span class="shortcut-key">1-9</span></li>
+      <li>Clear selection <span class="shortcut-key">Esc</span></li>
+    </ul>
+  </div>
+</body>
+</html>
