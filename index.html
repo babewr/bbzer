@@ -1,0 +1,266 @@
+<title>Book.∞ - Infinite Story Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
+
+:root {
+  --primary-color: #667eea;
+  --secondary-color: #764ba2;
+  --background-color: #000000;
+  --text-color: #ffffff;
+  --container-bg: rgba(255, 255, 255, 0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+header {
+  text-align: center;
+  padding: 5vh 0 2vh;
+  width: 100%;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 800;
+  color: var(--text-color);
+  text-shadow: 2px 2px 4px rgba(255,255,255,0.1);
+  animation: rainbow-glow 8s linear infinite;
+}
+
+@keyframes rainbow-glow {
+  0% { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000; }
+  14% { text-shadow: 0 0 10px #ff7f00, 0 0 20px #ff7f00, 0 0 30px #ff7f00; }
+  28% { text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00, 0 0 30px #ffff00; }
+  42% { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00; }
+  57% { text-shadow: 0 0 10px #0000ff, 0 0 20px #0000ff, 0 0 30px #0000ff; }
+  71% { text-shadow: 0 0 10px #8b00ff, 0 0 20px #8b00ff, 0 0 30px #8b00ff; }
+  85% { text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff; }
+  100% { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000; }
+}
+
+.generator-container {
+  width: 90%;
+  max-width: 800px;
+  margin: 2vh auto;
+  background-color: var(--container-bg);
+  padding: 5vh 5vw;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+}
+
+#story-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+}
+
+textarea, input[type="text"], select {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+textarea:focus, input[type="text"]:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+textarea { min-height: 120px; resize: vertical; }
+
+button {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: var(--text-color);
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 2vh auto 0;
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  border-radius: 50px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.options-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.toggle-container, .length-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
+.toggle input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+input:checked + .slider:before { transform: translateX(26px); }
+
+.toggle-label, .length-label {
+  font-weight: 600;
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+select {
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+select option { background-color: var(--background-color); }
+
+::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .generator-container { padding: 4vh 4vw; }
+  button { font-size: 1rem; padding: 12px 24px; }
+  .options-container { flex-direction: column; align-items: flex-start; }
+  .toggle-container, .length-container { width: 100%; }
+}
+</style>
+</head>
+<body>
+  <header>
+    <h1>Book.∞</h1>
+  </header>
+
+  <main class="generator-container">
+    <form id="story-form" action="/generate" method="GET">
+      <textarea name="prompt" placeholder="Write a story about..." required></textarea>
+      <input type="text" name="genre" placeholder="Genre (e.g., Sci-Fi, Fantasy, Mystery)">
+      <input type="text" name="flavor" placeholder="Flavor (e.g., Humorous, Dark, Whimsical)">
+      <div class="options-container">
+        <div class="toggle-container">
+          <label class="toggle">
+            <input type="checkbox" name="images">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">Generate Images</span>
+        </div>
+        <div class="length-container">
+          <label for="story-length" class="length-label">Story Length:</label>
+          <select name="story-length" id="story-length">
+            <option value="poem">Poem</option>
+            <option value="short-story">Short Story</option>
+            <option value="mid-length">Mid-Length</option>
+            <option value="novel">Novel</option>
+            <option value="book">Book</option>
+          </select>
+          <div class="tooltip">ⓘ
+            <span class="tooltiptext">
+              Poem: A poem<br>
+              Short Story: 1-5 paragraphs<br>
+              Mid-Length: 5-10 paragraphs<br>
+              Novel: 5-10 chapters<br>
+              Book: 10-30 chapters<br>
+              Chapters: 5-10 paragraphs each<br>
+              Each chapter has its own page
+            </span>
+          </div>
+        </div>
+      </div>
+      <button type="submit">Generate</button>
+    </form>
+  </main>
+</body>
+</html>
