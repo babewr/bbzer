@@ -1,0 +1,386 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f4f8;
+    color: #333;
+  }
+  .container {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+  .main-content {
+    display: flex;
+    flex: 1;
+  }
+  .chart-area {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  .chart-container {
+    width: calc(33% - 20px);
+    margin: 10px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .chart-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  .chart-container.highlight {
+    box-shadow: 0 0 0 3px #3498db, 0 0 15px 5px rgba(52, 152, 219, 0.7);
+    transform: scale(1.05);
+    z-index: 10;
+  }
+  .sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  .sidebar h2 {
+    margin-top: 0;
+    color: #3498db;
+    font-size: 1.5em;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+  }
+  .data-source {
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: #34495e;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .data-source:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+  }
+  .award-banner {
+    background-color: #f1c40f;
+    color: #2c3e50;
+    text-align: center;
+    padding: 15px;
+    font-weight: bold;
+    font-size: 1.2em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .change-charts-btn {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .change-charts-btn:hover {
+    background-color: #2980b9;
+  }
+  .data-display {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    margin: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .data-table th, .data-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  .data-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  .data-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+    }
+  }
+  .pulse {
+    animation: pulse 1.5s infinite;
+  }
+  .continent-chart {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="award-banner">
+    🏆 Winner of the 2023 Global Data Visualization Excellence Award 🏆
+  </div>
+  <div class="main-content">
+    <div class="sidebar">
+      <h2>Universal Data Sources</h2>
+      <div class="data-source" onclick="fetchData('social-media', [0, 2, 4])">Social Media Trends</div>
+      <div class="data-source" onclick="fetchData('stock-market', [1, 3, 5])">Global Stock Markets</div>
+      <div class="data-source" onclick="fetchData('climate', [0, 1, 2])">Climate Data</div>
+      <div class="data-source" onclick="fetchData('space-exploration', [3, 4, 5])">Space Exploration</div>
+      <div class="data-source" onclick="fetchData('global-health', [0, 3, 5])">Global Health Metrics</div>
+      <div class="data-source" onclick="fetchData('technology', [1, 2, 4])">Technology Adoption Rates</div>
+    </div>
+    <div class="chart-area">
+      <div class="chart-container">
+        <canvas id="chart1"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart2"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart3"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart4"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart5"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="chart6"></canvas>
+      </div>
+    </div>
+  </div>
+  <button class="change-charts-btn" onclick="changeAllCharts()">Refresh All Charts</button>
+  <div class="continent-chart">
+    <canvas id="continentChart"></canvas>
+  </div>
+  <div class="data-display">
+    <h3>Current Data Display</h3>
+    <table class="data-table" id="dataTable">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Value 1</th>
+          <th>Value 2</th>
+          <th>Value 3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be inserted here dynamically -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+let currentDataset = [];
+const chartTypes = ['bar', 'line', 'pie', 'doughnut', 'radar', 'polarArea'];
+let continentChart;
+
+function createRandomChart(ctx, type, index) {
+  const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+  const data = Array.from({length: 7}, () => Math.floor(Math.random() * 100));
+  currentDataset[index] = data;
+
+  const chartData = {
+    labels: labels,
+    datasets: [{
+      label: 'Random Data',
+      data: data,
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.5)',
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 206, 86, 0.5)',
+        'rgba(75, 192, 192, 0.5)',
+        'rgba(153, 102, 255, 0.5)',
+        'rgba(255, 159, 64, 0.5)',
+        'rgba(199, 199, 199, 0.5)'
+      ],
+      borderColor: [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)',
+        'rgba(199, 199, 199, 1)'
+      ],
+      borderWidth: 1
+    }]
+  };
+  
+  return new Chart(ctx, {
+    type: type,
+    data: chartData,
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Random ' + type.charAt(0).toUpperCase() + type.slice(1) + ' Chart'
+        }
+      }
+    }
+  });
+}
+
+function updateDataTable() {
+  const tableBody = document.querySelector('#dataTable tbody');
+  tableBody.innerHTML = ''; // Clear existing rows
+
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+  months.forEach((month, index) => {
+    const row = tableBody.insertRow();
+    const cell1 = row.insertCell(0);
+    const cell2 = row.insertCell(1);
+    const cell3 = row.insertCell(2);
+    const cell4 = row.insertCell(3);
+
+    cell1.textContent = month;
+    cell2.textContent = currentDataset[0][index];
+    cell3.textContent = currentDataset[1][index];
+    cell4.textContent = currentDataset[2][index];
+  });
+}
+
+function createContinentChart() {
+  const ctx = document.getElementById('continentChart').getContext('2d');
+  const data = {
+    labels: ['Asia', 'Africa', 'Europe', 'North America', 'South America', 'Australia/Oceania'],
+    datasets: [{
+      label: 'Population Distribution',
+      data: [4641054775, 1340598147, 747636026, 592072212, 430759766, 43111704],
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.5)',
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 206, 86, 0.5)',
+        'rgba(75, 192, 192, 0.5)',
+        'rgba(153, 102, 255, 0.5)',
+        'rgba(255, 159, 64, 0.5)'
+      ],
+      borderColor: [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)'
+      ],
+      borderWidth: 1
+    }]
+  };
+
+  return new Chart(ctx, {
+    type: 'pie',
+    data: data,
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'World Population by Continent'
+        }
+      }
+    }
+  });
+}
+
+// Create initial random charts
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.chart-container canvas').forEach((canvas, index) => {
+    const ctx = canvas.getContext('2d');
+    canvas.chart = createRandomChart(ctx, chartTypes[index], index);
+  });
+  updateDataTable();
+  continentChart = createContinentChart();
+});
+
+function fetchData(source, highlightIndices) {
+  console.log('Fetching data from: ' + source);
+  
+  // Reset all chart containers
+  document.querySelectorAll('.chart-container').forEach(container => {
+    container.classList.remove('highlight', 'pulse');
+  });
+
+  // Highlight and animate specified charts
+  highlightIndices.forEach(index => {
+    const container = document.querySelectorAll('.chart-container')[index];
+    container.classList.add('highlight', 'pulse');
+  });
+
+  // Simulate data fetching and chart updating
+  setTimeout(() => {
+    document.querySelectorAll('.chart-container canvas').forEach((canvas, index) => {
+      const ctx = canvas.getContext('2d');
+      canvas.chart.destroy(); // Destroy existing chart
+      canvas.chart = createRandomChart(ctx, chartTypes[index], index);
+    });
+    updateDataTable();
+    updateContinentChart();
+
+    // Remove highlight and animation after update
+    setTimeout(() => {
+      document.querySelectorAll('.chart-container').forEach(container => {
+        container.classList.remove('highlight', 'pulse');
+      });
+    }, 1000);
+  }, 1000);
+}
+
+function changeAllCharts() {
+  document.querySelectorAll('.chart-container canvas').forEach((canvas, index) => {
+    const ctx = canvas.getContext('2d');
+    canvas.chart.destroy(); // Destroy existing chart
+    canvas.chart = createRandomChart(ctx, chartTypes[index], index);
+  });
+  updateDataTable();
+  updateContinentChart();
+}
+
+function updateContinentChart() {
+  const newData = [
+    Math.random() * 5000000000,
+    Math.random() * 2000000000,
+    Math.random() * 1000000000,
+    Math.random() * 1000000000,
+    Math.random() * 1000000000,
+    Math.random() * 100000000
+  ];
+  continentChart.data.datasets[0].data = newData;
+  continentChart.update();
+}
+</script>
+</body></html>
