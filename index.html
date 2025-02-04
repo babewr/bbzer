@@ -1,0 +1,152 @@
+<style>
+    body {
+        font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+        background-color: #fdf2f7;
+        color: #4a0e2e;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    header {
+        background-color: #ff9ecd;
+        padding: 20px 0;
+        text-align: center;
+    }
+    h1 {
+        font-family: 'Brush Script MT', cursive;
+        font-size: 3.5em;
+        color: #4a0e2e;
+        margin: 0;
+    }
+    nav {
+        background-color: #ffc0cb;
+        padding: 10px 0;
+    }
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+    }
+    nav ul li {
+        display: inline;
+        margin: 0 15px;
+    }
+    nav ul li a {
+        text-decoration: none;
+        color: #4a0e2e;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    .blog-post {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .blog-post h2 {
+        color: #ff69b4;
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+    .blog-post img {
+        max-width: 100%;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+    .blog-meta {
+        font-style: italic;
+        color: #888;
+        margin-bottom: 15px;
+    }
+    .read-more {
+        display: inline-block;
+        background-color: #ff9ecd;
+        color: #4a0e2e;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+    .read-more:hover {
+        background-color: #ff69b4;
+    }
+    footer {
+        background-color: #ff9ecd;
+        color: #4a0e2e;
+        text-align: center;
+        padding: 20px 0;
+        margin-top: 30px;
+    }
+    .social-links a {
+        color: #4a0e2e;
+        margin: 0 10px;
+        font-size: 1.2em;
+    }
+    @keyframes wiggle {
+        0% { transform: rotate(0deg); }
+        25% { transform: rotate(5deg); }
+        50% { transform: rotate(0deg); }
+        75% { transform: rotate(-5deg); }
+        100% { transform: rotate(0deg); }
+    }
+    .wiggle:hover {
+        animation: wiggle 0.5s ease infinite;
+    }
+</style>
+</head>
+<body>
+    <header>
+        <h1>Cora Grace</h1>
+        <p>Beverly Hills' Most Adorable Bichon Frise</p>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#about">About Me</a></li>
+            <li><a href="#gallery">Photo Gallery</a></li>
+            <li><a href="#lifestyle">Beverly Hills Lifestyle</a></li>
+            <li><a href="#blog">Cora's Blog</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <section id="blog">
+            <h2>Cora's Pawsome Blog</h2>
+            <div class="blog-post">
+                <h2>Top 5 Dog Parks in Beverly Hills</h2>
+                <img src="beverly-hills-dog-park.jpg" alt="Cora Grace, the fluffy white Bichon Frise, enjoying a sunny day at a lush Beverly Hills dog park" width="800" height="400">
+                <p class="blog-meta">Posted on May 15, 2023 by Cora Grace</p>
+                <p>Woof woof, darlings! It's your favorite Beverly Hills socialite, Cora Grace, here to dish on the most paw-some places to play and socialize in our fabulous city. From the lush Beverly Gardens Park to the exclusive Roxbury Park, I'll show you where all the cool pups hang out. Get ready for some tail-wagging fun!</p>
+                <a href="https://cora-grace.beverly-hills/blog/top-5-dog-parks" class="read-more">Read More</a>
+            </div>
+            <div class="blog-post">
+                <h2>Cora's Guide to Doggy Couture</h2>
+                <img src="cora-fashion-show.jpg" alt="Cora Grace, the stylish Bichon Frise, strutting down a runway in a designer pink tutu and tiara" width="800" height="400">
+                <p class="blog-meta">Posted on May 1, 2023 by Cora Grace</p>
+                <p>Fashionistas and furry friends, gather 'round! Today, I'm spilling the kibble on how to dress to impress in Beverly Hills. From paw-dicures to designer collars, I'll share my secrets on how to turn heads at the dog park. Remember, every day is a fashion show, and the world is your runway!</p>
+                <a href="https://cora-grace.beverly-hills/blog/doggy-couture-guide" class="read-more">Read More</a>
+            </div>
+            <div class="blog-post">
+                <h2>A Day in the Life of a Beverly Hills Bichon</h2>
+                <img src="cora-day-in-life.jpg" alt="Cora Grace, the pampered Bichon Frise, enjoying a puppuccino at a chic Beverly Hills café" width="800" height="400">
+                <p class="blog-meta">Posted on April 20, 2023 by Cora Grace</p>
+                <p>Ever wondered what it's like to be a fabulous Bichon Frise living in the lap of luxury? Join me for a day filled with spa treatments, shopping on Rodeo Drive, and rubbing paws with the stars. From my morning puppuccino to my evening stroll down the Walk of Fame, I'll give you a glimpse into the glamorous life of a Beverly Hills pup!</p>
+                <a href="https://cora-grace.beverly-hills/blog/day-in-the-life" class="read-more">Read More</a>
+            </div>
+        </section>
+    </div>
+    <footer>
+        <p>&copy; 2023 Cora Grace | Beverly Hills' Cutest Bichon Frise</p>
+        <div class="social-links">
+            <a href="https://www.instagram.com/coragrace_bichon" class="wiggle">Instagram</a>
+            <a href="https://www.tiktok.com/@coragrace_beverlyhills" class="wiggle">TikTok</a>
+            <a href="https://www.youtube.com/coragracechannel" class="wiggle">YouTube</a>
+        </div>
+    </footer>
+</body></html>
