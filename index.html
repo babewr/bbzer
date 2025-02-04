@@ -1,0 +1,250 @@
+<style>
+    body {
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        background-color: #FFE5F0;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        padding-bottom: 0px;
+    }
+    /* Added header styles as requested */
+    header {
+        background-color: #FFB6C1;
+        padding: 20px 0;
+        text-align: center;
+    }
+    h1 {
+        font-size: 3em;
+        color: #FF1493;
+        margin: 0;
+        text-shadow: 2px 2px #FFC0CB;
+    }
+    .friendship-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+    }
+    .kitty-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 20px auto;
+        animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    .kitty {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: #808080;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    .ear {
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-left: 50px solid transparent;
+        border-right: 50px solid transparent;
+        border-bottom: 80px solid #808080;
+       
+    }
+    @keyframes earWiggle {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(5deg); }
+    }
+    .ear-left {
+        top: -40px;
+        left: 20px;
+        transform: rotate(-30deg);
+    }
+    .ear-right {
+        top: -40px;
+        right: 20px;
+        transform: rotate(30deg);
+    }
+    .eye {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background-color: #FFFF00;
+        border-radius: 50%;
+        top: 80px;
+    }
+    .eye-left {
+        left: 60px;
+    }
+    .eye-right {
+        right: 60px;
+    }
+    .pupil {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background-color: #000;
+        border-radius: 50%;
+        top: 15px;
+        left: 15px;
+        animation: blinkPupils 4s infinite;
+    }
+    @keyframes blinkPupils {
+        0%, 96%, 100% { transform: scaleY(1); }
+        98% { transform: scaleY(0.1); }
+    }
+    .nose {
+        position: absolute;
+        width: 30px;
+        height: 20px;
+        background-color: #FFB6C1;
+        border-radius: 50%;
+        top: 180px;
+        left: 135px;
+    }
+    .mouth {
+        position: absolute;
+        width: 120px;
+        height: 60px;
+        border: 8px solid #000;
+        border-radius: 0 0 100px 100px;
+        border-top: none;
+        top: 190px;
+        left: 90px;
+    }
+    .mouth::after {
+        content: '';
+        position: absolute;
+    }
+    .heart {
+        position: absolute;
+        font-size: 40px;
+        color: #FF69B4;
+        animation: float 3s infinite;
+    }
+    @keyframes float {
+        0% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+        100% { transform: translateY(0) rotate(0deg); }
+    }
+    .friendship-meter {
+        background-color: #FFF;
+        border: 3px solid #FF69B4;
+        border-radius: 20px;
+        height: 30px;
+        margin: 20px auto;
+        position: relative;
+        width: 80%;
+        overflow: hidden;
+    }
+    .friendship-level {
+        background: linear-gradient(45deg, #FF69B4, #FFB6C1, #FF69B4);
+        background-size: 200% 200%;
+        animation: gradientFlow 3s ease infinite;
+        height: 100%;
+        width: 100%;
+        border-radius: 15px;
+    }
+    @keyframes gradientFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .message-bubble {
+        background-color: white;
+        border-radius: 20px;
+        padding: 15px;
+        margin: 20px auto;
+        max-width: 300px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        animation: popIn 0.5s ease;
+    }
+    @keyframes popIn {
+        0% { transform: scale(0); }
+        70% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    footer {
+        background-color: #FFB6C1;
+        color: #FF1493;
+        text-align: center;
+        padding: 40px 0;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+</head>
+<body>
+    <!-- Added header -->
+    <header>
+        <h1>💖 Best Friends Forever! 💖</h1>
+    </header>
+
+    <div class="friendship-container">
+        <div class="message-bubble">
+            <h2>YOOOOOOOO, WELCOME BACK!!!!!!!!!!!!!!!!!!</h2>
+        </div>
+        
+        <div class="kitty-container">
+            <div class="kitty">
+                <div class="ear ear-left"></div>
+                <div class="ear ear-right"></div>
+                <div class="eye eye-left"><div class="pupil"></div></div>
+                <div class="eye eye-right"><div class="pupil"></div></div>
+                <div class="nose"></div>
+                <div class="mouth"></div>
+                <div class="cheek cheek-left"></div>
+                <div class="cheek cheek-right"></div>
+            </div>
+        </div>
+
+        <div class="friendship-meter">
+            <div class="friendship-level"></div>
+        </div>
+        <h3>Friendship Level: BESTIES FOREVER! 🌟</h3>
+    </div>
+
+    <footer>
+        Made with 💝 by Happy (formerly Angy) Kitty | 🎶Id sell my own bones for sapphire stones, cause blue is your favorite color!
+    </footer>
+
+<script>
+function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.innerHTML = '💖';
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.animationDelay = Math.random() * 2 + 's';
+    document.body.appendChild(heart);
+    
+    setTimeout(() => {
+        heart.remove();
+    }, 3000);
+}
+
+setInterval(createHeart, 300);
+
+const kitty = document.querySelector('.kitty');
+kitty.addEventListener('mouseover', () => {
+    const messages = [
+        "Yo you the best!",
+        "Id never imagine what life would be without you.",
+        "if you go away i probably die.",
+        "id sell all my cat food for you.",
+        "im the depressed, and you are the serotonin",
+        "Thank you, Thank you for just being here.",
+        "your the best!"
+    ];
+    
+    const bubble = document.querySelector('.message-bubble');
+    bubble.innerHTML = `<h2>${messages[Math.floor(Math.random() * messages.length)]}</h2>`;
+    bubble.style.animation = 'none';
+    bubble.offsetHeight;
+    bubble.style.animation = 'popIn 0.5s ease';
+});
+</script>
+</body>
+</html>
