@@ -1,0 +1,192 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird Clone</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/websim-socket@latest/dist/websim-socket.min.js"></script>
+    <style>
+        .banner-preview {
+            width: 100%;
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .gif-avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        #gif-avatar-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .gif-avatar-item {
+            width: 80px;
+            height: 80px;
+            border: 3px solid transparent;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gif-avatar-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .gif-avatar-item:hover, .gif-avatar-item.selected {
+            border-color: #4CAF50;
+        }
+
+        #banner-input {
+            display: none;
+        }
+
+        #banner-upload-btn {
+            margin-bottom: 20px;
+        }
+        #upload-gif-avatar-btn {
+            margin-bottom: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="game-over" class="hidden">
+            <h1>Game Over</h1>
+            <p>Pontuação: <span id="final-score">0</span></p>
+            
+            <div id="game-over-menu">
+                <button id="continue-btn">Continuar</button>
+                <button id="rank-btn">Rank</button>
+                <button id="shop-btn">Loja</button>
+                <button id="chat-btn">Chat</button>
+                <button id="profile-btn">Perfil</button>
+                <button id="support-btn">Apoiar Criador</button>
+            </div>
+        </div>
+
+        <div id="rank-screen" class="hidden">
+            <h1>Ranking</h1>
+            <table id="rank-table">
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Jogador</th>
+                        <th>Pontuação</th>
+                    </tr>
+                </thead>
+                <tbody id="rank-list">
+                    <!-- Ranking será preenchido dinamicamente -->
+                </tbody>
+            </table>
+            <button id="back-from-rank-btn">Voltar</button>
+        </div>
+
+        <div id="shop-screen" class="hidden">
+            <h1>Loja de Skins</h1>
+            <div id="skins-container">
+                <!-- Skins serão adicionadas dinamicamente -->
+            </div>
+            <button id="back-from-shop-btn">Voltar</button>
+        </div>
+
+        <div id="chat-screen" class="hidden">
+            <h1>Chat dos Jogadores</h1>
+            <div id="chat-messages"></div>
+            <div id="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+                <button id="send-message-btn">Enviar</button>
+            </div>
+            <button id="back-from-chat-btn">Voltar</button>
+        </div>
+
+        <div id="profile-screen" class="hidden">
+            <h1>Editar Perfil</h1>
+            <div id="profile-editor">
+                <div id="banner-selector">
+                    <h2>Banner</h2>
+                    <div id="banner-preview" class="banner-preview" style="background-color: #f0f0f0;"></div>
+                    <input type="file" id="banner-input" accept="image/*">
+                    <button id="banner-upload-btn">Escolher Banner</button>
+                </div>
+
+                <div id="gif-avatar-selector">
+                    <h2>Escolha seu Avatar GIF</h2>
+                    <img id="gif-avatar-preview" class="gif-avatar-preview" src="">
+                    
+                    <!-- New upload button for mobile GIF upload -->
+                    <input type="file" id="mobile-gif-upload" accept="image/gif" style="display:none;">
+                    <button id="upload-gif-avatar-btn">Carregar GIF do Celular</button>
+                    
+                    <div id="gif-avatar-gallery">
+                        <!-- GIF avatar gallery will be dynamically populated -->
+                    </div>
+                </div>
+
+                <div id="avatar-selector">
+                    <h2>Escolha seu Avatar Emoji</h2>
+                    <div id="avatar-gallery">
+                        <!-- Emoji avatar gallery will be dynamically populated -->
+                    </div>
+                </div>
+
+                <div id="name-input-container">
+                    <h2>Nome de Usuário</h2>
+                    <input type="text" id="profile-name-input" placeholder="Digite seu nome">
+                </div>
+                <button id="save-profile-btn">Salvar Perfil</button>
+                <button id="back-from-profile-btn">Voltar</button>
+            </div>
+        </div>
+
+        <div id="support-screen" class="hidden">
+            <h1>Apoie o Criador</h1>
+            <div id="support-content">
+                <p>Apoie o criador do jogo inscrevendo-se no canal do YouTube!</p>
+                <a href="https://youtube.com/@xnicolas99?si=dLlQIwP2u3mJ2fN2" 
+                   target="_blank" 
+                   id="subscribe-link" 
+                   class="youtube-link">
+                    📺 Inscrever-se no Canal
+                </a>
+                <div id="support-rewards">
+                    <h2>Recompensas por Apoiar</h2>
+                    <ul>
+                        <li>🎮 Skin exclusiva</li>
+                        <li>💰 Bônus de moedas</li>
+                        <li>🏆 Destaque no Rank</li>
+                    </ul>
+                </div>
+            </div>
+            <button id="back-from-support-btn">Voltar</button>
+        </div>
+    </div>
+    <script src="game.js" type="module"></script>
+</body>
+</html>
