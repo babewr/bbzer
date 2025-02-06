@@ -1,0 +1,327 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doggy Nutrition Board Game: Fun Facts Adventure</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background-color: #f0f8ff;
+    margin: 0;
+    padding: 20px;
+    background-image: url('https://example.com/paw-print-pattern.png');
+    background-repeat: repeat;
+  }
+  h1, h2 {
+    color: #4a4a4a;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  }
+  .game-board {
+    background-color: #8bc34a;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .menu {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .menu-button {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .menu-button:hover {
+    background-color: #f57c00;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  .flip-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    justify-content: center;
+  }
+  .flip-card {
+    background-color: transparent;
+    width: 200px;
+    height: 200px;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .flip-card-front {
+    background-color: #ffd54f;
+    color: #4a4a4a;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .flip-card-back {
+    background-color: #4a4a4a;
+    color: white;
+    transform: rotateY(180deg);
+    padding: 10px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+  .dog-avatar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 100px;
+    height: 100px;
+    transition: all 0.3s;
+  }
+  .dog-avatar:hover {
+    transform: scale(1.1) rotate(10deg);
+  }
+</style>
+</head>
+<body>
+  <div class="game-board">
+    <h1>🐾 Doggy Nutrition Board Game: Fun Facts Adventure 🐾</h1>
+    <div class="menu">
+      <button class="menu-button" onclick="showCategory('kibbles')">Kibbles</button>
+      <button class="menu-button" onclick="showCategory('raw')">Raw</button>
+      <button class="menu-button" onclick="showCategory('frozen')">Frozen</button>
+      <button class="menu-button" onclick="showCategory('homemade')">Home Made</button>
+      <button class="menu-button" onclick="showCategory('mixed')">Mixed</button>
+    </div>
+    <h2 id="category-title">Select a food type to start your adventure!</h2>
+    <div id="flip-card-container" class="flip-card-container"></div>
+  </div>
+
+  <svg class="dog-avatar" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="45" fill="#8d6e63"/>
+    <circle cx="30" cy="40" r="5" fill="#ffffff"/>
+    <circle cx="70" cy="40" r="5" fill="#ffffff"/>
+    <ellipse cx="50" cy="70" rx="15" ry="10" fill="#bcaaa4"/>
+    <path d="M 40 60 Q 50 70 60 60" fill="none" stroke="#5d4037" stroke-width="3"/>
+  </svg>
+
+  <script>
+    const facts = {
+      kibbles: [
+        "Kibbles were first invented in 1860 by James Spratt.",
+        "The term 'kibble' comes from the verb 'to kibble,' meaning to grind coarsely.",
+        "Most kibbles are made through a process called extrusion.",
+        "Kibbles can stay fresh for up to a year if stored properly.",
+        "The shape of kibbles can affect how quickly a dog eats.",
+        "Some kibbles are designed to clean dogs' teeth as they chew.",
+        "The first commercial dog food was a type of kibble made from wheat meals, vegetables, and beef blood.",
+        "Kibbles typically contain 3-5% moisture.",
+        "The average kibble is about 4 calories per gram.",
+        "Kibbles often include added vitamins and minerals to ensure complete nutrition.",
+        "Some kibbles are grain-free, using alternatives like sweet potatoes or lentils.",
+        "The size of kibbles varies based on the size of the dog they're intended for.",
+        "Kibbles can be made with a variety of protein sources, including chicken, beef, fish, and even kangaroo.",
+        "The color of kibbles doesn't affect their nutritional value - it's mainly for human appeal.",
+        "Some kibbles are formulated for specific health conditions, like weight management or joint health.",
+        "The hardness of kibbles can vary, affecting dental benefits and palatability.",
+        "Kibbles can be used as training treats due to their convenience and portion control.",
+        "The first puppy-specific kibble was introduced in the 1960s.",
+        "Some kibbles are coated with flavor enhancers to make them more appealing to dogs.",
+        "The process of making kibbles destroys harmful bacteria, making them very safe to store and feed.",
+        "Kibbles can be soaked in water to make them easier for puppies or senior dogs to eat.",
+        "The protein content in kibbles can range from 18% to over 30%.",
+        "Some kibbles include probiotics to support digestive health.",
+        "Kibbles are often used in food-dispensing toys to provide mental stimulation.",
+        "The shelf life of opened kibble is typically 2-3 weeks.",
+        "Some premium kibbles include fresh or freeze-dried raw ingredients.",
+        "Kibbles were instrumental in virtually eliminating nutritional deficiencies in domesticated dogs.",
+        "The texture of kibbles can vary from crunchy to semi-moist.",
+        "Some kibbles are formulated to reduce allergic reactions in sensitive dogs.",
+        "The average dog kibble is about 1/2 inch in diameter."
+      ],
+      raw: [
+        "Raw diets for dogs are also known as BARF (Biologically Appropriate Raw Food).",
+        "The raw diet trend for dogs started in 1993 by Australian veterinarian Ian Billinghurst.",
+        "Raw diets typically consist of muscle meat, bones, organs, eggs, and some fruits and vegetables.",
+        "Advocates claim raw diets lead to shinier coats and healthier skin.",
+        "Raw diets can include both commercial frozen products and homemade meals.",
+        "Some raw feeders practice 'prey model' feeding, mimicking what a wild dog would eat.",
+        "Raw diets often have higher protein content than traditional kibble.",
+        "Bones in raw diets can help clean dogs' teeth naturally.",
+        "Raw diets require careful handling to prevent bacterial contamination.",
+        "Some vets warn that raw diets may not provide complete and balanced nutrition.",
+        "Raw diets can include novel proteins like rabbit or venison for dogs with food sensitivities.",
+        "The moisture content in raw diets is much higher than in kibble, often over 70%.",
+        "Raw diets may help some dogs with chronic digestive issues.",
+        "Freezing raw meat does not kill all potential pathogens.",
+        "Raw diets often exclude grains, aligning with the belief that dogs are primarily carnivorous.",
+        "Some raw feeders incorporate fermented vegetables for added probiotics.",
+        "Raw diets can be more expensive than commercial kibble.",
+        "Puppies on raw diets may grow at a different rate compared to those on commercial diets.",
+        "Raw diets often require supplementation to ensure complete nutrition.",
+        "Some raw feeders practice 'rotation feeding' to provide a variety of nutrients.",
+        "Raw diets may not be suitable for dogs with certain health conditions like pancreatitis.",
+        "The calcium-phosphorus ratio is crucial in raw diets, especially for growing puppies.",
+        "Some commercial raw diets use High Pressure Processing (HPP) to kill bacteria.",
+        "Raw diets can include green tripe, which is rich in digestive enzymes.",
+        "Transitioning to a raw diet often requires a gradual approach.",
+        "Raw diets may lead to smaller, firmer stools due to higher digestibility.",
+        "Some raw feeders include supplements like fish oil for omega-3 fatty acids.",
+        "Raw diets require more freezer space for storage compared to kibble.",
+        "The concept of raw feeding is controversial within the veterinary community.",
+        "Some dogs may need time to adjust to the taste and texture of raw food."
+      ],
+      frozen: [
+        "Frozen dog food can be raw, cooked, or a mixture of both.",
+        "Freezing helps preserve nutrients in the food.",
+        "Frozen dog food often contains fewer preservatives than kibble.",
+        "Some frozen dog foods are human-grade, meaning they're safe for human consumption.",
+        "Frozen dog food typically needs to be thawed before serving.",
+        "Many frozen dog foods are formulated to meet AAFCO standards for complete nutrition.",
+        "Frozen food can be a good option for dogs with food sensitivities or allergies.",
+        "Some frozen dog foods come in convenient patty or nugget forms.",
+        "Freezing can help kill some parasites that may be present in raw ingredients.",
+        "Frozen dog food often has a higher moisture content than kibble or dehydrated foods.",
+        "Some pet owners use frozen dog food as a topper for kibble to increase palatability.",
+        "Frozen dog food can have a shelf life of up to two years when stored properly.",
+        "Thawed frozen dog food should be used within 24-48 hours.",
+        "Some frozen dog foods include fruits and vegetables for added nutrients.",
+        "Frozen raw dog food should be handled with the same care as raw meat for human consumption.",
+        "Some frozen dog foods are gently cooked before freezing to reduce bacterial risk.",
+        "Frozen dog food can be a good option for dogs who need to increase their water intake.",
+        "Some companies offer subscription services for frozen dog food delivery.",
+        "Frozen dog food can be more expensive than traditional kibble.",
+        "Some frozen dog foods are specifically formulated for puppies or senior dogs.",
+        "Freezing can help preserve the natural enzymes in raw ingredients.",
+        "Frozen dog food often requires more storage space than dry kibble.",
+        "Some frozen dog foods are formulated to help with specific health issues like weight management.",
+        "The texture of frozen dog food can vary from smooth pate to chunky stew-like consistencies.",
+        "Some frozen dog foods include novel proteins like kangaroo or alligator for dogs with food sensitivities.",
+        "Frozen dog food can be a good option for dogs who are picky eaters.",
+        "Some frozen dog foods are flash-frozen to preserve nutrients and texture.",
+        "Thawing frozen dog food in the refrigerator is generally considered the safest method.",
+        "Some pet owners prepare and freeze their own homemade dog food.",
+        "Frozen dog food can be a good option for dogs recovering from illness or surgery who need extra hydration."
+      ],
+      homemade: [
+        "Homemade dog food allows for complete control over ingredients.",
+        "Preparing homemade dog food requires careful attention to nutritional balance.",
+        "Many homemade dog food recipes include a mix of protein, carbohydrates, and vegetables.",
+        "Homemade diets can be tailored to a dog's specific health needs or preferences.",
+        "It's important to consult with a veterinary nutritionist when planning a homemade diet.",
+        "Homemade dog food often contains fewer preservatives than commercial options.",
+        "Preparing homemade dog food can be more time-consuming than serving commercial food.",
+        "Some dog owners batch cook and freeze homemade meals for convenience.",
+        "Homemade dog food can be a good option for dogs with multiple food sensitivities.",
+        "It's crucial to include calcium in homemade diets, often through supplements.",
+        "Homemade dog food can be cooked or raw, depending on the recipe and preference.",
+        "Some homemade dog food recipes incorporate organ meats for added nutrients.",
+        "Homemade diets allow for easy rotation of proteins to prevent food boredom.",
+        "It's important to introduce new homemade recipes gradually to avoid digestive upset.",
+        "Homemade dog food can be more expensive than commercial kibble, depending on ingredients used.",
+        "Some pet owners use pressure cookers or slow cookers to prepare homemade dog food.",
+        "Homemade dog food should be stored properly to prevent spoilage.",
+        "It's important to avoid ingredients toxic to dogs when preparing homemade meals.",
+        "Homemade dog food can be adjusted easily for weight management.",
+        "Some homemade dog food recipes incorporate eggs as a complete protein source.",
+        "Homemade diets can include supplements to ensure complete nutrition.",
+        "It's important to measure portions carefully in homemade diets to prevent overfeeding.",
+        "Some pet owners incorporate herbs or spices safe for dogs in homemade recipes.",
+        "Homemade dog food can be a good option for dogs with certain health conditions like kidney disease.",
+        "It's crucial to ensure the proper balance of nutrients in homemade diets, especially for growing puppies.",
+        "Some homemade dog food recipes incorporate bone broth for added nutrients and flavor.",
+        "Homemade dog treats can complement a homemade diet for training and rewards.",
+        "It's important to transition gradually from commercial to homemade dog food.",
+        "Some pet owners use food processors or grinders to prepare homemade dog food.",
+        "Regular vet check-ups are important to ensure a homemade diet is meeting all nutritional needs."
+      ],
+      mixed: [
+        "Mixed feeding combines different types of dog food in one diet.",
+        "A common mixed feeding approach is combining kibble with wet food.",
+        "Mixed feeding can provide both the convenience of dry food and the palatability of wet food.",
+        "Some pet owners mix commercial dog food with homemade ingredients.",
+        "Mixed feeding can help increase moisture intake for dogs who don't drink enough water.",
+        "Combining different food types can provide a wider range of nutrients.",
+        "Mixed feeding can be a good way to transition between different diets.",
+        "Some pet owners use mixed feeding to make premium foods more affordable.",
+        "It's important to adjust portion sizes when mixed feeding to prevent overfeeding.",
+        "Mixed feeding can be a good option for picky eaters.",
+        "Some vets recommend mixed feeding to provide variety in a dog's diet.",
+        "Mixed feeding can combine the dental benefits of kibble with the hydration of wet food.",
+        "It's important to introduce new foods gradually when starting mixed feeding.",
+        "Mixed feeding can be tailored to a dog's individual nutritional needs.",
+        "Some pet owners use mixed feeding to increase the protein content of their dog's diet.",
+        "Mixed feeding can combine the benefits of raw and cooked foods.",
+        "It's important to ensure that all components of a mixed diet are nutritionally complete.",
+        "Mixed feeding can be a good way to use up leftover safe human foods.",
+        "Some pet owners use mixed feeding to disguise medications or supplements.",
+        "Mixed feeding can provide different textures, which some dogs find more interesting.",
+        "It's important to store different components of a mixed diet properly.",
+        "Mixed feeding can be adjusted easily for weight management.",
+        "Some pet owners use mixed feeding to incorporate fresh foods into their dog's diet.",
+        "Mixed feeding can be a good option for dogs transitioning from puppy to adult food.",
+        "It's important to consider the calorie content of all components in mixed feeding.",
+        "Some pet owners use mixed feeding to incorporate therapeutic diets with regular food.",
+        "Mixed feeding can be a good way to use up opened packages of different dog foods.",
+        "It's important to monitor a dog's reaction when starting mixed feeding.",
+        "Some pet owners use mixed feeding to balance the cost of different types of dog food.",
+        "Mixed feeding can provide both quick energy (from easily digestible foods) and sustained energy (from complex carbohydrates)."
+      ]
+    };
+
+    function showCategory(category) {
+      const container = document.getElementById('flip-card-container');
+      const title = document.getElementById('category-title');
+      container.innerHTML = '';
+      title.textContent = `🐶 ${category.charAt(0).toUpperCase() + category.slice(1)} Dog Food Facts 🍖`;
+
+      facts[category].forEach((fact, index) => {
+        const flipCard = document.createElement('div');
+        flipCard.className = 'flip-card';
+        flipCard.innerHTML = `
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <h3>Fact #${index + 1}</h3>
+              <p>Flip me!</p>
+            </div>
+            <div class="flip-card-back">
+              <p>${fact}</p>
+            </div>
+          </div>
+        `;
+        container.appendChild(flipCard);
+      });
+    }
+
+    // Add dog avatar animation
+    const dogAvatar = document.querySelector('.dog-avatar');
+    setInterval(() => {
+      dogAvatar.style.transform = `scale(${1 + Math.random() * 0.1}) rotate(${Math.random() * 20 - 10}deg)`;
+    }, 2000);
+  </script>
+</body></html>
