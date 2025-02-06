@@ -1,0 +1,2122 @@
+<link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
+<style>
+* {
+  font-family: 'Titan One', cursive;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+    --enemy-speed-multiplier: 1;
+}
+
+body {
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d, #404040);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 3em;
+  text-shadow: 3px 3px 0px #000;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.wonky {
+  font-size: 2em;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 0px #000;
+}
+
+.market-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 30px;
+}
+
+.pack {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.pack:hover {
+  transform: translateY(-5px);
+}
+
+.blook {
+  font-size: 4em;
+  margin: 10px 0;
+}
+
+.price {
+  background: #ffd700;
+  color: black;
+  padding: 5px 15px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.common { color: #ffffff; }
+.uncommon { color: #4bc22e; }
+.rare { color: #0a14fa; }
+.epic { color: #be0000; }
+.legendary { color: #ff910f; }
+.chroma { color: #00ccff; }
+.mystical { 
+    color: #a335ee; 
+    text-shadow: 0 0 10px #a335ee;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  padding: 20px;
+  border-radius: 15px;
+  z-index: 1000;
+  text-align: center;
+}
+
+.modal.active {
+  display: block;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.overlay.active {
+  display: block;
+}
+
+.collection {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.collection h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.collection-item {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  font-size: 2em;
+}
+
+.collection-item.locked {
+  filter: grayscale(100%);
+  opacity: 0.5;
+}
+
+.factory-game {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.mode-select {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.mode-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-family: 'Titan One', cursive;
+    transition: background 0.3s;
+}
+
+.mode-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.mode-button.active {
+    background: #ff4d4d;
+}
+
+.factory-button {
+  background: #ff4d4d;
+  border: none;
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  font-size: 3em;
+  cursor: pointer;
+  transition: transform 0.1s;
+  margin: 20px;
+}
+
+.factory-button:active {
+  transform: scale(0.95);
+}
+
+.factory-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.timer {
+  font-size: 2em;
+  margin: 10px 0;
+}
+
+.click-count {
+  font-size: 1.5em;
+  margin: 10px 0;
+}
+
+.fishing-game {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.fishing-area {
+    background: rgba(0, 100, 255, 0.2);
+    border-radius: 15px;
+    height: 400px;
+    position: relative;
+    margin: 20px 0;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.fish {
+    position: absolute;
+    font-size: 3.5em; /* Increased from 2em */
+    cursor: pointer;
+    transition: transform 0.1s;
+    animation: swim 3s linear; /* Increased duration from 1.5s to 3s */
+    user-select: none;
+    pointer-events: auto; /* Ensure hover works */
+}
+
+.fish:hover {
+    transform: scale(1.2); /* Optional: add a hover effect */
+}
+
+.fishing-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    color: white;
+}
+
+@keyframes swim {
+    from {
+        left: 100%;
+    }
+    to {
+        left: -50px;
+    }
+}
+
+.splash {
+    position: absolute;
+    color: white;
+    font-size: 1.5em;
+    animation: splash 0.5s ease-out;
+    pointer-events: none;
+}
+
+@keyframes splash {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+}
+
+.tower-defense {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.game-area {
+    background: #2c3e50;
+    height: 400px;
+    position: relative;
+    margin: 20px 0;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.path {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #34495e;
+    transform: translateY(-50%);
+}
+
+.tower-slots {
+    position: absolute;
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    top: 70%;
+}
+
+.tower-slot {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+}
+
+.tower-slot:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.enemy {
+    position: absolute;
+    font-size: 3.5em; /* Increased from 2em */
+    top: 50%;
+    transform: translateY(-50%);
+    animation: moveEnemy calc(6s * var(--enemy-speed-multiplier)) linear; /* Increased duration from 4s */
+}
+
+.projectile {
+    position: absolute;
+    font-size: 1.5em;
+    animation: shoot 0.5s linear;
+}
+
+@keyframes moveEnemy {
+    from { left: 100%; }
+    to { left: -50px; }
+}
+
+@keyframes shoot {
+    to { transform: translateY(-200px); }
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px 0;
+    align-items: center;
+}
+
+.start-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #3498db;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.start-button:hover {
+    background: #2980b9;
+}
+
+.enemy.skull {
+    animation: moveEnemy calc(10s * var(--enemy-speed-multiplier)) linear;
+}
+
+.enemy.troll {
+    animation: moveEnemy calc(7s * var(--enemy-speed-multiplier)) linear;
+}
+
+.enemy.invader {
+    animation: moveEnemy calc(4s * var(--enemy-speed-multiplier)) linear;
+}
+
+.enemy.ghost {
+    animation: moveEnemy calc(2s * var(--enemy-speed-multiplier)) linear;
+}
+
+.gem-count {
+    color: #50c878;
+    font-size: 1.2em;
+    position: absolute;
+    right: 10px;
+    top: -30px;
+}
+
+.tower-shop {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tower-option {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tower-option:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.projectile {
+    position: absolute;
+    font-size: 1em;
+    color: white;
+    animation: shoot 0.5s linear;
+    z-index: 100;
+}
+
+@keyframes shoot {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-200px);
+    }
+}
+
+.tower-slot.selected {
+    outline: 3px solid #ffd700;
+    box-shadow: 0 0 10px #ffd700;
+}
+
+#platinumCount {
+    color: #FFD700; /* Golden color for platinum */
+    text-shadow: 0 0 5px #FFA500; /* Glowing effect */
+}
+
+.legendary-shop {
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.legendary-shop h2 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #ffd700;
+    text-shadow: 0 0 10px #ffa500;
+}
+
+.legendary-pack {
+    background: linear-gradient(135deg, #ffd700, #ffa500);
+    box-shadow: 0 0 15px #ffd700;
+}
+
+.legendary-pack .price {
+    background: #ffffff;
+}
+
+.legendary-pack:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 25px #ffd700;
+}
+
+.spooky-price {
+    background: #ff4081;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.power-up .duration {
+    font-size: 0.8em;
+    color: #ffffff;
+    margin-top: 5px;
+}
+
+.power-up.active {
+    box-shadow: 0 0 25px #00ff00;
+}
+
+.power-up-timer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    z-index: 1000;
+}
+
+.code-entry {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.code-entry input {
+    padding: 10px;
+    font-size: 1.2em;
+    border-radius: 10px;
+    border: 2px solid #ffd700;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    margin-right: 10px;
+    font-family: 'Titan One', cursive;
+}
+
+.code-entry input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.code-entry button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    border-radius: 10px;
+    border: none;
+    background: #ffd700;
+    color: black;
+    cursor: pointer;
+    font-family: 'Titan One', cursive;
+    transition: transform 0.1s;
+}
+
+.code-entry button:hover {
+    transform: scale(1.05);
+}
+
+#codeMessage {
+    margin-top: 10px;
+    font-size: 1.2em;
+    min-height: 1.5em;
+}
+
+.code-success {
+    color: #4bc22e;
+}
+
+.code-error {
+    color: #ff4d4d;
+}
+
+/* Add these styles to enable the hidden codes */
+.hidden-code {
+  position: absolute;
+  font-size: 0.8em;
+  opacity: 0;
+  transition: opacity 0.3s;
+  color: rgba(255,255,255,0.5);
+  pointer-events: none;
+  user-select: none;
+}
+
+.hidden-code:hover {
+  opacity: 1;
+}
+
+/* Add hover zones that reveal the codes */
+.code-reveal-zone {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  z-index: 10;
+}
+
+.code-reveal-zone:hover + .hidden-code {
+  opacity: 1;
+}
+
+/* Add tooltip styles */
+.power-up {
+    position: relative;
+}
+
+.power-up:hover::after {
+    content: attr(data-description);
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    width: max-content;
+    max-width: 250px;
+    z-index: 1000;
+    white-space: normal;
+}
+
+/* Add new styles for color scheme packs */
+.color-scheme-pack {
+    background: linear-gradient(45deg, var(--scheme-color-1), var(--scheme-color-2), var(--scheme-color-3));
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.color-scheme-pack.sunset {
+    --scheme-color-1: #ff7e5f;
+    --scheme-color-2: #feb47b;
+    --scheme-color-3: #ffcb80;
+}
+
+.color-scheme-pack.ocean {
+    --scheme-color-1: #2193b0;
+    --scheme-color-2: #3498db;
+    --scheme-color-3: #6dd5ed;
+}
+
+.color-scheme-pack.forest {
+    --scheme-color-1: #114357;
+    --scheme-color-2: #1a8c3d;
+    --scheme-color-3: #91f086;
+}
+
+.color-scheme-pack.galaxy {
+    --scheme-color-1: #4a148c;
+    --scheme-color-2: #7c43bd;
+    --scheme-color-3: #b968c7;
+}
+
+.theme-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+#themeButton {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-family: 'Titan One', cursive;
+    transition: background 0.3s;
+}
+
+#themeButton:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.theme-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 5px;
+}
+
+.theme-menu.active {
+    display: block;
+}
+
+.theme-option {
+    padding: 8px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.3s;
+}
+
+.theme-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+</style>
+</head>
+<body>
+<h1>🎮 BLOOKET MARKET 🎮</h1>
+<div class="wonky">💰 <span id="tokenCount">100</span> | 🌟 <span id="platinumCount">0</span> | 🎄 <span id="holidayTokenCount">1</span></div>
+
+<div class="theme-switcher">
+    <button id="themeButton">🎨 Switch Theme</button>
+    <div id="themeMenu" class="theme-menu">
+        <div class="theme-option" data-theme="default">🌑 Default Theme</div>
+    </div>
+</div>
+
+<div class="code-entry">
+    <input type="text" id="codeInput" placeholder="Enter code here (CAPS SENSITIVE)..." maxlength="12">
+    <button id="codeSubmitBtn">Redeem Code</button>
+    <div id="codeMessage"></div>
+</div>
+
+<div class="market-container">
+    <div class="pack" data-pack="Space">
+        <div class="blook">🚀</div>
+        <h2>Space Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+    
+    <div class="pack" data-pack="Breakfast">
+        <div class="blook">🍳</div>
+        <h2>Breakfast Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+    
+    <div class="pack" data-pack="Dino">
+        <div class="blook">🦖</div>
+        <h2>Dino Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+    
+    <div class="pack" data-pack="Ice">
+        <div class="blook">❄️</div>
+        <h2>Ice Monsters Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+    
+    <div class="pack" data-pack="Medieval">
+        <div class="blook">⚔️</div>
+        <h2>Medieval Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+    
+    <div class="pack" data-pack="Safari">
+        <div class="blook">🦁</div>
+        <h2>Safari Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+    
+    <div class="pack" data-pack="Outback">
+        <div class="blook">🦘</div>
+        <h2>Outback Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+    
+    <div class="pack" data-pack="Wonderland">
+        <div class="blook">🎩</div>
+        <h2>Wonderland Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+    
+    <div class="pack" data-pack="Pirate">
+        <div class="blook">🏴‍☠️</div>
+        <h2>Pirate Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+
+    <div class="pack" data-pack="Aquatic">
+        <div class="blook">🌊</div>
+        <h2>Aquatic Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+
+    <div class="pack" data-pack="Bot">
+        <div class="blook">🤖</div>
+        <h2>Bot Pack</h2>
+        <div class="price">25 💰</div>
+    </div>
+
+    <div class="pack" data-pack="Blizzard">
+        <div class="blook">❄️</div>
+        <h2>Blizzard Pack</h2>
+        <div class="spooky-price">1 🎄 (<span class="purchase-remaining">100</span> left)</div>
+    </div>
+
+    <div class="pack" data-pack="Lucky">
+        <div class="blook">🐰</div>
+        <h2>Lucky Pack</h2>
+        <div class="spooky-price">1 🎄 (<span class="purchase-remaining">100</span> left)</div>
+    </div>
+
+    <div class="pack" data-pack="Spooky">
+        <div class="blook">👻</div>
+        <h2>Spooky Pack</h2>
+        <div class="spooky-price">1 🎄 (<span class="purchase-remaining">100</span> left)</div>
+    </div>
+</div>
+
+<div class="legendary-shop">
+    <h2>🌟 LEGENDARY SHOP 🌟</h2>
+    <div class="market-container">
+        <div class="pack legendary-pack" data-unique="King Bot">
+            <div class="blook">🤴</div>
+            <h2>King Bot</h2>
+            <div class="price">100 🌟</div>
+        </div>
+        
+        <div class="pack legendary-pack" data-unique="Rainbow Dragon">
+            <div class="blook">🐉</div>
+            <h2>Rainbow Dragon</h2>
+            <div class="price">100 🌟</div>
+        </div>
+        
+        <div class="pack legendary-pack" data-unique="Space Emperor">
+            <div class="blook">👑</div>
+            <h2>Space Emperor</h2>
+            <div class="price">100 🌟</div>
+        </div>
+        
+        <div class="pack legendary-pack" data-unique="Dark Phoenix">
+            <div class="blook">🦅</div>
+            <h2>Dark Phoenix</h2>
+            <div class="price">100 🌟</div>
+        </div>
+
+        <div class="pack legendary-pack power-up" data-powerup="lucky" 
+            data-description="50% chance to get Epic or better rarity when opening packs for 2 minutes">
+            <div class="blook">🍀</div>
+            <h2>Lucky Charm</h2>
+            <div class="price">75 🌟</div>
+            <div class="duration">Duration: 2 minutes</div>
+        </div>
+
+        <div class="pack legendary-pack power-up" data-powerup="fishing-magnet" 
+            data-description="Attracts fish and spawns extra fish in Fishing Frenzy for 4 minutes">
+            <div class="blook">🧲</div>
+            <h2>Fish Magnet</h2>
+            <div class="price">40 🌟</div>
+            <div class="duration">Duration: 4 minutes</div>
+        </div>
+        
+        <div class="pack legendary-pack power-up" data-powerup="double-fish" 
+            data-description="Spawns two fish at once in Fishing Frenzy for 3 minutes">
+            <div class="blook">🎣</div>
+            <h2>Double Fish</h2>
+            <div class="price">35 🌟</div>
+            <div class="duration">Duration: 3 minutes</div>
+        </div>
+
+        <div class="pack legendary-pack power-up" data-powerup="time-warp" 
+            data-description="Makes enemies move twice as slow in Tower Defense for 3 minutes">
+            <div class="blook">⏰</div>
+            <h2>Time Warp</h2>
+            <div class="price">45 🌟</div>
+            <div class="duration">Duration: 3 minutes</div>
+        </div>
+
+        <!-- Add new color scheme packs -->
+        <div class="pack legendary-pack color-scheme-pack sunset" data-scheme="sunset">
+            <div class="blook">🌅</div>
+            <h2>Sunset Theme</h2>
+            <div class="price">50 🌟</div>
+        </div>
+
+        <div class="pack legendary-pack color-scheme-pack ocean" data-scheme="ocean">
+            <div class="blook">🌊</div>
+            <h2>Ocean Theme</h2>
+            <div class="price">50 🌟</div>
+        </div>
+
+        <div class="pack legendary-pack color-scheme-pack forest" data-scheme="forest">
+            <div class="blook">🌲</div>
+            <h2>Forest Theme</h2>
+            <div class="price">50 🌟</div>
+        </div>
+
+        <div class="pack legendary-pack color-scheme-pack galaxy" data-scheme="galaxy">
+            <div class="blook">🌌</div>
+            <h2>Galaxy Theme</h2>
+            <div class="price">50 🌟</div>
+        </div>
+    </div>
+</div>
+
+<div class="collection">
+    <h2>🏆 MY COLLECTION 🏆</h2>
+    <div class="collection-grid" id="collectionGrid">
+        <!-- Collection items will be populated by JavaScript -->
+    </div>
+</div>
+
+<div class="modal" id="resultModal">
+    <h2>You got:</h2>
+    <div id="blookResults"></div>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<div class="factory-game">
+    <h2>🏭 TOKEN FACTORY 🏭</h2>
+    <div class="mode-select">
+        <button class="mode-button" data-mode="10">10 Second Mode</button>
+        <button class="mode-button" data-mode="60">1 Minute Mode</button>
+    </div>
+    <div class="timer" id="timer">Time: 10s</div>
+    <div class="click-count" id="clickCount">Clicks: 0</div>
+    <button class="factory-button" id="factoryButton">🏭</button>
+</div>
+
+<div class="fishing-game">
+    <h2>🎣 FISHING FRENZY 🎣</h2>
+    <div class="timer" id="fishingTimer">Time: 10s</div>
+    <div class="score" id="fishingScore">Score: 0</div>
+    <div class="fishing-area" id="fishingArea">
+        <div class="fishing-message">Click to Start!</div>
+    </div>
+</div>
+
+<div class="tower-defense">
+    <h2>🏰 TOWER DEFENSE 🏰</h2>
+    <div class="game-info">
+        <div class="timer" id="tdTimer">Time: 60s</div>
+        <div class="score" id="tdScore">Score: 0</div>
+        <div class="lives" id="tdLives">Lives: 10</div>
+    </div>
+    <div class="game-area" id="tdGameArea">
+        <div class="path"></div>
+        <div class="tower-slots">
+            <div class="tower-slot" data-index="0"></div>
+            <div class="tower-slot" data-index="1"></div>
+            <div class="tower-slot" data-index="2"></div>
+            <div class="tower-slot" data-index="3"></div>
+        </div>
+        <div class="start-button" id="tdStartButton">Start Game!</div>
+        <div class="gem-count">💎 <span id="gemCount">50</span></div>
+        <div class="tower-shop">
+            <div class="tower-option" data-type="basic" data-cost="10">
+                🗼 Basic (10 💎)
+            </div>
+            <div class="tower-option" data-type="archer" data-cost="20">
+                🏹 Archer (20 💎)
+            </div>
+            <div class="tower-option" data-type="mage" data-cost="30">
+                🧙‍♂️ Mage (30 💎)
+            </div>
+            <div class="tower-option" data-type="ultimate" data-cost="50">
+                ⚡ Ultimate (50 💎)
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add secret code hover zones and text -->
+<div class="code-reveal-zone" style="top: 20px; right: 20px;"></div>
+<div class="hidden-code" style="top: 20px; right: 20px;">Code: WELCOME2024</div>
+
+<div class="code-reveal-zone" style="bottom: 20px; left: 50%;"></div>
+<div class="hidden-code" style="bottom: 20px; left: 50%;">Code: PLATINUM50</div>
+
+<div class="code-reveal-zone" style="top: 50%; left: 20px;"></div>
+<div class="hidden-code" style="top: 50%; left: 20px;">Code: HOLIDAY10</div>
+
+<div class="code-reveal-zone" style="bottom: 150px; right: 40px;"></div>
+<div class="hidden-code" style="bottom: 150px; right: 40px;">Code: GEMBONUS</div>
+
+<div class="code-reveal-zone" style="top: 200px; left: 40px;"></div>
+<div class="hidden-code" style="top: 200px; left: 40px;">Code: BLOOKET100</div>
+
+<div class="code-reveal-zone" style="top: 150px; right: 60px;"></div>
+<div class="hidden-code" style="top: 150px; right: 60px;">Code: ADDSELLING</div>
+
+<div class="code-reveal-zone" style="bottom: 50px; left: 100px;"></div>
+<div class="hidden-code" style="bottom: 50px; left: 100px;">Code: BELLA</div>
+
+<div class="code-reveal-zone" style="top: 300px; right: 100px;"></div>
+<div class="hidden-code" style="top: 300px; right: 100px;">Code: DARTH</div>
+
+<div class="code-reveal-zone" style="top: 400px; left: 60px;"></div>
+<div class="hidden-code" style="top: 400px; left: 60px;">Code: MINI</div>
+
+<div class="code-reveal-zone" style="bottom: 200px; right: 80px;"></div>
+<div class="hidden-code" style="bottom: 200px; right: 80px;">Code: CLOCK</div>
+
+<div class="code-reveal-zone" style="top: 250px; left: 80px;"></div>
+<div class="hidden-code" style="top: 250px; left: 80px;">Code: PYRA</div>
+
+<div class="code-reveal-zone" style="bottom: 100px; right: 120px;"></div>
+<div class="hidden-code" style="bottom: 100px; right: 120px;">Code: TOAST</div>
+
+<div class="code-reveal-zone" style="top: 350px; right: 40px;"></div>
+<div class="hidden-code" style="top: 350px; right: 40px;">Code: ADAM</div>
+
+<div class="code-reveal-zone" style="bottom: 300px; left: 120px;"></div>
+<div class="hidden-code" style="bottom: 300px; left: 120px;">Code: SLIME</div>
+
+<script>
+let tokens = 100;
+let gems = 50; // Starting gems
+let platinum = 0; // Add platinum currency
+let holidayTokens = 1; // Start with 1 holiday token
+const holidayTokenDisplay = document.getElementById('holidayTokenCount'); // Add holiday token display reference
+let packsPurchased = 0; // Added packs purchased counter
+let collection = new Set(); // Initialize empty collection set
+const tokenDisplay = document.getElementById('tokenCount');
+const gemDisplay = document.getElementById('gemCount');
+const platinumDisplay = document.getElementById('platinumCount'); // Add platinum display reference
+
+const modal = document.getElementById('resultModal');
+const overlay = document.getElementById('overlay');
+
+const HOLIDAY_PACK_LIMIT = 100;
+let holidayPacksPurchased = {
+    'Spooky': 0,
+    'Blizzard': 0,
+    'Lucky': 0
+};
+
+const rarityWeights = {
+    common: 4,
+    rare: 2,
+    epic: 2,
+    legendary: 1,
+    chroma: 1,
+    mystical: 0 // Mythical blooks can't be obtained from packs
+};
+
+const packBlooks = {
+    Space: {
+        common: ['👨‍🚀 Astronaut', '🛸 UFO', '🚀 Rocket', '⭐ Star'],
+        rare: ['🌎 Earth', '🌑 Moon'],
+        epic: ['👾 Alien', '🌌 Galaxy'],
+        legendary: ['🌟 Supernova'],
+        chroma: ['🌈 Rainbow Astronaut'],
+        mystical: ['🌌 Cosmic Entity'] // Added mystical tier
+    },
+    Breakfast: {
+        common: ['🍳 Egg', '🥓 Bacon', '🥛 Milk', '🥣 Cereal'],
+        rare: ['🥞 Pancakes', '🧇 Waffle'],
+        epic: ['🍳 Sunny Side Up', '🥪 Sandwich'],
+        legendary: ['🍞 Toast'],
+        chroma: ['🌈 Rainbow Toast'],
+        mystical: ['🍳 Breakfast King']
+    },
+    Dino: {
+        common: ['🦕 Brontosaurus', '🦖 Baby Dino', '🦎 Lizard', '🥚 Dino Egg'],
+        rare: ['🦖 Raptor', '🦕 Stegosaurus'],
+        epic: ['🦖 T-Rex', '🦕 Triceratops'],
+        legendary: ['🦖 Mega Rex'],
+        chroma: ['🌈 Rainbow Rex'],
+        mystical: ['🦖 Ancient One']
+    },
+    Spooky: {
+        common: ['🎃 Pumpkin', '🦇 Bat', '🕷️ Spider', '🕯️ Candle'],
+        rare: ['🧟‍♂️ Zombie', '💀 Skull'],
+        epic: ['👻 Ghost', '🧙‍♀️ Witch'],
+        legendary: ['🧛‍♂️ Vampire'],
+        chroma: ['🌈 Rainbow Ghost'],
+        mystical: ['🦇 Night Stalker']
+    },
+    Ice: {
+        common: ['🧊 Ice Cube', '⛄ Snowman', '❄️ Snowflake', '🌨️ Snow Cloud'],
+        rare: ['🐧 Penguin', '🦭 Seal'],
+        epic: ['🐻‍❄️ Polar Bear', '🧊 Ice Golem'],
+        legendary: ['❄️ Frost Giant'],
+        chroma: ['🌈 Aurora Beast'],
+        mystical: ['❄️ Ice Titan']
+    },
+    Medieval: {
+        common: ['🛡️ Shield', '⚔️ Sword', '🏰 Castle', '👑 Crown'],
+        rare: ['🐉 Baby Dragon', '🗡️ Magic Sword'],
+        epic: ['🐉 Dragon', '🧙‍♂️ Wizard'],
+        legendary: ['🦄 Royal Unicorn'],
+        chroma: ['🌈 Rainbow Knight'],
+        mystical: ['🛡️ Knight of Honor']
+    },
+    Safari: {
+        common: ['🦁 Lion', '🦒 Giraffe', '🦛 Hippo', '🦊 Fox'],
+        rare: ['🐘 Elephant', '🦏 Rhino'],
+        epic: ['🐆 Leopard', '🦓 Zebra'],
+        legendary: ['🦁 Golden Lion'],
+        chroma: ['🌈 Rainbow Safari'],
+        mystical: ['🐉 Safari Beast']
+    },
+    Outback: {
+        common: ['🦘 Kangaroo', '🐨 Koala', '🦎 Lizard', '🪱 Worm'],
+        rare: ['🦅 Eagle', '🦦 Goanna'],
+        epic: ['🐍 Snake', '🕷️ Spider'],
+        legendary: ['🐊 Crocodile'],
+        chroma: ['🌈 Rainbow Roo'],
+        mystical: ['🦘 Outback Spirit']
+    },
+    
+    Wonderland: {
+        common: ['🐰 White Rabbit', '🍵 Tea Cup', '🎩 Mad Hat', '🌹 Rose'],
+        rare: ['😺 Cheshire Cat', '👑 Crown'],
+        epic: ['👸 Alice', '🎭 Mad Hatter'],
+        legendary: ['♥️ Queen of Hearts'],
+        chroma: ['🌈 Rainbow Wonderland'],
+        mystical: ['🌹 Wonderland Guardian']
+    },
+    
+    Pirate: {
+        common: ['⚓ Anchor', '🏴‍☠️ Flag', '🗺️ Map', '🦜 Parrot'],
+        rare: ['⛵ Ship', '💎 Gems'],
+        epic: ['🗡️ Cutlass', '🏝️ Island'],
+        legendary: ['🏴‍☠️ Captain'],
+        chroma: ['🌈 Rainbow Pirate'],
+        mystical: ['🏴‍☠️ Pirate King']
+    },
+    
+    Aquatic: {
+        common: ['🐟 Fish', '🦈 Shark', '🐡 Pufferfish', '🦀 Crab'],
+        rare: ['🐋 Whale', '🐙 Octopus'],
+        epic: ['🧜‍♀️ Mermaid', '🐊 Croc'],
+        legendary: ['🌊 Wave Lord'],
+        chroma: ['🌈 Rainbow Shark'],
+        mystical: ['🐉 Aquatic Leviathan']
+    },
+
+    Bot: {
+        common: ['🤖 Robot', '⚙️ Gear', '🔧 Tool', '💻 Computer'],
+        rare: ['🦾 Robot Arm', '🤖 Android'],
+        epic: ['🤖 Cyborg', '⚡ Power Bot'],
+        legendary: ['🤖 Mega Bot'],
+        chroma: ['🌈 Rainbow Bot'],
+        mystical: ['🤖 Bot Overlord']
+    },
+
+    Blizzard: {
+        common: ['🎄 Tree', '🎁 Present', '☃️ Snowman', '❄️ Snowflake'],
+        rare: ['🦌 Reindeer', '🛷 Sleigh'],
+        epic: ['🎅 Santa', '🧝 Elf'],
+        legendary: ['🌟 Star Guardian'],
+        chroma: ['🌈 Frost Spirit'],
+        mystical: ['❄️ Winter King']
+    },
+
+    Lucky: {
+        common: ['🥚 Egg', '🐰 Bunny', '🌸 Flower', '🍀 Clover'],
+        rare: ['🌈 Rainbow', '🎀 Ribbon'],
+        epic: ['🦊 Spring Fox', '🐣 Chick'],
+        legendary: ['✨ Easter Spirit'],
+        chroma: ['🌟 Golden Egg'],
+        mystical: ['🐰 Master Bunny']
+    }
+};
+
+function getAllBlooks() {
+    const allBlooks = [];
+    Object.values(packBlooks).forEach(pack => {
+        Object.entries(pack).forEach(([rarity, blooks]) => {
+            blooks.forEach(blook => {
+                allBlooks.push({ blook, rarity });
+            });
+        });
+    });
+    
+    // Add unique legendary shop blooks
+    ['King Bot', 'Rainbow Dragon', 'Space Emperor', 'Dark Phoenix'].forEach(blook => {
+        allBlooks.push({ blook, rarity: 'legendary' });
+    });
+    
+    return allBlooks;
+}
+
+function updateHolidayPackCounts() {
+    document.querySelectorAll('.pack').forEach(pack => {
+        const packType = pack.dataset.pack;
+        if (['Spooky', 'Blizzard', 'Lucky'].includes(packType)) {
+            const remaining = HOLIDAY_PACK_LIMIT - (holidayPacksPurchased[packType] || 0);
+            const counter = pack.querySelector('.purchase-remaining');
+            if (counter) counter.textContent = remaining;
+        }
+    });
+}
+
+function updateCollection() {
+    const collectionGrid = document.getElementById('collectionGrid');
+    collectionGrid.innerHTML = '';
+    
+    getAllBlooks().forEach(({ blook, rarity }) => {
+        const div = document.createElement('div');
+        div.className = `collection-item ${rarity} ${collection.has(blook) ? '' : 'locked'}`;
+        div.textContent = collection.has(blook) ? blook : '❓';
+        collectionGrid.appendChild(div);
+    });
+}
+
+let currentPack; // Track the current pack being opened
+
+function openPack(packType) {
+    currentPack = packType; // Set the current pack type
+    
+    // Check if it's a holiday pack
+    const isHolidayPack = ['Spooky', 'Blizzard', 'Lucky'].includes(packType);
+    
+    if (isHolidayPack) {
+        if (holidayPacksPurchased[packType] >= HOLIDAY_PACK_LIMIT) {
+            alert(`You've reached the maximum purchase limit for ${packType} packs!`);
+            return;
+        }
+        if (holidayTokens < 1) {
+            alert("Not enough Holiday Tokens! 🎄");
+            return;
+        }
+        holidayTokens--;
+        holidayTokenDisplay.textContent = holidayTokens;
+        holidayPacksPurchased[packType]++;
+        updateHolidayPackCounts();
+    } else {
+        // Regular packs just need tokens
+        if (tokens < 25) {
+            alert("Not enough 💰!");
+            return;
+        }
+        tokens -= 25;
+        tokenDisplay.textContent = tokens;
+    }
+    
+    packsPurchased++;
+    
+    const rarity = selectRarity();
+    
+    // Check if pack and rarity exist before accessing blooks
+    if (!packBlooks[packType] || !packBlooks[packType][rarity]) {
+        console.error(`Invalid pack type ${packType} or rarity ${rarity}`);
+        return;
+    }
+    
+    const blooks = packBlooks[packType][rarity];
+    if (!blooks || blooks.length === 0) {
+        console.error(`No blooks found for pack ${packType} and rarity ${rarity}`);
+        return;
+    }
+    
+    const result = {
+        blook: blooks[Math.floor(Math.random() * blooks.length)],
+        rarity: rarity
+    };
+    
+    collection.add(result.blook);
+    updateCollection();
+    showResults(result);
+    
+    checkPackCompletion(packType);
+}
+
+function selectRarity() {
+    const rand = Math.random();
+    if (rand < 0.64) return 'common';      // 64% chance
+    if (rand < 0.84) return 'rare';        // 20% chance
+    if (rand < 0.94) return 'epic';        // 10% chance
+    if (rand < 0.99) return 'legendary';    // 5% chance
+    return 'chroma';                        // 1% chance
+}
+
+function showResults(result) {
+    // Check if the result is from a holiday pack
+    const isHolidayPack = ['Spooky', 'Blizzard', 'Lucky'].includes(currentPack);
+    
+    // Award platinum for legendary and chroma
+    if (result.rarity === 'legendary') {
+        platinum += 1;
+        platinumDisplay.textContent = platinum;
+        // Add holiday tokens for legendary, but not from holiday packs
+        if (!isHolidayPack) {
+            holidayTokens += 5;
+            holidayTokenDisplay.textContent = holidayTokens;
+        }
+    } else if (result.rarity === 'chroma') {
+        platinum += 5;
+        platinumDisplay.textContent = platinum;
+        // Add holiday tokens for chroma, but not from holiday packs
+        if (!isHolidayPack) {
+            holidayTokens += 10;
+            holidayTokenDisplay.textContent = holidayTokens;
+        }
+    } else if (result.rarity === 'epic' && !isHolidayPack) {
+        // Add holiday token for epic, but not from holiday packs
+        holidayTokens += 1;
+        holidayTokenDisplay.textContent = holidayTokens;
+    }
+    
+    // Show both the blook and any rewards earned
+    let resultHTML = `<div class="${result.rarity}">${result.blook}</div>`;
+    
+    // Add reward text for each type (only if not a holiday pack)
+    if (!isHolidayPack) {
+        if (result.rarity === 'legendary') {
+            resultHTML += `
+                <div style="margin-top: 10px">
+                    +1 🌟 Platinum!<br>
+                    +5 🎄 Holiday Tokens!
+                </div>`;
+        } else if (result.rarity === 'chroma') {
+            resultHTML += `
+                <div style="margin-top: 10px">
+                    +5 🌟 Platinum!<br>
+                    +10 🎄 Holiday Tokens!
+                </div>`;
+        } else if (result.rarity === 'epic') {
+            resultHTML += `
+                <div style="margin-top: 10px">
+                    +1 🎄 Holiday Token!
+                </div>`;
+        }
+    }
+    
+    document.getElementById('blookResults').innerHTML = resultHTML;
+    modal.classList.add('active'); 
+    overlay.classList.add('active');
+    
+    // Remove existing click handlers if any
+    modal.removeEventListener('click', closeModal);
+    overlay.removeEventListener('click', closeModal);
+    
+    // Add fresh click handlers
+    modal.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+}
+
+function closeModal() {
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+    // Make sure collection is updated
+    updateCollection();
+}
+
+function checkPackCompletion(packType) {
+    const packBlooksList = [];
+    Object.entries(packBlooks[packType]).forEach(([rarity, blooks]) => {
+        if (rarity !== 'mystical') { // Don't include mystical in completion check
+            blooks.forEach(blook => packBlooksList.push(blook));
+        }
+    });
+    
+    const hasAllBlooks = packBlooksList.every(blook => collection.has(blook));
+    const mysticalBlook = packBlooks[packType].mystical[0];
+    
+    if (hasAllBlooks && !collection.has(mysticalBlook)) {
+        collection.add(mysticalBlook);
+        
+        // Show special notification for mystical unlock
+        const resultHTML = `
+            <div class="mystical">${mysticalBlook}</div>
+            <div style="margin-top: 10px">🎉 Pack Completed! Mystical Blook Unlocked! 🎉</div>
+        `;
+        document.getElementById('blookResults').innerHTML = resultHTML;
+        modal.classList.add('active');
+        overlay.classList.add('active');
+        
+        // Update collection display
+        updateCollection();
+        
+        // Award bonus platinum for mystical unlock
+        platinum += 10;
+        platinumDisplay.textContent = platinum;
+    }
+}
+
+document.querySelectorAll('.pack').forEach(pack => {
+    pack.addEventListener('click', () => {
+        const packType = pack.dataset.pack;
+        openPack(packType);
+        pack.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            pack.style.transform = 'scale(1)';
+        }, 100);
+    });
+});
+
+document.querySelectorAll('.legendary-pack').forEach(pack => {
+    pack.addEventListener('click', () => {
+        const uniqueBlook = pack.dataset.unique;
+        if (platinum >= 100) {
+            platinum -= 100;
+            platinumDisplay.textContent = platinum;
+            
+            // Add to collection
+            collection.add(uniqueBlook);
+            updateCollection();
+            
+            // Show result
+            const resultHTML = `
+                <div class="legendary">${uniqueBlook}</div>
+                <div style="margin-top: 10px">Legendary Blook Acquired!</div>
+            `;
+            document.getElementById('blookResults').innerHTML = resultHTML;
+            modal.classList.add('active');
+            overlay.classList.add('active');
+            
+            // Animation feedback
+            pack.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                pack.style.transform = 'scale(1)';
+            }, 100);
+        } else {
+            alert("Not enough Platinum! You need 100 🌟");
+        }
+    });
+});
+
+// Add functionality for color scheme packs
+document.querySelectorAll('.color-scheme-pack').forEach(pack => {
+    pack.addEventListener('click', () => {
+        if (platinum >= 50) {
+            const scheme = pack.dataset.scheme;
+            let colors;
+            let themeName;
+            
+            switch(scheme) {
+                case 'sunset':
+                    colors = ['#ff7e5f', '#feb47b', '#ffcb80'];
+                    themeName = 'Sunset Theme';
+                    break;
+                case 'ocean':
+                    colors = ['#2193b0', '#3498db', '#6dd5ed'];
+                    themeName = 'Ocean Theme';
+                    break;
+                case 'forest':
+                    colors = ['#114357', '#1a8c3d', '#91f086'];
+                    themeName = 'Forest Theme';
+                    break;
+                case 'galaxy':
+                    colors = ['#4a148c', '#7c43bd', '#b968c7'];
+                    themeName = 'Galaxy Theme';
+                    break;
+            }
+            
+            // Apply the color scheme
+            document.body.style.background = `linear-gradient(135deg, ${colors[0]}, ${colors[1]}, ${colors[2]})`;
+            
+            // Add to purchased themes
+            purchasedThemes[scheme] = {
+                name: themeName,
+                colors: colors
+            };
+            
+            // Add theme to menu if not already present
+            if (!document.querySelector(`.theme-option[data-theme="${scheme}"]`)) {
+                const option = document.createElement('div');
+                option.className = 'theme-option';
+                option.dataset.theme = scheme;
+                option.textContent = themeName;
+                themeMenu.appendChild(option);
+            }
+            
+            // Deduct platinum
+            platinum -= 50;
+            platinumDisplay.textContent = platinum;
+            
+            // Show confirmation
+            const resultHTML = `
+                <div class="legendary">Color Scheme Applied!</div>
+                <div style="margin-top: 10px">🎨 New theme activated!</div>
+            `;
+            document.getElementById('blookResults').innerHTML = resultHTML;
+            modal.classList.add('active');
+            overlay.classList.add('active');
+            
+            // Add click handlers to close modal
+            const closeThemeModal = () => {
+                modal.classList.remove('active');
+                overlay.classList.remove('active');
+                // Remove the event listeners after closing
+                modal.removeEventListener('click', closeThemeModal);
+                overlay.removeEventListener('click', closeThemeModal);
+            };
+            
+            // Add the click handlers
+            modal.addEventListener('click', closeThemeModal);
+            overlay.addEventListener('click', closeThemeModal);
+        } else {
+            alert("Not enough Platinum! You need 50 🌟");
+        }
+    });
+});
+
+// Track purchased themes
+let purchasedThemes = {
+    default: {
+        name: 'Default Theme',
+        colors: ['#1a1a1a', '#2d2d2d', '#404040']
+    }
+};
+
+// Theme switcher functionality
+const themeButton = document.getElementById('themeButton');
+const themeMenu = document.getElementById('themeMenu');
+
+themeButton.addEventListener('click', () => {
+    themeMenu.classList.toggle('active');
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!themeButton.contains(e.target) && !themeMenu.contains(e.target)) {
+        themeMenu.classList.remove('active');
+    }
+});
+
+// Handle theme selection
+themeMenu.addEventListener('click', (e) => {
+    const themeOption = e.target.closest('.theme-option');
+    if (themeOption) {
+        const themeName = themeOption.dataset.theme;
+        if (purchasedThemes[themeName]) {
+            const colors = purchasedThemes[themeName].colors;
+            document.body.style.background = `linear-gradient(135deg, ${colors[0]}, ${colors[1]}, ${colors[2]})`;
+        }
+        themeMenu.classList.remove('active');
+    }
+});
+
+// Initialize collection display
+updateCollection();
+updateHolidayPackCounts(); // Call this when the page loads
+
+// Factory Game Logic
+const factoryButton = document.getElementById('factoryButton');
+const timerDisplay = document.getElementById('timer');
+const clickCountDisplay = document.getElementById('clickCount');
+let isGameActive = false;
+let clickCount = 0;
+let timeLeft = 10;
+let gameTimer;
+let gameMode = 10; // default to 10 second mode
+
+// Add mode selection handlers
+document.querySelectorAll('.mode-button').forEach(button => {
+    button.addEventListener('click', () => {
+        if (!isGameActive) {
+            gameMode = parseInt(button.dataset.mode);
+            timeLeft = gameMode;
+            timerDisplay.textContent = `Time: ${timeLeft}`;
+            
+            // Update active state
+            document.querySelectorAll('.mode-button').forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+        }
+    });
+});
+
+factoryButton.addEventListener('click', () => {
+    if (!isGameActive) {
+        // Start new game
+        startFactoryGame();
+    } else {
+        // Count click during active game
+        clickCount++;
+        clickCountDisplay.textContent = `Clicks: ${clickCount}`;
+        factoryButton.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            factoryButton.style.transform = 'scale(1)';
+        }, 50);
+    }
+});
+
+function startFactoryGame() {
+    isGameActive = true;
+    clickCount = 0;
+    timeLeft = gameMode;
+    clickCountDisplay.textContent = `Clicks: ${clickCount}`;
+    timerDisplay.textContent = `Time: ${timeLeft}`;
+    
+    gameTimer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `Time: ${timeLeft}`;
+        
+        if (timeLeft <= 0) {
+            endFactoryGame();
+        }
+    }, 1000);
+}
+
+function endFactoryGame() {
+    clearInterval(gameTimer);
+    isGameActive = false;
+    
+    // Calculate and award tokens - more tokens for 1 minute mode
+    const multiplier = gameMode === 60 ? 15 : 10; // 15 tokens per click for 1 minute mode
+    const tokensEarned = clickCount * multiplier;
+    tokens += tokensEarned;
+    tokenDisplay.textContent = tokens;
+    
+    // Show results
+    alert(`Game Over!\nMode: ${gameMode === 60 ? '1 Minute' : '10 Second'}\nClicks: ${clickCount}\nTokens Earned: ${tokensEarned}`);
+    
+    // Reset displays
+    timeLeft = gameMode;
+    clickCount = 0;
+    timerDisplay.textContent = `Time: ${timeLeft}`;
+    clickCountDisplay.textContent = `Clicks: ${clickCount}`;
+}
+
+// Fishing Frenzy Game Logic
+const fishingArea = document.getElementById('fishingArea');
+const fishingTimer = document.getElementById('fishingTimer');
+const fishingScore = document.getElementById('fishingScore');
+let isFishingActive = false;
+let fishingTimeLeft = 10;
+let fishingGameTimer;
+let spawnTimer;
+let score = 0;
+
+const fishEmojis = ['🐟', '🐠', '🐡', '🦈', '🐋', '🐳', '🦀', '🦞', '🦐', '🐙', '🦑'];
+
+function startFishingGame() {
+    if (isFishingActive) return;
+    
+    isFishingActive = true;
+    fishingTimeLeft = 10;
+    score = 0;
+    fishingArea.innerHTML = '';
+    updateFishingDisplays();
+    
+    spawnTimer = setInterval(spawnFish, 400);
+    
+    fishingGameTimer = setInterval(() => {
+        fishingTimeLeft--;
+        updateFishingDisplays();
+        
+        if (fishingTimeLeft <= 0) {
+            endFishingGame();
+        }
+    }, 1000);
+}
+
+function endFishingGame() {
+    clearInterval(fishingGameTimer);
+    clearInterval(spawnTimer);
+    isFishingActive = false;
+    
+    // Award tokens
+    const tokensEarned = score * 100;
+    tokens += tokensEarned;
+    tokenDisplay.textContent = tokens;
+    
+    // Clear fishing area and show message
+    fishingArea.innerHTML = '<div class="fishing-message">Game Over!<br>Click to Start!</div>';
+    
+    // Show results
+    alert(`Fishing Frenzy Over!\nFish Caught: ${score}\nTokens Earned: ${tokensEarned}`);
+}
+
+function spawnFish() {
+    if (!isFishingActive) return;
+    
+    const fish = document.createElement('div');
+    fish.className = 'fish';
+    fish.textContent = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
+    
+    // Random vertical position
+    const top = Math.random() * (fishingArea.offsetHeight - 50);
+    fish.style.top = `${top}px`;
+    
+    fish.addEventListener('mouseenter', catchFish);
+    
+    fishingArea.appendChild(fish);
+    
+    // Remove fish after animation
+    fish.addEventListener('animationend', () => {
+        fish.remove();
+    });
+
+    // Spawn second fish if double-fish power-up is active
+    if (activeBuffs['double-fish']) {
+        setTimeout(() => {
+            const secondFish = document.createElement('div');
+            secondFish.className = 'fish';
+            secondFish.textContent = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
+            secondFish.style.top = `${Math.random() * (fishingArea.offsetHeight - 50)}px`;
+            secondFish.addEventListener('mouseenter', catchFish);
+            fishingArea.appendChild(secondFish);
+            
+            secondFish.addEventListener('animationend', () => {
+                secondFish.remove();
+            });
+        }, 200);
+    }
+}
+
+function catchFish(event) {
+    if (!isFishingActive) return;
+    
+    const fish = event.target;
+    score++;
+    updateFishingDisplays();
+    
+    // Create splash effect
+    const splash = document.createElement('div');
+    splash.className = 'splash';
+    splash.textContent = '+100 💰';
+    splash.style.left = `${event.clientX - fishingArea.getBoundingClientRect().left}px`;
+    splash.style.top = `${event.clientY - fishingArea.getBoundingClientRect().top}px`;
+    fishingArea.appendChild(splash);
+    
+    // Remove splash after animation
+    splash.addEventListener('animationend', () => {
+        splash.remove();
+    });
+    
+    fish.remove();
+}
+
+function updateFishingDisplays() {
+    fishingTimer.textContent = `Time: ${fishingTimeLeft}s`;
+    fishingScore.textContent = `Score: ${score}`;
+}
+
+fishingArea.addEventListener('click', () => {
+    if (!isFishingActive) {
+        startFishingGame();
+    }
+});
+
+// Tower Defense Game Logic
+const tdGameArea = document.getElementById('tdGameArea');
+const tdTimer = document.getElementById('tdTimer');
+const tdScore = document.getElementById('tdScore');
+const tdLives = document.getElementById('tdLives');
+const tdStartButton = document.getElementById('tdStartButton');
+
+let isTDActive = false;
+let tdTimeLeft = 60;
+let tdScoreValue = 0; // Changed from tdScore
+let lives = 10;
+let tdGameTimer;
+let enemySpawnTimer;
+let towers = [];
+
+const enemyTypes = {
+    '💀': { // Skull
+        speed: 10, // Seconds to cross
+        damage: 3,
+        className: 'enemy skull'
+    },
+    '👹': { // Troll
+        speed: 7, // Seconds to cross
+        damage: 2,
+        className: 'enemy troll'
+    },
+    '👾': { // Space Invader
+        speed: 4, // Seconds to cross
+        damage: 1,
+        className: 'enemy invader'
+    },
+    '👻': { // Ghost
+        speed: 2, // Seconds to cross
+        damage: 0.5,
+        className: 'enemy ghost'
+    }
+};
+
+const projectiles = {
+    'basic': ['•', '⚪', '⦿'],
+    'archer': ['↟', '⇈', '↑'],
+    'mage': ['✦', '✧', '⋆'],
+    'ultimate': ['⚡', '☄️', '✨']
+};
+
+function startTowerDefense() {
+    if (isTDActive) return;
+    
+    isTDActive = true;
+    tdTimeLeft = 60;
+    tdScoreValue = 0; // Changed from tdScore
+    lives = 10;
+    towers = [];
+    updateTDDisplays();
+    
+    // Initialize tower slots
+    document.querySelectorAll('.tower-slot').forEach(slot => {
+        slot.innerHTML = '🏛️';  // Changed to building emoji
+        slot.addEventListener('click', () => {
+            if (!towers[slot.dataset.index]) {
+                towers[slot.dataset.index] = true;
+                slot.innerHTML = '🏰';
+            }
+        });
+    });
+    
+    tdStartButton.style.display = 'none';
+    
+    // Start spawning enemies
+    enemySpawnTimer = setInterval(spawnEnemy, 1500);
+    
+    tdGameTimer = setInterval(() => {
+        tdTimeLeft--;
+        updateTDDisplays();
+        
+        if (tdTimeLeft <= 0) {
+            endTowerDefense();
+        }
+    }, 1000);
+}
+
+function endTowerDefense() {
+    clearInterval(tdGameTimer);
+    clearInterval(enemySpawnTimer);
+    isTDActive = false;
+    
+    // Calculate reward based on score and remaining lives
+    const tokensEarned = (tdScoreValue * 50) + (lives * 100); // Changed from tdScore
+    tokens += tokensEarned;
+    tokenDisplay.textContent = tokens;
+    
+    // Clear game area and show results
+    tdGameArea.querySelectorAll('.enemy, .projectile').forEach(el => el.remove());
+    tdStartButton.style.display = 'block';
+    
+    alert(`Tower Defense Complete!\nScore: ${tdScoreValue}\nLives Remaining: ${lives}\nTokens Earned: ${tokensEarned}`); // Changed from tdScore
+}
+
+function spawnEnemy() {
+    if (!isTDActive) return;
+
+    // Select random enemy type with weights
+    const weights = [1, 2, 3, 4]; // Skull is rare, ghost is common
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+    let random = Math.random() * totalWeight;
+    
+    let enemyKeys = Object.keys(enemyTypes);
+    let selectedEnemy = enemyKeys[0];
+    
+    for (let i = 0; i < weights.length; i++) {
+        if (random < weights[i]) {
+            selectedEnemy = enemyKeys[i];
+            break;
+        }
+        random -= weights[i];
+    }
+
+    const enemyData = enemyTypes[selectedEnemy];
+    
+    const enemy = document.createElement('div');
+    enemy.className = enemyData.className;
+    enemy.textContent = selectedEnemy;
+    enemy.dataset.damage = enemyData.damage;
+    tdGameArea.appendChild(enemy);
+
+    enemy.addEventListener('animationend', () => {
+        if (isTDActive) {
+            lives -= enemyData.damage;
+            lives = Math.max(0, lives); // Prevent negative lives
+            updateTDDisplays();
+            if (lives <= 0) endTowerDefense();
+        }
+        enemy.remove();
+    });
+}
+
+function shootProjectile(towerIndex) {
+    const slot = document.querySelector(`.tower-slot[data-index="${towerIndex}"]`);
+    const towerType = slot.dataset.towerType || 'basic'; // Default to basic if no type set
+    
+    const projectile = document.createElement('div');
+    projectile.className = 'projectile';
+    
+    // Get projectiles for this tower type
+    const towerProjectiles = projectiles[towerType];
+    projectile.textContent = towerProjectiles[Math.floor(Math.random() * towerProjectiles.length)];
+    
+    const rect = slot.getBoundingClientRect();
+    const gameRect = tdGameArea.getBoundingClientRect();
+    
+    projectile.style.left = `${rect.left - gameRect.left + 25}px`;
+    projectile.style.top = `${rect.top - gameRect.top}px`;
+    
+    tdGameArea.appendChild(projectile);
+    
+    // Check for collisions and damage based on tower type
+    const enemies = document.querySelectorAll('.enemy');
+    enemies.forEach(enemy => {
+        const enemyRect = enemy.getBoundingClientRect();
+        if (Math.abs(rect.left - enemyRect.left) < 50) {
+            let damage = 1; // Basic tower damage
+            
+            // Different damage for different tower types
+            switch(towerType) {
+                case 'archer':
+                    damage = 2;
+                    break;
+                case 'mage':
+                    damage = 3;
+                    break;
+                case 'ultimate':
+                    damage = 5;
+                    break;
+            }
+            
+            // Award gems for hitting enemy
+            gems += 20;
+            gemDisplay.textContent = gems;
+            
+            enemy.remove();
+            tdScoreValue += damage;
+            updateTDDisplays();
+        }
+    });
+    
+    projectile.addEventListener('animationend', () => projectile.remove());
+}
+
+function updateTDDisplays() {
+    tdTimer.textContent = `Time: ${tdTimeLeft}s`;
+    tdScore.textContent = `Score: ${tdScoreValue}`; // Changed from tdScore
+    tdLives.textContent = `Lives: ${lives}`;
+}
+
+// Start shooting from active towers
+setInterval(() => {
+    if (isTDActive) {
+        towers.forEach((active, index) => {
+            if (active) shootProjectile(index);
+        });
+    }
+}, 1000);
+
+tdStartButton.addEventListener('click', startTowerDefense);
+
+// Update the gem display initially
+gemDisplay.textContent = gems;
+
+// Add functionality to buy towers
+document.querySelectorAll('.tower-option').forEach(option => {
+    option.addEventListener('click', () => {
+        const type = option.dataset.type;
+        const cost = parseInt(option.dataset.cost);
+        
+        // Find first empty tower slot
+        const emptySlot = Array.from(document.querySelectorAll('.tower-slot'))
+            .find(slot => !slot.dataset.towerType);
+            
+        if (!emptySlot) {
+            alert("No empty tower slots!");
+            return;
+        }
+        
+        if (gems >= cost) {
+            gems -= cost;
+            gemDisplay.textContent = gems;
+            
+            // Set tower type and update appearance
+            emptySlot.dataset.towerType = type;
+            switch(type) {
+                case 'basic':
+                    emptySlot.innerHTML = '🗼';
+                    break;
+                case 'archer':
+                    emptySlot.innerHTML = '🏹';
+                    break;
+                case 'mage':
+                    emptySlot.innerHTML = '🧙‍♂️';
+                    break;
+                case 'ultimate':
+                    emptySlot.innerHTML = '⚡';
+                    break;
+            }
+            
+            // Activate tower
+            towers[emptySlot.dataset.index] = true;
+        } else {
+            alert("Not enough gems!");
+        }
+    });
+});
+
+// Add click handlers to tower slots for selection
+document.querySelectorAll('.tower-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+        // Clear any existing selections
+        document.querySelectorAll('.tower-slot').forEach(s => s.classList.remove('selected'));
+        
+        // If the slot has a tower, select it for upgrade
+        if (slot.dataset.towerType) {
+            slot.classList.add('selected');
+        }
+    });
+});
+
+// Game code system
+const validCodes = {
+    'WELCOME2024': {
+        tokens: 1000,
+        message: '🎉 Welcome bonus: +1000 tokens!'
+    },
+    'PLATINUM50': {
+        platinum: 50,
+        message: '⭐ Premium reward: +50 platinum!'
+    },
+    'HOLIDAY10': {
+        holidayTokens: 10,
+        message: '🎄 Special gift: +10 holiday tokens!'
+    },
+    'GEMBONUS': {
+        gems: 500,
+        message: '💎 Bonus gems: +500 gems!'
+    },
+    'BLOOKET100': {
+        tokens: 500,
+        platinum: 25,
+        holidayTokens: 5,
+        message: '🎮 Super combo reward!'
+    },
+    'ADDSELLING': {  // Add new code
+        tokens: 750,
+        platinum: 15,
+        message: '🏪 Selling bonus: +750 tokens, +15 platinum!'
+    },
+    'BELLA': {
+        tokens: 250,
+        platinum: 5,
+        message: '🐕 Hidden reward found!'
+    },
+    'DARTH': {
+        tokens: 400,
+        platinum: 8,
+        message: '⚔️ Secret dark side bonus!'
+    },
+    'MINI': {
+        tokens: 150,
+        platinum: 3,
+        message: '🔍 Mini reward discovered!'
+    },
+    'CLOCK': {
+        tokens: 300,
+        platinum: 6,
+        message: '⏰ Time bonus unlocked!'
+    },
+    'PYRA': {
+        tokens: 350,
+        platinum: 7,
+        message: '🔺 Pyramid treasure found!'
+    },
+    // Add the new platinum-only codes
+    'TOAST': {
+        platinum: 20,
+        message: '🍞 Toasty reward: +20 platinum!'
+    },
+    'ADAM': {
+        platinum: 25,
+        message: '👨 Adam\'s gift: +25 platinum!'
+    },
+    'SLIME': {
+        platinum: 30,
+        message: '🦠 Slimy surprise: +30 platinum!'
+    }
+};
+
+const codeInput = document.getElementById('codeInput');
+const codeSubmitBtn = document.getElementById('codeSubmitBtn');
+const codeMessage = document.getElementById('codeMessage');
+
+// Track used codes
+let usedCodes = new Set();
+
+codeSubmitBtn.addEventListener('click', () => {
+    const code = codeInput.value.toUpperCase();
+    
+    if (usedCodes.has(code)) {
+        showCodeMessage('❌ Code already used!', false);
+        return;
+    }
+    
+    const reward = validCodes[code];
+    if (reward) {
+        // Apply rewards
+        if (reward.tokens) {
+            tokens += reward.tokens;
+            tokenDisplay.textContent = tokens;
+        }
+        if (reward.platinum) {
+            platinum += reward.platinum;
+            platinumDisplay.textContent = platinum;
+        }
+        if (reward.holidayTokens) {
+            holidayTokens += reward.holidayTokens;
+            holidayTokenDisplay.textContent = holidayTokens;
+        }
+        if (reward.gems) {
+            gems += reward.gems;
+            gemDisplay.textContent = gems;
+        }
+        
+        // Mark code as used
+        usedCodes.add(code);
+        
+        // Show success message
+        showCodeMessage('✅ ' + reward.message, true);
+        
+        // Clear input
+        codeInput.value = '';
+    } else {
+        showCodeMessage('❌ Invalid code!', false);
+    }
+});
+
+function showCodeMessage(message, isSuccess) {
+    codeMessage.textContent = message;
+    codeMessage.className = isSuccess ? 'code-success' : 'code-error';
+    
+    // Clear message after 3 seconds
+    setTimeout(() => {
+        codeMessage.textContent = '';
+        codeMessage.className = '';
+    }, 3000);
+}
+</script>
+</body></html>
