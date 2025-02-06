@@ -1,0 +1,741 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Evolution Simulator</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-chart-line"></i> Crypto Evolution Simulator</h1>
+      <div class="wallet-container">
+        <div class="language-selector">
+          <button class="lang-btn">
+            <i class="fas fa-globe"></i> 
+            <span id="current-lang">English</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="lang-dropdown">
+            <div class="lang-option" data-lang="en">
+              <img src="https://flagcdn.com/w20/us.png" alt="English" class="lang-flag">
+              English
+            </div>
+            <div class="lang-option" data-lang="fr">
+              <img src="https://flagcdn.com/w20/fr.png" alt="French" class="lang-flag">
+              Français
+            </div>
+            <div class="lang-option" data-lang="it">
+              <img src="https://flagcdn.com/w20/it.png" alt="Italian" class="lang-flag">
+              Italiano
+            </div>
+            <div class="lang-option" data-lang="hi">
+              <img src="https://flagcdn.com/w20/in.png" alt="Hindi" class="lang-flag">
+              हिंदी
+            </div>
+            <div class="lang-option" data-lang="ru">
+              <img src="https://flagcdn.com/w20/ru.png" alt="Russian" class="lang-flag">
+              Русский
+            </div>
+            <div class="lang-option" data-lang="pl">
+              <img src="https://flagcdn.com/w20/pl.png" alt="Polish" class="lang-flag">
+              Polski
+            </div>
+            <div class="lang-option" data-lang="de">
+              <img src="https://flagcdn.com/w20/de.png" alt="German" class="lang-flag">
+              Deutsch
+            </div>
+            <div class="lang-option" data-lang="pt">
+              <img src="https://flagcdn.com/w20/br.png" alt="Portuguese" class="lang-flag">
+              Português
+            </div>
+            <div class="lang-option" data-lang="es">
+              <img src="https://flagcdn.com/w20/es.png" alt="Spanish" class="lang-flag">
+              Español
+            </div>
+          </div>
+        </div>
+        <div class="level-container">
+          <div class="level-badge">
+            <span id="level-display">1</span>
+          </div>
+          <div>
+            <div class="exp-bar">
+              <div class="exp-progress" id="exp-progress"></div>
+            </div>
+            <div class="exp-text">
+              <span data-translate="exp">EXP</span>: <span id="exp-amount">0</span> / <span id="next-level-exp">100</span>
+            </div>
+          </div>
+        </div>
+        <div class="wallet">
+          <i class="fas fa-wallet"></i> <span data-translate="wallet">Wallet</span></span>
+        </div>
+        <button id="save-btn" class="marketplace-btn">
+          <i class="fas fa-save"></i> <span data-translate="save_manager">Save Manager</span>
+        </button>
+        <button id="rankings-btn" class="marketplace-btn">
+          <i class="fas fa-trophy"></i> <span data-translate="rankings">Rankings</span>
+        </button>
+        <button id="marketplace-btn" class="marketplace-btn">
+          <i class="fas fa-shopping-cart"></i> <span data-translate="marketplace">Marketplace</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Rankings Modal -->
+    <div id="rankings-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 data-translate="rankings">Rankings</h2>
+          <span class="close-rankings">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="rankings-list">
+            <div class="rankings-tabs">
+              <button class="tab-btn active" data-tab="wealth">Wealth</button>
+              <button class="tab-btn" data-tab="inventory">Inventory</button>
+            </div>
+            <div class="rankings-content" id="rankings-content">
+              <!-- Rankings will be dynamically added here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save Manager Modal -->
+    <div id="save-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 data-translate="save_manager">Save Manager</h2>
+          <span class="close-save">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="save-actions">
+            <button class="save-action-btn" onclick="market.saveGame()">
+              <i class="fas fa-save"></i> Save Game
+            </button>
+            <button class="save-action-btn warning" onclick="market.confirmReset()">
+              <i class="fas fa-trash"></i> Reset Game
+            </button>
+          </div>
+          <div class="save-info">
+            <p>Last saved: <span id="last-saved">Never</span></p>
+            <p class="save-warning">Warning: Resetting your game will permanently delete all progress!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Marketplace Modal -->
+    <div id="marketplace-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 data-translate="marketplace">Marketplace</h2>
+          <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="marketplace-categories">
+            <div class="category">
+              <h3><i class="fas fa-home"></i> Real Estate</h3>
+              <div class="items">
+                <div class="item">
+                  <i class="fas fa-building"></i>
+                  <h4>Apartment</h4>
+                  <p>Modern city apartment</p>
+                  <p class="price">$250,000</p>
+                  <button onclick="market.purchaseItem('apartment')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-house"></i>
+                  <h4>House</h4>
+                  <p>Suburban family house</p>
+                  <p class="price">$500,000</p>
+                  <button onclick="market.purchaseItem('house')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-hotel"></i>
+                  <h4>Luxury Villa</h4>
+                  <p>Beachfront luxury villa</p>
+                  <p class="price">$2,000,000</p>
+                  <button onclick="market.purchaseItem('villa')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="category">
+              <h3><i class="fas fa-car"></i> Vehicles</h3>
+              <div class="items">
+                <div class="item">
+                  <i class="fas fa-bolt"></i>
+                  <h4>Tesla Model S Plaid</h4>
+                  <p>Ultimate electric performance</p>
+                  <p class="price">$130,000</p>
+                  <button onclick="market.purchaseItem('tesla-plaid')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-car-side"></i>
+                  <h4>Lamborghini Huracán</h4>
+                  <p>Supercar excellence</p>
+                  <p class="price">$330,000</p>
+                  <button onclick="market.purchaseItem('lambo')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-truck"></i>
+                  <h4>Lamborghini Urus</h4>
+                  <p>Super SUV</p>
+                  <p class="price">$230,000</p>
+                  <button onclick="market.purchaseItem('urus')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-car-side"></i>
+                  <h4>Rolls-Royce Phantom</h4>
+                  <p>Ultimate luxury car</p>
+                  <p class="price">$460,000</p>
+                  <button onclick="market.purchaseItem('rolls')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-car-side"></i>
+                  <h4>Bugatti Chiron</h4>
+                  <p>Engineering masterpiece</p>
+                  <p class="price">$3,000,000</p>
+                  <button onclick="market.purchaseItem('bugatti')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-car-side"></i>
+                  <h4>Ferrari SF90 Stradale</h4>
+                  <p>Hybrid supercar</p>
+                  <p class="price">$520,000</p>
+                  <button onclick="market.purchaseItem('ferrari')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="category">
+              <h3><i class="fas fa-mobile-alt"></i> Electronics</h3>
+              <div class="items">
+                <div class="item">
+                  <i class="fas fa-mobile"></i>
+                  <h4>iPhone 14 Pro Max</h4>
+                  <p>Latest Apple flagship</p>
+                  <p class="price">$1,299</p>
+                  <button onclick="market.purchaseItem('iphone')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-laptop"></i>
+                  <h4>MacBook Pro 16"</h4>
+                  <p>Premium laptop</p>
+                  <p class="price">$2,499</p>
+                  <button onclick="market.purchaseItem('macbook')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-tv"></i>
+                  <h4>Samsung 98" QLED 8K</h4>
+                  <p>Ultimate TV experience</p>
+                  <p class="price">$15,000</p>
+                  <button onclick="market.purchaseItem('tv')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-volume-up"></i>
+                  <h4>Bang & Olufsen BeoLab 90</h4>
+                  <p>Ultimate speaker system</p>
+                  <p class="price">$85,000</p>
+                  <button onclick="market.purchaseItem('speakers')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-film"></i>
+                  <h4>Private Cinema Room</h4>
+                  <p>Complete home theater setup</p>
+                  <p class="price">$250,000</p>
+                  <button onclick="market.purchaseItem('cinema')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="category">
+              <h3><i class="fas fa-gem"></i> Luxury Items</h3>
+              <div class="items">
+                <div class="item">
+                  <i class="fas fa-clock"></i>
+                  <h4>Rolex Daytona</h4>
+                  <p>Platinum edition</p>
+                  <p class="price">$75,000</p>
+                  <button onclick="market.purchaseItem('rolex')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-plane"></i>
+                  <h4>Private Jet</h4>
+                  <p>Gulfstream G650</p>
+                  <p class="price">$65,000,000</p>
+                  <button onclick="market.purchaseItem('jet')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+                <div class="item">
+                  <i class="fas fa-ship"></i>
+                  <h4>Luxury Yacht</h4>
+                  <p>Custom 40m yacht</p>
+                  <p class="price">$15,000,000</p>
+                  <button onclick="market.purchaseItem('yacht')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          
+          <div class="inventory">
+            <h3><i class="fas fa-box-open"></i> Your Inventory</h3>
+            <div id="inventory-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="crypto-grid">
+      <div class="crypto-card" id="btc-card">
+        <div class="crypto-header">
+          <h2><i class="fab fa-bitcoin"></i> Bitcoin (BTC)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('btc')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="btc-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="btc-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="btc-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('btc')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('btc')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="btc-holdings">0</span> BTC</div>
+          <div id="btc-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-btc" onclick="startDetailedAnalysis('btc')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-btc"></span>
+          </button>
+          <div id="detailed-analysis-btc"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="eth-card">
+        <div class="crypto-header">
+          <h2><i class="fab fa-ethereum"></i> Ethereum (ETH)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('eth')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="eth-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="eth-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="eth-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('eth')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('eth')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="eth-holdings">0</span> ETH</div>
+          <div id="eth-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-eth" onclick="startDetailedAnalysis('eth')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-eth"></span>
+          </button>
+          <div id="detailed-analysis-eth"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="ada-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-coins"></i> Cardano (ADA)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('ada')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="ada-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="ada-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="ada-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('ada')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('ada')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="ada-holdings">0</span> ADA</div>
+          <div id="ada-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-ada" onclick="startDetailedAnalysis('ada')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-ada"></span>
+          </button>
+          <div id="detailed-analysis-ada"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="sol-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-sun"></i> Solana (SOL)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('sol')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="sol-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="sol-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="sol-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('sol')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('sol')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="sol-holdings">0</span> SOL</div>
+          <div id="sol-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-sol" onclick="startDetailedAnalysis('sol')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-sol"></span>
+          </button>
+          <div id="detailed-analysis-sol"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="xrp-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-wave-square"></i> Ripple (XRP)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('xrp')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="xrp-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="xrp-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="xrp-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('xrp')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('xrp')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="xrp-holdings">0</span> XRP</div>
+          <div id="xrp-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-xrp" onclick="startDetailedAnalysis('xrp')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-xrp"></span>
+          </button>
+          <div id="detailed-analysis-xrp"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="doge-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-dog"></i> Dogecoin (DOGE)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('doge')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="doge-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="doge-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="doge-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('doge')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('doge')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="doge-holdings">0</span> DOGE</div>
+          <div id="doge-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-doge" onclick="startDetailedAnalysis('doge')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-doge"></span>
+          </button>
+          <div id="detailed-analysis-doge"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="shib-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-paw"></i> Shiba Inu (SHIB)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('shib')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="shib-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="shib-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="shib-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('shib')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('shib')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="shib-holdings">0</span> SHIB</div>
+          <div id="shib-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-shib" onclick="startDetailedAnalysis('shib')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-shib"></span>
+          </button>
+          <div id="detailed-analysis-shib"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="pepe-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-frog"></i> Pepe (PEPE)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('pepe')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="pepe-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="pepe-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="pepe-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('pepe')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('pepe')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="pepe-holdings">0</span> PEPE</div>
+          <div id="pepe-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-pepe" onclick="startDetailedAnalysis('pepe')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-pepe"></span>
+          </button>
+          <div id="detailed-analysis-pepe"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="floki-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-dragon"></i> Floki Inu (FLOKI)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('floki')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="floki-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="floki-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="floki-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('floki')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('floki')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="floki-holdings">0</span> FLOKI</div>
+          <div id="floki-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-floki" onclick="startDetailedAnalysis('floki')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-floki"></span>
+          </button>
+          <div id="detailed-analysis-floki"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="cyberdoge-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-rocket"></i> CyberDoge (CYBERDOGE)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('cyberdoge')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="cyberdoge-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="cyberdoge-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="cyberdoge-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('cyberdoge')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('cyberdoge')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="cyberdoge-holdings">0</span> CYBERDOGE</div>
+          <div id="cyberdoge-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-cyberdoge" onclick="startDetailedAnalysis('cyberdoge')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-cyberdoge"></span>
+          </button>
+          <div id="detailed-analysis-cyberdoge"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="elonx-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-satellite"></i> ElonX (ELONX)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('elonx')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="elonx-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="elonx-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="elonx-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('elonx')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('elonx')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="elonx-holdings">0</span> ELONX</div>
+          <div id="elonx-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-elonx" onclick="startDetailedAnalysis('elonx')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-elonx"></span>
+          </button>
+          <div id="detailed-analysis-elonx"></div>
+        </div>
+      </div>
+
+      <div class="crypto-card" id="maga-card">
+        <div class="crypto-header">
+          <h2><i class="fas fa-flag-usa"></i> MAGA Coin (MAGA)</h2>
+          <button class="fullscreen-btn" onclick="market.toggleFullscreen('maga')">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+        <div class="chart-container">
+          <canvas id="maga-chart"></canvas>
+        </div>
+        <div class="price">Current Price: $<span id="maga-price">0</span></div>
+        <div class="controls">
+          <input type="number" id="maga-amount" data-translate="amount" placeholder="Amount">
+          <button onclick="buy('maga')"><i class="fas fa-shopping-cart"></i> <span data-translate="buy">Buy</span></button>
+          <button onclick="sell('maga')"><i class="fas fa-dollar-sign"></i> <span data-translate="sell">Sell</span></button>
+        </div>
+        <div class="holdings-info">
+          <div class="holdings">Holdings: <span id="maga-holdings">0</span> MAGA</div>
+          <div id="maga-profit">
+            <div>Total Spent: $0.00</div>
+            <div>Current Value: $0.00</div>
+            <div class="profit-info">Profit: $0.00 (0.00%)</div>
+          </div>
+        </div>
+        <div class="analysis-controls">
+          <button class="analysis-button" id="analyze-maga" onclick="startDetailedAnalysis('maga')">
+            <i class="fas fa-microscope"></i> <span data-translate="detailed_analysis">Detailed Analysis</span>
+            <span class="cooldown-timer" id="cooldown-maga"></span>
+          </button>
+          <div id="detailed-analysis-maga"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analysis-panel">
+      <h2><i class="fas fa-chart-bar"></i> Market Analysis</h2>
+      <div id="market-analysis"></div>
+    </div>
+
+    <div class="news-panel">
+      <h2><i class="fas fa-newspaper"></i> Market News</h2>
+      <div id="news-feed">
+        <!-- News items will be dynamically added here -->
+      </div>
+    </div>
+
+    <div class="auto-trade-panel">
+      <h2><i class="fas fa-robot"></i> Auto Trading</h2>
+      <form class="auto-trade-form" onsubmit="addAutoTradeOrder(event)">
+        <select name="crypto" required>
+          <option value="">Select Crypto</option>
+          <option value="btc">Bitcoin (BTC)</option>
+          <option value="eth">Ethereum (ETH)</option>
+          <option value="ada">Cardano (ADA)</option>
+          <option value="sol">Solana (SOL)</option>
+          <option value="xrp">Ripple (XRP)</option>
+          <option value="doge">Dogecoin (DOGE)</option>
+        </select>
+        <select name="type" required>
+          <option value="">Select Type</option>
+          <option value="buy">Buy</option>
+          <option value="sell">Sell</option>
+        </select>
+        <input type="number" name="price" placeholder="Target Price" step="0.000001" required>
+        <input type="number" name="amount" placeholder="Amount" step="0.000001" required>
+        <button type="submit">
+          <i class="fas fa-plus"></i> Add Order
+        </button>
+      </form>
+      <div class="active-orders" id="active-orders">
+        <!-- Auto-trade orders will be inserted here -->
+      </div>
+    </div>
+  </div>
+  
+  <footer style="text-align: center; padding: 20px; margin-top: 30px; background: #2d2d2d; border-radius: 10px;">
+    <p>Made by <a href="https://websim.ai/@blockwarss" style="color: #6200ea; text-decoration: none; font-weight: bold;">blockwarss</a></p>
+  </footer>
+
+  <script type="module" src="translations.js"></script>
+  <script type="module" src="crypto.js"></script>
+</body>
+</html>
