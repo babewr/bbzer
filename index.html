@@ -1,0 +1,532 @@
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(skyblue, darkblue);
+      font-family: Arial, sans-serif;
+    }
+
+    .water {
+      width: 100%;
+      height: 60vh;
+      position: relative;
+      overflow: hidden;
+      background: rgba(0,0,150,0.3);
+    }
+
+    .pier {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 100px;
+      background: #8B4513;
+      z-index: 2;
+    }
+
+    .person {
+      position: absolute;
+      top: -40px;
+      right: 20px;
+      z-index: 3;
+    }
+
+    .fish {
+      position: absolute;
+      transition: all 0.5s;
+      cursor: pointer;
+    }
+
+    .hook {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-right: 4px solid #666;
+      border-bottom: 4px solid #666;
+      border-radius: 0 0 10px 0;
+      cursor: pointer;
+    }
+
+    .line {
+      position: absolute;
+      width: 2px;
+      background: #666;
+      transform-origin: top;
+    }
+
+    .stats {
+      background: rgba(255,255,255,0.9);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .shop, .dictionary {
+      position: fixed;
+      background: rgba(255,255,255,0.9);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .shop {
+      top: 10px;
+      right: 10px;
+    }
+
+    .dictionary {
+      top: 10px;
+      left: 10px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .fish-entry {
+      margin: 10px 0;
+      padding: 5px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .decorations {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .seaweed {
+      position: absolute;
+      bottom: 0;
+      animation: sway 3s ease-in-out infinite;
+    }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    .sand {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 50px;
+      background: #f0e68c;
+      z-index: 1;
+    }
+
+    .small-creature {
+      position: absolute;
+      bottom: 0;
+      cursor: pointer;
+      z-index: 2;
+      transition: all 0.3s;
+    }
+
+    .small-creature:hover {
+      transform: scale(1.1);
+    }
+
+    .boss-hp-bar {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 20px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      display: none;
+    }
+
+    .boss-hp {
+      width: 100%;
+      height: 100%;
+      background: red;
+      border-radius: 10px;
+      transition: width 0.3s;
+    }
+
+    .fish.boss {
+      filter: brightness(0.8) saturate(1.5);
+    }
+  </style>
+</head>
+<body>
+  <h1 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin-bottom: 0;">Ocean Fisher</h1>
+  <div class="dictionary" id="fishDictionary">
+    <h3>Fish Dictionary</h3>
+    <div id="fishEntries"></div>
+  </div>
+  <div class="stats">
+    <div>Fish Caught: <span id="score">0</span>/<span id="capacity">5</span></div>
+    <div>Cash: &#x24;<span id="cash">0</span></div>
+    <div>Rod Level: <span id="rodLevel">1</span></div>
+    <div>Level: <span id="level">1</span> (XP: <span id="xp">0</span>/<span id="nextLevelXp">100</span>)</div>
+    <div>Cash Multiplier: <span id="multiplier">1</span>x</div>
+  </div>
+  <div class="shop">
+    <h3>Shop</h3>
+    <button id="sellFish">Sell Fish</button>
+    <button id="upgradeCapacity">Upgrade Storage (&#x24;50) +3 slots</button>
+    <button id="upgradeRod">Upgrade Rod (&#x24;100)</button>
+  </div>
+  <div class="boss-hp-bar">
+    <div class="boss-hp"></div>
+  </div>
+  <div class="water" id="water">
+    <div class="decorations">
+      <svg class="seaweed" style="left: 10%" width="50" height="100">
+        <path d="M25,100 Q10,75 25,50 Q40,25 25,0" stroke="darkgreen" fill="none" stroke-width="5"/>
+      </svg>
+      <svg class="seaweed" style="left: 30%" width="50" height="80">
+        <path d="M25,80 Q10,60 25,40 Q40,20 25,0" stroke="darkgreen" fill="none" stroke-width="5"/>
+      </svg>
+      <svg class="seaweed" style="left: 70%" width="50" height="120">
+        <path d="M25,120 Q10,90 25,60 Q40,30 25,0" stroke="darkgreen" fill="none" stroke-width="5"/>
+      </svg>
+      <div class="sand"></div>
+    </div>
+    <div class="pier">
+      <svg class="person" width="60" height="100" viewBox="0 0 60 100">
+        <circle cx="30" cy="20" r="10" fill="#FFB6C1"/>
+        <rect x="25" y="30" width="10" height="30" fill="#4169E1"/>
+        <line x1="25" y1="35" x2="0" y2="25" stroke="#FFB6C1" stroke-width="5"/>
+        <line x1="35" y1="35" x2="60" y2="25" stroke="#FFB6C1" stroke-width="5"/>
+        <line x1="30" y1="60" x2="20" y2="90" stroke="#000" stroke-width="5"/>
+        <line x1="30" y1="60" x2="40" y2="90" stroke="#000" stroke-width="5"/>
+      </svg>
+    </div>
+    <div class="hook" id="hook"></div>
+    <div class="line" id="line"></div>
+  </div>
+
+<script>class FishingGame {
+  constructor() {
+    this.fishTypes = {
+      guppy: {
+        name: "Guppy",
+        color: "#FF9999",
+        minRodLevel: 1,
+        value: 10,
+        rarity: 1,
+        size: [30, 40],
+        xp: 10
+      },
+      goldfish: {
+        name: "Goldfish",
+        color: "#FFD700",
+        minRodLevel: 1,
+        value: 15,
+        rarity: 0.8,
+        size: [35, 45],
+        xp: 15
+      },
+      tuna: {
+        name: "Tuna",
+        color: "#4169E1",
+        minRodLevel: 2,
+        value: 30,
+        rarity: 0.6,
+        size: [50, 60],
+        xp: 25
+      },
+      salmon: {
+        name: "Salmon",
+        color: "#FA8072",
+        minRodLevel: 3,
+        value: 45,
+        rarity: 0.4,
+        size: [55, 65],
+        xp: 40
+      },
+      shark: {
+        name: "Shark",
+        color: "#708090",
+        minRodLevel: 4,
+        value: 100,
+        rarity: 0.2,
+        size: [70, 80],
+        xp: 100
+      }
+    };
+    this.score = 0;
+    this.cash = 0;
+    this.capacity = 5;
+    this.catchRadius = 50;
+    this.rodLevel = 1;
+    this.caughtFish = [];
+    this.hook = document.getElementById('hook');
+    this.line = document.getElementById('line');
+    this.water = document.getElementById('water');
+    this.scoreElement = document.getElementById('score');
+    this.cashElement = document.getElementById('cash');
+    this.capacityElement = document.getElementById('capacity');
+    this.rodLevelElement = document.getElementById('rodLevel');
+    this.level = 1;
+    this.xp = 0;
+    this.nextLevelXp = 100;
+    this.cashMultiplier = 1;
+    this.levelElement = document.getElementById('level');
+    this.xpElement = document.getElementById('xp');
+    this.nextLevelXpElement = document.getElementById('nextLevelXp');
+    this.multiplierElement = document.getElementById('multiplier');
+    this.hookPos = {
+      x: window.innerWidth / 2,
+      y: 50
+    };
+    this.hasBait = true;
+    this.baitPrice = 50;
+    this.bossHpBar = document.querySelector('.boss-hp-bar');
+    this.bossHp = document.querySelector('.boss-hp');
+    this.setupEventListeners();
+    this.setupShop();
+    this.updateFishDictionary();
+    this.spawnFish();
+    const sand = document.createElement('div');
+    sand.className = 'sand';
+    this.water.appendChild(sand);
+    this.spawnSmallCreatures();
+  }
+  updateFishDictionary() {
+    const container = document.getElementById('fishEntries');
+    container.innerHTML = '';
+    Object.entries(this.fishTypes).forEach(([key, fish]) => {
+      const entry = document.createElement('div');
+      entry.className = 'fish-entry';
+      entry.innerHTML = `
+        <h4>${fish.name}</h4>
+        <p>Value: $${fish.value}</p>
+        <p>Required Rod Level: ${fish.minRodLevel}</p>
+      `;
+      container.appendChild(entry);
+    });
+  }
+  setupEventListeners() {
+    this.water.addEventListener('mousemove', e => {
+      const rect = this.water.getBoundingClientRect();
+      this.hookPos.x = e.clientX - rect.left;
+      this.hookPos.y = e.clientY - rect.top;
+      this.updateHookPosition();
+    });
+  }
+  setupShop() {
+    document.getElementById('sellFish').addEventListener('click', () => this.sellFish());
+    document.getElementById('upgradeCapacity').addEventListener('click', () => this.upgradeCapacity());
+    document.getElementById('upgradeRod').addEventListener('click', () => this.upgradeRod());
+    document.getElementById('upgradeRod').insertAdjacentHTML('afterend', `
+      <button id="buyBait">Buy Bait ($${this.baitPrice})</button>
+    `);
+    document.getElementById('buyBait').addEventListener('click', () => this.buyBait());
+  }
+  sellFish() {
+    if (this.caughtFish.length > 0) {
+      const totalValue = this.caughtFish.reduce((sum, fish) => sum + fish.value, 0) * this.cashMultiplier;
+      this.cash += totalValue;
+      this.caughtFish = [];
+      this.score = 0;
+      this.updateUI();
+    }
+  }
+  upgradeCapacity() {
+    const cost = 50;
+    if (this.cash >= cost) {
+      this.cash -= cost;
+      this.capacity += 3;
+      this.updateUI();
+    }
+  }
+  upgradeRod() {
+    const cost = 100;
+    if (this.cash >= cost) {
+      this.cash -= cost;
+      this.rodLevel++;
+      this.catchRadius += 20;
+      this.updateUI();
+    }
+  }
+  buyBait() {
+    if (this.cash >= this.baitPrice) {
+      this.cash -= this.baitPrice;
+      this.hasBait = true;
+      this.updateUI();
+    }
+  }
+  updateUI() {
+    this.scoreElement.textContent = this.score;
+    this.cashElement.textContent = this.cash;
+    this.capacityElement.textContent = this.capacity;
+    this.rodLevelElement.textContent = this.rodLevel;
+    this.levelElement.textContent = this.level;
+    this.xpElement.textContent = this.xp;
+    this.nextLevelXpElement.textContent = this.nextLevelXp;
+    this.multiplierElement.textContent = this.cashMultiplier.toFixed(1);
+    document.getElementById('sellFish').disabled = this.caughtFish.length === 0;
+    document.getElementById('upgradeCapacity').disabled = this.cash < 50;
+    document.getElementById('upgradeRod').disabled = this.cash < 100;
+    document.getElementById('buyBait').disabled = this.cash < this.baitPrice || this.hasBait;
+    document.getElementById('buyBait').textContent = `Buy Bait ($${this.baitPrice})`;
+  }
+  updateHookPosition() {
+    this.hook.style.left = `${this.hookPos.x}px`;
+    this.hook.style.top = `${this.hookPos.y}px`;
+    this.line.style.height = `${this.hookPos.y}px`;
+    this.line.style.left = `${this.hookPos.x + 10}px`;
+    this.line.style.top = '0';
+  }
+  getRandomFishType() {
+    const availableFish = Object.entries(this.fishTypes).filter(([_, fish]) => fish.minRodLevel <= this.rodLevel);
+    const totalRarity = availableFish.reduce((sum, [_, fish]) => sum + fish.rarity, 0);
+    let random = Math.random() * totalRarity;
+    for (const [type, fish] of availableFish) {
+      random -= fish.rarity;
+      if (random <= 0) return {
+        type,
+        ...fish
+      };
+    }
+    return availableFish[0];
+  }
+  spawnFish() {
+    setInterval(() => {
+      if (document.querySelectorAll('.fish').length < 5) {
+        const fishType = this.getRandomFishType();
+        const fish = document.createElement('div');
+        fish.className = 'fish';
+        fish.dataset.type = fishType.type;
+        const [minSize, maxSize] = fishType.size;
+        const size = Math.random() * (maxSize - minSize) + minSize;
+        const direction = Math.random() < 0.5 ? 'left' : 'right';
+        fish.innerHTML = `<svg width="${size}" height="${size / 2}" viewBox="0 0 40 20">
+          <path d="M${direction === 'left' ? '40 10' : '0 10'} Q${direction === 'left' ? '20 0' : '20 0'} ${direction === 'left' ? '0 10' : '40 10'} Q${direction === 'left' ? '20 20' : '20 20'} ${direction === 'left' ? '40 10' : '0 10'}" 
+                fill="${fishType.color}" stroke="black"/>
+          <circle cx="${direction === 'left' ? '35' : '5'}" cy="8" r="2" fill="black"/>
+        </svg>`;
+        fish.style.top = `${Math.random() * (this.water.clientHeight - size)}px`;
+        fish.style.left = `${direction === 'left' ? this.water.clientWidth : -size}px`;
+        this.water.appendChild(fish);
+        this.animateFish(fish, direction, size);
+        this.makeClickable(fish, fishType);
+      }
+    }, 2000);
+  }
+  animateFish(fish, direction, size) {
+    const speed = Math.random() * 4000 + 4000;
+    fish.style.transition = `left ${speed}ms linear`;
+    setTimeout(() => {
+      fish.style.left = `${direction === 'left' ? -size : this.water.clientWidth}px`;
+    }, 100);
+    setTimeout(() => {
+      fish.remove();
+    }, speed + 100);
+  }
+  makeClickable(fish, fishType) {
+    fish.addEventListener('click', () => {
+      if (!this.hasBait) return;
+      if (fishType.type === 'shark' && fish.classList.contains('boss')) {
+        if (this.isNearHook(fish)) {
+          const hp = parseInt(fish.dataset.hp || 100);
+          const newHp = hp - 10 * this.rodLevel;
+          fish.dataset.hp = newHp;
+          this.bossHp.style.width = `${newHp}%`;
+          if (Math.random() < 0.3) {
+            this.hasBait = false;
+            this.updateUI();
+          }
+          if (newHp <= 0) {
+            this.catchFish(fish, fishType);
+            this.bossHpBar.style.display = 'none';
+          }
+        }
+      } else if (this.isNearHook(fish) && this.score < this.capacity) {
+        if (Math.random() < 0.1 && fishType.type === 'shark') {
+          this.hasBait = false;
+          this.updateUI();
+          fish.remove();
+        } else {
+          this.catchFish(fish, fishType);
+        }
+      }
+    });
+  }
+  isNearHook(fish) {
+    const fishRect = fish.getBoundingClientRect();
+    const hookRect = this.hook.getBoundingClientRect();
+    const distance = Math.hypot(fishRect.left + fishRect.width / 2 - (hookRect.left + hookRect.width / 2), fishRect.top + fishRect.height / 2 - (hookRect.top + hookRect.height / 2));
+    return distance < this.catchRadius;
+  }
+  catchFish(fish, fishType) {
+    fish.style.transition = 'all 0.5s';
+    fish.style.transform = 'scale(0)';
+    this.score++;
+    this.caughtFish.push(fishType);
+    this.updateUI();
+    this.gainXp(fishType.xp);
+    setTimeout(() => {
+      fish.remove();
+    }, 500);
+  }
+  gainXp(xp) {
+    this.xp += xp;
+    if (this.xp >= this.nextLevelXp) {
+      this.levelUp();
+    }
+  }
+  levelUp() {
+    this.level++;
+    this.xp -= this.nextLevelXp;
+    this.nextLevelXp *= 1.2;
+    this.cashMultiplier *= 1.1;
+    this.baitPrice = Math.floor(50 * (1 + this.rodLevel * 0.5));
+    if (this.level % 5 === 0) {
+      this.spawnBossShark();
+    }
+    this.updateUI();
+  }
+  spawnBossShark() {
+    const sharkType = this.fishTypes.shark;
+    const fish = document.createElement('div');
+    fish.className = 'fish boss';
+    fish.dataset.type = 'shark';
+    fish.dataset.hp = 100;
+    const size = 100;
+    fish.innerHTML = `<svg width="${size}" height="${size / 2}" viewBox="0 0 40 20">
+      <path d="M40 10 Q20 0 0 10 Q20 20 40 10" 
+            fill="${sharkType.color}" stroke="black"/>
+      <circle cx="35" cy="8" r="2" fill="black"/>
+    </svg>`;
+    fish.style.top = `${Math.random() * (this.water.clientHeight - size)}px`;
+    fish.style.left = `${this.water.clientWidth}px`;
+    this.water.appendChild(fish);
+    this.bossHpBar.style.display = 'block';
+    this.bossHp.style.width = '100%';
+    this.animateFish(fish, 'left', size);
+    this.makeClickable(fish, sharkType);
+  }
+  spawnSmallCreatures() {}
+}
+new FishingGame().spawnSmallCreatures();</script>
+</body>
+</html>
