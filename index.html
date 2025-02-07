@@ -1,0 +1,271 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Témoignages OVNI et Paranormal</title>
+<style>
+  :root {
+    --main-color: #1a1a2e;
+    --secondary-color: #16213e;
+    --text-color: #e94560;
+    --highlight-color: #0f3460;
+    --accent-color: #533483;
+  }
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--main-color);
+    color: var(--text-color);
+  }
+
+  header {
+    background-color: var(--secondary-color);
+    padding: 2rem;
+    text-align: center;
+  }
+
+  nav {
+    background-color: var(--highlight-color);
+    padding: 1rem;
+    text-align: center;
+  }
+
+  nav a {
+    color: var(--text-color);
+    text-decoration: none;
+    margin: 0 1rem;
+    font-weight: bold;
+  }
+
+  .testimony-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .testimony-categories {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .testimony-category {
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+
+  .testimony-item {
+    background-color: var(--highlight-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .testimony-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .testimony-meta {
+    font-size: 0.9rem;
+    color: #ccc;
+  }
+
+  .media-player {
+    width: 100%;
+    margin: 1rem 0;
+  }
+
+  .testimony-content {
+    line-height: 1.6;
+  }
+
+  .comments-section {
+    margin-top: 1rem;
+    border-top: 1px solid var(--text-color);
+    padding-top: 1rem;
+  }
+
+  .comment-form {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  textarea, input {
+    background-color: var(--secondary-color);
+    border: 1px solid var(--text-color);
+    color: var(--text-color);
+    padding: 0.5rem;
+    border-radius: 4px;
+    width: 100%;
+  }
+
+  button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    opacity: 0.9;
+  }
+
+  .rating {
+    color: gold;
+  }
+
+  .filters {
+    margin: 2rem 0;
+    padding: 1rem;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background-color: var(--highlight-color);
+    border: none;
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .filter-btn.active {
+    background-color: var(--accent-color);
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Témoignages OVNI et Paranormal</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Accueil</a>
+    <a href="ovni.html">OVNI</a>
+    <a href="paranormal.html">Paranormal</a>
+    <a href="bibliotheque.html">Bibliothèque</a>
+  </nav>
+
+  <div class="testimony-container">
+    <div class="filters">
+      <button class="filter-btn active" data-type="all">Tous</button>
+      <button class="filter-btn" data-type="video">Vidéos</button>
+      <button class="filter-btn" data-type="audio">Audio</button>
+      <button class="filter-btn" data-type="photo">Photos</button>
+      <button class="filter-btn" data-type="text">Texte</button>
+    </div>
+
+    <div class="testimony-categories">
+      <!-- Section Témoignages Vidéo -->
+      <div class="testimony-category">
+        <h2>Témoignages Vidéo</h2>
+        <div class="testimony-item">
+          <div class="testimony-header">
+            <h3>Observation d'OVNI à Lyon</h3>
+            <span class="rating">★★★★☆</span>
+          </div>
+          <div class="testimony-meta">
+            Par Jean D. - 15 Mars 2024
+          </div>
+          <video class="media-player" controls>
+            <source src="" type="video/mp4">
+            Votre navigateur ne supporte pas la lecture vidéo.
+          </video>
+          <div class="testimony-content">
+            <p>J'ai observé cet objet lumineux pendant environ 15 minutes. Il effectuait des mouvements impossibles pour un avion conventionnel.</p>
+          </div>
+          <div class="comments-section">
+            <h4>Commentaires</h4>
+            <div class="comment-form">
+              <textarea placeholder="Ajoutez votre commentaire..."></textarea>
+              <button>Commenter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Témoignages Audio -->
+      <div class="testimony-category">
+        <h2>Témoignages Audio</h2>
+        <div class="testimony-item">
+          <div class="testimony-header">
+            <h3>Sons étranges dans la forêt</h3>
+            <span class="rating">★★★★★</span>
+          </div>
+          <div class="testimony-meta">
+            Par Marie L. - 10 Mars 2024
+          </div>
+          <audio class="media-player" controls>
+            <source src="" type="audio/mpeg">
+            Votre navigateur ne supporte pas la lecture audio.
+          </audio>
+          <div class="testimony-content">
+            <p>Enregistrement capturé lors d'une randonnée nocturne. Ces sons ne correspondent à aucun animal connu de la région.</p>
+          </div>
+          <div class="comments-section">
+            <h4>Commentaires</h4>
+            <div class="comment-form">
+              <textarea placeholder="Ajoutez votre commentaire..."></textarea>
+              <button>Commenter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Gestion des filtres
+    document.querySelectorAll('.filter-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        // Retirer la classe active de tous les boutons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        // Ajouter la classe active au bouton cliqué
+        button.classList.add('active');
+      });
+    });
+
+    // Système de commentaires
+    document.querySelectorAll('.comment-form').forEach(form => {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const commentText = e.target.querySelector('textarea').value;
+        if (commentText.trim()) {
+          const commentElement = document.createElement('div');
+          commentElement.className = 'comment';
+          commentElement.innerHTML = `
+            <p>${commentText}</p>
+            <small>Posté à l'instant</small>
+          `;
+          e.target.parentElement.insertBefore(commentElement, e.target);
+          e.target.querySelector('textarea').value = '';
+        }
+      });
+    });
+
+    // Système de notation
+    document.querySelectorAll('.rating').forEach(rating => {
+      rating.style.cursor = 'pointer';
+      rating.addEventListener('click', () => {
+        const currentRating = rating.textContent.split('★').length - 1;
+        const newRating = (currentRating % 5) + 1;
+        rating.textContent = '★'.repeat(newRating) + '☆'.repeat(5 - newRating);
+      });
+    });
+  </script>
+</body>
+</html>
