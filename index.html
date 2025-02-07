@@ -1,0 +1,533 @@
+    <title>Interactive Story Generator (28+)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap');
+
+        :root {
+            --bg-color: #F5DEB3;
+            --text-color: #333;
+            --border-color: #8B4513;
+            --highlight-color: #DEB887;
+        }
+
+        body {
+            font-family: 'Courier Prime', monospace;
+            background-image: url('https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+        .container {
+            background-color: rgba(245, 245, 220, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            width: 95%;
+            max-width: 1400px;
+            border: 2px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .game-area {
+            display: flex;
+            gap: 20px;
+        }
+        .chat-area {
+            flex: 2;
+        }
+        .side-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .stats-area, .inventory-area, .quest-area, .journal-area {
+            background-color: rgba(245, 245, 220, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: rgba(245, 245, 220, 0.7);
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) var(--bg-color);
+        }
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-box::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        .chat-box::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 20px;
+            border: 2px solid var(--bg-color);
+        }
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #user-input {
+            padding: 10px;
+            font-size: 16px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-family: 'Courier Prime', monospace;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            font-family: 'Courier Prime', monospace;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: var(--highlight-color);
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        .user {
+            background-color: rgba(222, 184, 135, 0.2);
+            text-align: right;
+            border-right: 3px solid var(--border-color);
+        }
+        .gm {
+            background-color: rgba(139, 69, 19, 0.2);
+            border-left: 3px solid var(--border-color);
+        }
+        .system {
+            background-color: rgba(245, 222, 179, 0.2);
+            font-style: italic;
+            text-align: center;
+            border: 1px dashed var(--border-color);
+        }
+        h1, h2 {
+            text-align: center;
+            color: var(--border-color);
+        }
+        h1 {
+            font-size: 2.5em;
+        }
+        h2 {
+            font-size: 1.8em;
+        }
+        .stat {
+            margin-bottom: 10px;
+        }
+        .stat-name {
+            font-weight: bold;
+        }
+        .inventory-item, .quest-item, .journal-entry {
+            background-color: rgba(245, 222, 179, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+        .save-load-area {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .age-warning {
+            background-color: #8B0000;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 2px solid #FF0000;
+            font-size: 1.2em;
+        }
+        .settings-menu {
+            position: relative;
+            display: inline-block;
+        }
+        .settings-content {
+            display: none;
+            position: absolute;
+            background-color: var(--bg-color);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+        }
+        .settings-content.show {
+            display: block;
+        }
+        .settings-content label {
+            display: block;
+            padding: 10px;
+        }
+        .settings-content select, .settings-content input {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            --bg-color: #2C2C2C;
+            --text-color: #E0E0E0;
+            --border-color: #B8860B;
+            --highlight-color: #4A4A4A;
+        }
+        body.dark-mode .container {
+            background-color: rgba(44, 44, 44, 0.9);
+        }
+        body.dark-mode .stats-area, 
+        body.dark-mode .inventory-area, 
+        body.dark-mode .quest-area, 
+        body.dark-mode .journal-area,
+        body.dark-mode .chat-box {
+            background-color: rgba(44, 44, 44, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="age-warning">
+            WARNING: This interactive story is intended for mature adults (28+) only. Content may contain graphic adult themes, strong language, intense situations, and complex moral scenarios. Viewer discretion strongly advised.
+        </div>
+        <div class="save-load-area">
+            <button id="save-button">Save Game</button>
+            <button id="load-button">Load Game</button>
+            <div class="settings-menu">
+                <button id="settings-button">Settings</button>
+                <div id="settings-content" class="settings-content">
+                    <label>
+                        Language:
+                        <select id="language-select">
+                            <option value="en">English</option>
+                            <option value="es">Espa&#xf1;ol</option>
+                            <option value="fr">Fran&#xe7;ais</option>
+                            <option value="de">Deutsch</option>
+                        </select>
+                    </label>
+                    <label>
+                        Difficulty:
+                        <select id="difficulty-select">
+                            <option value="easy">Easy</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="hard">Hard</option>
+                            <option value="insane">Insane</option>
+                            <option value="good-luck">Good Luck</option>
+                        </select>
+                    </label>
+                    <label>
+                        Font:
+                        <select id="font-select">
+                            <option value="&apos;Courier Prime&apos;, monospace">Courier Prime</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="&apos;Times New Roman&apos;, serif">Times New Roman</option>
+                            <option value="&apos;Georgia&apos;, serif">Georgia</option>
+                        </select>
+                    </label>
+                    <label>
+                        Font Size:
+                        <input type="range" id="font-size-slider" min="12" max="24" value="16">
+                    </label>
+                    <label>
+                        Dark Mode:
+                        <input type="checkbox" id="dark-mode-toggle">
+                    </label>
+                </div>
+            </div>
+        </div>
+        <h1>Interactive Story Generator (28+)</h1>
+        <div class="game-area">
+            <div class="chat-area">
+                <div id="chat-box" class="chat-box"></div>
+                <div class="input-area">
+                    <input type="text" id="user-input" placeholder="Type your response here...">
+                    <button id="send-button">Send</button>
+                    <div id="action-buttons" class="action-buttons"></div>
+                </div>
+            </div>
+            <div class="side-panel">
+                <div class="stats-area">
+                    <h2>Character Info</h2>
+                    <div id="stats"></div>
+                </div>
+                <div class="inventory-area">
+                    <h2>Inventory</h2>
+                    <div id="inventory"></div>
+                </div>
+                <div class="quest-area">
+                    <h2>Objectives</h2>
+                    <div id="quests"></div>
+                </div>
+                <div class="journal-area">
+                    <h2>Journal</h2>
+                    <div id="journal"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>const chatBox = document.getElementById('chat-box');
+const userInput = document.getElementById('user-input');
+const sendButton = document.getElementById('send-button');
+const statsElement = document.getElementById('stats');
+const inventoryElement = document.getElementById('inventory');
+const questsElement = document.getElementById('quests');
+const journalElement = document.getElementById('journal');
+const actionButtonsElement = document.getElementById('action-buttons');
+const saveButton = document.getElementById('save-button');
+const loadButton = document.getElementById('load-button');
+const settingsButton = document.getElementById('settings-button');
+const settingsContent = document.getElementById('settings-content');
+const languageSelect = document.getElementById('language-select');
+const difficultySelect = document.getElementById('difficulty-select');
+const fontSelect = document.getElementById('font-select');
+const fontSizeSlider = document.getElementById('font-size-slider');
+const darkModeToggle = document.getElementById('dark-mode-toggle');
+let playerState = {
+  name: '',
+  age: 0,
+  occupation: '',
+  traits: [],
+  skills: [],
+  inventory: [],
+  quests: [],
+  journal: []
+};
+let turnCount = 0;
+let journalEntryCount = 0;
+let settings = {
+  language: 'en',
+  difficulty: 'normal',
+  font: "'Courier Prime', monospace",
+  fontSize: '16px',
+  darkMode: false
+};
+function updatePlayerState() {
+  statsElement.innerHTML = `
+                <div class="stat"><span class="stat-name">Name:</span> ${playerState.name}</div>
+                <div class="stat"><span class="stat-name">Age:</span> ${playerState.age}</div>
+                <div class="stat"><span class="stat-name">Occupation:</span> ${playerState.occupation}</div>
+                <div class="stat"><span class="stat-name">Traits:</span> ${playerState.traits.join(', ')}</div>
+                <div class="stat"><span class="stat-name">Skills:</span> ${playerState.skills.join(', ')}</div>
+            `;
+  inventoryElement.innerHTML = playerState.inventory.map(item => `<div class="inventory-item">${item}</div>`).join('');
+  questsElement.innerHTML = playerState.quests.map(quest => `<div class="quest-item">${quest}</div>`).join('');
+  journalElement.innerHTML = playerState.journal.map(entry => `<div class="journal-entry">${entry}</div>`).join('');
+}
+function addMessage(message, type) {
+  const messageElement = document.createElement('div');
+  messageElement.classList.add('message', type);
+  message = message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  messageElement.innerHTML = message;
+  chatBox.appendChild(messageElement);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+function updateActionButtons(actions) {
+  actionButtonsElement.innerHTML = '';
+  actions.forEach(action => {
+    const button = document.createElement('button');
+    button.textContent = action;
+    button.addEventListener('click', () => sendMessage(action));
+    actionButtonsElement.appendChild(button);
+  });
+}
+async function sendMessage(message = null) {
+  const userMessage = message || userInput.value.trim();
+  if (userMessage) {
+    addMessage(userMessage, 'user');
+    userInput.value = '';
+    try {
+      const response = await fetch('/api/gamemaster', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          playerState: playerState,
+          settings: settings
+        })
+      });
+      const data = await response.json();
+      addMessage(data.response, 'gm');
+      if (data.stateChanges) {
+        Object.assign(playerState, data.stateChanges);
+        updatePlayerState();
+      }
+      if (data.actions) {
+        updateActionButtons(data.actions);
+      }
+      turnCount++;
+      if (turnCount % 5 === 0) {
+        summarizeAndAddToJournal();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      addMessage('An error occurred. Please try again.', 'system');
+    }
+  }
+}
+async function summarizeAndAddToJournal() {
+  try {
+    const response = await fetch('/api/summarize', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        chatLog: Array.from(chatBox.children).map(msg => msg.textContent).join('\n')
+      })
+    });
+    const data = await response.json();
+    playerState.journal.push(data.summary);
+    journalEntryCount++;
+    if (journalEntryCount % 10 === 0) {
+      summarizeJournal();
+    }
+    updatePlayerState();
+  } catch (error) {
+    console.error('Error summarizing chat:', error);
+  }
+}
+async function summarizeJournal() {
+  try {
+    const response = await fetch('/api/summarize-journal', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        journal: playerState.journal
+      })
+    });
+    const data = await response.json();
+    playerState.journal = [data.summary];
+    updatePlayerState();
+  } catch (error) {
+    console.error('Error summarizing journal:', error);
+  }
+}
+function saveGame() {
+  const saveName = prompt("Enter a name for your save game:");
+  if (saveName) {
+    const saveData = {
+      playerState: playerState,
+      turnCount: turnCount,
+      journalEntryCount: journalEntryCount,
+      chatHistory: chatBox.innerHTML,
+      settings: settings
+    };
+    localStorage.setItem(`save_${saveName}`, JSON.stringify(saveData));
+    alert(`Game saved as "${saveName}"`);
+  }
+}
+function loadGame() {
+  const saves = Object.keys(localStorage).filter(key => key.startsWith('save_'));
+  if (saves.length === 0) {
+    alert("No saved games found.");
+    return;
+  }
+  const saveName = prompt("Enter the name of the save game to load:\n" + saves.map(s => s.replace('save_', '')).join(', '));
+  if (saveName) {
+    const saveData = localStorage.getItem(`save_${saveName}`);
+    if (saveData) {
+      const parsedData = JSON.parse(saveData);
+      playerState = parsedData.playerState;
+      turnCount = parsedData.turnCount;
+      journalEntryCount = parsedData.journalEntryCount;
+      chatBox.innerHTML = parsedData.chatHistory;
+      settings = parsedData.settings || settings;
+      updatePlayerState();
+      updateSettingsUI();
+      applySettings();
+      alert(`Game "${saveName}" loaded successfully.`);
+    } else {
+      alert(`No save game found with the name "${saveName}".`);
+    }
+  }
+}
+function toggleSettingsMenu() {
+  settingsContent.classList.toggle('show');
+}
+function updateSettings() {
+  const difficultyDescriptions = {
+    'easy': 'Forgiving - For casual storytelling',
+    'normal': 'Balanced - True-to-life challenges',
+    'hard': 'Intense - Gritty realism',
+    'insane': 'Brutal - Unforgiving circumstances',
+    'good-luck': 'Nightmare - Expect the worst'
+  };
+  settings.language = languageSelect.value;
+  settings.difficulty = difficultySelect.value;
+  settings.font = fontSelect.value;
+  settings.fontSize = `${fontSizeSlider.value}px`;
+  settings.darkMode = darkModeToggle.checked;
+  difficultySelect.title = difficultyDescriptions[settings.difficulty];
+  applySettings();
+}
+function updateSettingsUI() {
+  languageSelect.value = settings.language;
+  difficultySelect.value = settings.difficulty;
+  fontSelect.value = settings.font;
+  fontSizeSlider.value = parseInt(settings.fontSize);
+  darkModeToggle.checked = settings.darkMode;
+}
+function applySettings() {
+  document.body.style.fontFamily = settings.font;
+  document.body.style.fontSize = settings.fontSize;
+  if (settings.darkMode) {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+}
+sendButton.addEventListener('click', () => sendMessage());
+userInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter') {
+    sendMessage();
+  }
+});
+saveButton.addEventListener('click', saveGame);
+loadButton.addEventListener('click', loadGame);
+settingsButton.addEventListener('click', toggleSettingsMenu);
+languageSelect.addEventListener('change', updateSettings);
+difficultySelect.addEventListener('change', updateSettings);
+fontSelect.addEventListener('change', updateSettings);
+fontSizeSlider.addEventListener('input', updateSettings);
+darkModeToggle.addEventListener('change', updateSettings);
+window.addEventListener('click', event => {
+  if (!event.target.matches('#settings-button') && !settingsContent.contains(event.target)) {
+    settingsContent.classList.remove('show');
+  }
+});
+updatePlayerState();
+updateSettingsUI();
+applySettings();
+const initialMessages = ["Welcome to the Interactive Story Generator! For the best experience, please press F11 for fullscreen mode and use the green button in the top left corner to maximize the WebSim window.", "This is an uncensored storytelling experience intended for mature adults (28+) only. The story may contain graphic content, adult themes, strong language, and morally complex scenarios.", "Before we begin, please provide some initial details about your story. What type of world does it take place in? Describe the setting in detail. Is it a fantasy realm, a futuristic universe, a modern-day setting, a historical period, or something entirely unique? Please provide as much detail as possible about the world's atmosphere, technology level, social structures, and any unique features.", "Next, tell me about the main character. What's their full name, age, appearance, occupation, personality traits, skills, background, and any unique items they possess?", "Lastly, what is the main character's primary goal or motivation? This could be a specific quest, a personal ambition, a problem to solve, or an enemy to face. Explain why this goal is important to the character and how it relates to the world you've described.", "Let's establish some ground rules for our storytelling experience:", "1. Mature content: This story is intended for adults (28+) and may include mature themes. However, explicit graphic violence or non-consensual acts are still off-limits.", "2. Character agency: Your choices will have consequences, so consider them carefully.", "3. Immersion: Try to stay in character and consider the world's logic in your decisions.", "4. Creativity: Feel free to suggest plot twists or introduce new elements, but remember that the GM has final say on world consistency.", "5. Enjoy the journey: This is a collaborative storytelling experience, so have fun and let your imagination soar!", "Now, let's begin crafting your unique tale. What genre or mix of genres would you like for your story?"].forEach(msg => addMessage(msg, 'system'));</script>
+</body></html>
