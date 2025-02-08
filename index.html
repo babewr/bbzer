@@ -1,0 +1,130 @@
+<title>CatDogs: The Purr-fect Bark</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(45deg, #FFD700, #FF69B4);
+    color: #333;
+    height: 100%;
+    overflow-x: hidden;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  header {
+    text-align: center;
+    padding: 20px 0;
+  }
+  h1 {
+    font-size: 3em;
+    color: #8B4513;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+  .catdog-image {
+    width: 300px;
+    height: 300px;
+    margin: 20px auto;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23FFA500"/><circle cx="30" cy="30" r="10" fill="%23FFF"/><circle cx="70" cy="30" r="10" fill="%23FFF"/><circle cx="30" cy="33" r="5" fill="%23000"/><circle cx="70" cy="33" r="5" fill="%23000"/><path d="M 30 70 Q 50 80 70 70" fill="none" stroke="%23000" stroke-width="3"/><path d="M 20 20 Q 10 10 0 20" fill="none" stroke="%23000" stroke-width="3"/><path d="M 80 20 Q 90 10 100 20" fill="none" stroke="%23000" stroke-width="3"/></svg>') center/cover no-repeat;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    animation: bounce 2s infinite alternate;
+  }
+  @keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-20px); }
+  }
+  .content {
+    background: rgba(255,255,255,0.8);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  .feature {
+    margin-bottom: 20px;
+  }
+  h2 {
+    color: #4B0082;
+  }
+  .paw-print {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="%23FF69B4"/><circle cx="30" cy="30" r="10" fill="%23FF69B4"/><circle cx="70" cy="30" r="10" fill="%23FF69B4"/><circle cx="30" cy="70" r="10" fill="%23FF69B4"/><circle cx="70" cy="70" r="10" fill="%23FF69B4"/></svg>') center/cover no-repeat;
+    margin-right: 10px;
+  }
+  footer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Welcome to the Wonderful World of CatDogs!</h1>
+  </header>
+  
+  <div class="catdog-image"></div>
+  
+  <div class="content">
+    <div class="feature">
+      <h2><span class="paw-print"></span>What is a CatDog?</h2>
+      <p>A CatDog is a marvelous creature that combines the best of both feline and canine worlds. Imagine the purr-fect cuddle buddy with the loyalty of a dog and the independence of a cat!</p>
+    </div>
+    
+    <div class="feature">
+      <h2><span class="paw-print"></span>CatDog Characteristics</h2>
+      <ul>
+        <li>Meows and barks interchangeably</li>
+        <li>Chases its own tail... and catches it!</li>
+        <li>Enjoys both catnip and dog treats</li>
+        <li>Can use a litterbox or go for walks</li>
+        <li>Expert at fetching toys... but might not bring them back</li>
+      </ul>
+    </div>
+    
+    <div class="feature">
+      <h2><span class="paw-print"></span>How to Care for Your CatDog</h2>
+      <p>Caring for a CatDog is an adventure! They need a scratching post next to their doghouse, and enjoy playing with balls of yarn and frisbees equally. Feed them a diet of premium cat food mixed with dog kibble for optimal health.</p>
+    </div>
+    
+    <div class="feature">
+      <h2><span class="paw-print"></span>Famous CatDogs in Pop Culture</h2>
+      <p>While CatDog from the Nickelodeon show might be the most famous, our real-life CatDogs are making waves in the pet world. Keep an eye out for them in upcoming pet shows and adorable animal videos!</p>
+    </div>
+  </div>
+  
+  <footer>
+    <p>© 2023 CatDogs: The Purr-fect Bark. All rights reserved. No cats or dogs were confused in the making of this website.</p>
+  </footer>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  const catdogImage = document.querySelector('.catdog-image');
+  
+  catdogImage.addEventListener('click', () => {
+    const sounds = ['Meow!', 'Woof!', 'Purr...', 'Bark!', 'Meowoof!'];
+    alert(sounds[Math.floor(Math.random() * sounds.length)]);
+  });
+
+  const pawPrints = document.querySelectorAll('.paw-print');
+  pawPrints.forEach(paw => {
+    paw.addEventListener('mouseover', () => {
+      paw.style.transform = 'rotate(360deg)';
+      paw.style.transition = 'transform 0.5s';
+    });
+    paw.addEventListener('mouseout', () => {
+      paw.style.transform = 'rotate(0deg)';
+    });
+  });
+});
+</script>
+</body></html>
