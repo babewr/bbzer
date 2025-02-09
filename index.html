@@ -1,0 +1,402 @@
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  header {
+    text-align: center;
+    padding: 20px 0;
+    position: relative;
+  }
+  .logo {
+    font-size: 48px;
+    font-weight: bold;
+  }
+  .product {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .product h2 {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  .product p {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  .cta {
+    display: inline-block;
+    background-color: #0071e3;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 18px;
+    transition: background-color 0.3s;
+  }
+  .cta:hover {
+    background-color: #2997ff;
+  }
+  .skibidi-animation {
+    animation: skibidi 2s infinite;
+  }
+  @keyframes skibidi {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1); }
+  }
+  .footer-text {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 50px;
+    padding: 20px;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+  }
+  .ios18 {
+    background: linear-gradient(45deg, #ff3e3e, #ff993e, #ffff3e, #3eff3e, #3e3eff, #993eff);
+    background-size: 600% 600%;
+    animation: gradientBG 10s ease infinite;
+    padding: 40px;
+    border-radius: 20px;
+    margin-bottom: 50px;
+  }
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .ios18 h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+  .ios18 p {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+  .free-ipad {
+    background: url('https://images.unsplash.com/photo-1585790049045-e1af5d524d20?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80') center/cover;
+    padding: 60px;
+    border-radius: 20px;
+    margin-bottom: 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .free-ipad::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1;
+  }
+  .free-ipad * {
+    position: relative;
+    z-index: 2;
+  }
+  .free-ipad h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+  .free-ipad p {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #fff;
+  }
+  .glitch-effect {
+    animation: glitch 1s linear infinite;
+    opacity: 0.8;
+  }
+  @keyframes glitch {
+    2%, 64% {
+      transform: translate(2px,0) skew(0deg);
+    }
+    4%, 60% {
+      transform: translate(-2px,0) skew(0deg);
+    }
+    62% {
+      transform: translate(0,0) skew(5deg); 
+    }
+  }
+  #bruh-mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+  #bruh-mode-toggle:hover {
+    background: #f0f0f0;
+  }
+  body.bruh-mode {
+    background-color: #fff;
+    color: #000;
+  }
+  body.bruh-mode .footer-text {
+    background-color: #f0f0f0;
+    color: #000;
+  }
+  body.bruh-mode .cta {
+    background-color: #000;
+    color: #fff;
+  }
+  body.bruh-mode .cta:hover {
+    background-color: #333;
+  }
+  body.bruh-mode #bruh-mode-toggle {
+    background: #000;
+    color: #fff;
+  }
+  body.bruh-mode #bruh-mode-toggle:hover {
+    background: #333;
+  }
+  .suck-android {
+    background: linear-gradient(135deg, #a4c639, #6ab344);
+    padding: 40px;
+    border-radius: 20px;
+    margin-bottom: 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .suck-android h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+  .suck-android p {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #fff;
+  }
+  .suck-android::after {
+    content: '🤮';
+    font-size: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    opacity: 0.2;
+  }
+  .suck-android .cta {
+    background-color: #fff;
+    color: #a4c639;
+  }
+  .suck-android .cta:hover {
+    background-color: #f0f0f0;
+  }
+  .help-with-google {
+    background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+    padding: 40px;
+    border-radius: 20px;
+    margin-bottom: 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .help-with-google h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+  .help-with-google p {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #fff;
+  }
+  .help-with-google::after {
+    content: '🔍';
+    font-size: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    opacity: 0.2;
+  }
+  .help-with-google .cta {
+    background-color: #fff;
+    color: #4285f4;
+  }
+  .help-with-google .cta:hover {
+    background-color: #f0f0f0;
+  }
+  .search-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+  }
+  .search-input {
+    padding: 10px;
+    border: none;
+    border-radius: 20px 0 0 20px;
+    font-size: 16px;
+    width: 200px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+  .search-input:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  .search-button {
+    background-color: #0071e3;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 0 20px 20px 0;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  .search-button:hover {
+    background-color: #2997ff;
+  }
+  body.bruh-mode .search-input {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #000;
+  }
+  body.bruh-mode .search-input:focus {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  body.bruh-mode .search-button {
+    background-color: #000;
+    color: #fff;
+  }
+  body.bruh-mode .search-button:hover {
+    background-color: #333;
+  }
+</style>
+</head>
+<body>
+  <button id="bruh-mode-toggle">White Bruh Mode</button>
+  <div class="container">
+    <header>
+      <div class="logo skibidi-animation">🍎 Apple</div>
+      <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search for bussin' stuff...">
+        <button class="search-button">🔍 Yeet</button>
+      </div>
+    </header>
+    
+    <div class="free-ipad">
+      <h2 class="glitch-effect">Free iPad Giveaway</h2>
+      <p>No cap, we're giving away iPads like they're Fanum tax refunds! It's bussin', fr fr!</p>
+      <a href="https://www.apple.com/ipad-giveaway/" class="cta">Claim Your Free iPad</a>
+    </div>
+
+    <div class="ios18">
+      <h2>iOS 18: The Skibidi Update</h2>
+      <p>Bussin' features that'll make your iPhone go brr! No cap, it's straight fire.</p>
+      <a href="https://www.apple.com/ios/ios-18-preview/" class="cta">Get that heat</a>
+    </div>
+
+    <div class="suck-android">
+      <h2>Android? More like Andro-DEAD</h2>
+      <p>Imagine using a phone that's not bussin'. Couldn't be us. Android users stay taking L's.</p>
+      <a href="https://www.apple.com/iphone/switch/" class="cta">Ditch that Android L</a>
+    </div>
+
+    <div class="help-with-google">
+      <h2>Help With Google? Nah, We Got You Fam</h2>
+      <p>Who needs Google when you've got Siri? She's the real MVP, no cap. Let's show Google how we roll!</p>
+      <a href="https://www.apple.com/siri/" class="cta">Meet Your New Bestie, Siri</a>
+    </div>
+
+    <div class="product">
+      <h2>iPhone 15 Pro Max</h2>
+      <p>No cap, this phone's got mad rizz. It's giving Ohio energy, fr fr.</p>
+      <a href="https://www.apple.com/iphone-15-pro/" class="cta">Cop that heat</a>
+    </div>
+    
+    <div class="product">
+      <h2>MacBook Air</h2>
+      <p>Lightweight like Kai Cenat, but with that sigma grindset power.</p>
+      <a href="https://www.apple.com/macbook-air/" class="cta">Level up your setup</a>
+    </div>
+    
+    <div class="product">
+      <h2>AirPods Pro</h2>
+      <p>Edge lord approved. Perfect for mewing while you listen.</p>
+      <a href="https://www.apple.com/airpods-pro/" class="cta">Flex on 'em</a>
+    </div>
+    
+    <div class="product">
+      <h2>Apple Watch Series 8</h2>
+      <p>Stay on that grind, but watch out for the Fanum tax on your gains.</p>
+      <a href="https://www.apple.com/apple-watch-series-8/" class="cta">Secure the drip</a>
+    </div>
+
+    <div class="footer-text">
+      <p>Nuh uh, skibidi? Digital circus? Uhh benjix o' inside out 2! Wowow</p>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.product, .ios18, .free-ipad, .suck-android, .help-with-google').forEach(element => {
+      element.addEventListener('mouseover', () => {
+        element.classList.add('skibidi-animation');
+      });
+      element.addEventListener('mouseout', () => {
+        element.classList.remove('skibidi-animation');
+      });
+    });
+
+    const bruhModeToggle = document.getElementById('bruh-mode-toggle');
+    const body = document.body;
+
+    bruhModeToggle.addEventListener('click', () => {
+      body.classList.toggle('bruh-mode');
+      if (body.classList.contains('bruh-mode')) {
+        bruhModeToggle.textContent = 'Dark Bruh Mode';
+      } else {
+        bruhModeToggle.textContent = 'White Bruh Mode';
+      }
+    });
+
+    const searchButton = document.querySelector('.search-button');
+    const searchInput = document.querySelector('.search-input');
+
+    searchButton.addEventListener('click', () => {
+      const searchTerm = searchInput.value.trim();
+      if (searchTerm) {
+        alert(`Yo, you tryna find "${searchTerm}"? That's bussin', fr fr! We're on it like white on rice, no cap!`);
+        searchInput.value = '';
+      } else {
+        alert("Bruh, you gotta type somethin' to search. Don't be skibidi, fam!");
+      }
+    });
+
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        searchButton.click();
+      }
+    });
+  </script>
+</body>
+</html>
