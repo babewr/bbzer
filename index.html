@@ -1,0 +1,2276 @@
+<style>
+.game-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+}
+
+.cats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.cat {
+    width: 100px;
+    height: 120px;
+    cursor: grab;
+    position: relative;
+    transition: transform 0.2s;
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 10px;
+    user-select: none;
+}
+
+.cat:hover {
+    transform: scale(1.1);
+}
+
+.cat.selected {
+    border: 3px solid #ffcc00;
+}
+
+.cat.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.stats {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.cat-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-transform: capitalize;
+}
+
+.battlefield {
+    background: linear-gradient(to bottom, #4a9f4a, #3a7f3a);
+    border: 2px solid #2a5f2a;
+    padding: 20px;
+    margin: 20px 0;
+    min-height: 200px;
+    border-radius: 15px;
+    position: relative;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.battlefield.dragover {
+    border: 2px dashed #ffcc00;
+    background: linear-gradient(to bottom, #5abf5a, #4a9f4a);
+}
+
+.battlefield::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(0,0,0,0.1) 10px,
+        rgba(0,0,0,0.1) 20px
+    );
+    border-radius: 13px;
+    pointer-events: none;
+}
+
+.battle-zone {
+    border: 2px solid #ff4444;
+    padding: 20px;
+    margin: 20px 0;
+    min-height: 150px;
+    border-radius: 15px;
+    display: none;
+}
+
+.battle-result {
+    font-size: 24px;
+    margin: 20px 0;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.dog {
+    width: 100px;
+    height: 120px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px auto;
+}
+
+.dogs-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.dog-instance {
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 5px;
+    width: 100px;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px) rotate(-5deg); }
+    75% { transform: translateX(5px) rotate(5deg); }
+}
+
+.fighting {
+    animation: shake 0.5s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.cat-svg {
+    width: 60px;
+    height: 60px;
+}
+
+.battlefield-cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#nextWaveBtn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+#nextWaveBtn:hover {
+    background-color: #45a049;
+}
+
+.shiny-box {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    border: 2px solid #DAA520;
+    padding: 20px;
+    margin: 20px 0;
+    min-height: 150px;
+    border-radius: 15px;
+    position: relative;
+    text-align: center;
+}
+
+.shiny-box.dragover {
+    border: 2px dashed #FFD700;
+    background: linear-gradient(45deg, #FFE700, #FFB500);
+}
+
+#convertShinyBtn {
+    background-color: #DAA520;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: none;
+}
+
+#convertShinyBtn:hover {
+    background-color: #B8860B;
+}
+
+.cat.shiny {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    box-shadow: 0 0 10px #FFD700;
+}
+
+.cat.rainbow {
+    background: linear-gradient(45deg, 
+        red, 
+        orange,
+        yellow,
+        green,
+        blue,
+        indigo,
+        violet
+    );
+    box-shadow: 0 0 15px rgba(255,255,255,0.8);
+    animation: rainbow-pulse 2s infinite;
+}
+
+@keyframes rainbow-pulse {
+    0% { box-shadow: 0 0 15px rgba(255,0,0,0.8); }
+    16.6% { box-shadow: 0 0 15px rgba(255,165,0,0.8); }
+    33.3% { box-shadow: 0 0 15px rgba(255,255,0,0.8); }
+    50% { box-shadow: 0 0 15px rgba(0,255,0,0.8); }
+    66.6% { box-shadow: 0 0 15px rgba(0,0,255,0.8); }
+    83.3% { box-shadow: 0 0 15px rgba(75,0,130,0.8); }
+    100% { box-shadow: 0 0 15px rgba(238,130,238,0.8); }
+}
+
+.cat.quicksilver {
+    background: linear-gradient(45deg, #C0C0C0, #E8E8E8);
+    box-shadow: 0 0 15px rgba(192,192,192,0.8);
+    animation: silver-pulse 2s infinite;
+}
+
+@keyframes silver-pulse {
+    0% { box-shadow: 0 0 15px rgba(192,192,192,0.8); }
+    50% { box-shadow: 0 0 25px rgba(230,230,230,0.9); }
+    100% { box-shadow: 0 0 15px rgba(192,192,192,0.8); }
+}
+
+.cat.sorcerer {
+    background: linear-gradient(45deg, #9932CC, #4B0082);
+    box-shadow: 0 0 20px rgba(153,50,204,0.8);
+    animation: sorcerer-pulse 2s infinite;
+}
+
+@keyframes sorcerer-pulse {
+    0% { box-shadow: 0 0 20px rgba(153,50,204,0.8); }
+    50% { box-shadow: 0 0 30px rgba(75,0,130,0.9); }
+    100% { box-shadow: 0 0 20px rgba(153,50,204,0.8); }
+}
+
+.cat.sound-mech {
+    background: linear-gradient(45deg, #FF00FF, #2F0F2F);
+    box-shadow: 0 0 20px rgba(255,0,255,0.8);
+    animation: sound-mech-pulse 2s infinite;
+}
+
+@keyframes sound-mech-pulse {
+    0% { box-shadow: 0 0 20px rgba(255,0,255,0.8); }
+    50% { box-shadow: 0 0 30px rgba(47,15,47,0.9); }
+    100% { box-shadow: 0 0 20px rgba(255,0,255,0.8); }
+}
+
+.cat.darkAngel {
+    background: linear-gradient(45deg, #000033, #1a1a3a);
+    box-shadow: 0 0 20px rgba(0,0,51,0.8);
+    animation: darkAngel-pulse 2s infinite;
+}
+
+@keyframes darkAngel-pulse {
+    0% { box-shadow: 0 0 20px rgba(0,0,51,0.8); }
+    50% { box-shadow: 0 0 30px rgba(26,26,58,0.9); }
+    100% { box-shadow: 0 0 20px rgba(0,0,51,0.8); }
+}
+
+.cat.jellyfish {
+    background: linear-gradient(45deg, #0077be, #4B0082);
+    box-shadow: 0 0 20px rgba(0,119,190,0.8);
+    animation: jellyfish-pulse 3s infinite;
+}
+
+@keyframes jellyfish-pulse {
+    0% { 
+        box-shadow: 0 0 20px rgba(0,119,190,0.8);
+        transform: translateY(0);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(75,0,130,0.9);
+        transform: translateY(-5px);
+    }
+    100% { 
+        box-shadow: 0 0 20px rgba(0,119,190,0.8);
+        transform: translateY(0);
+    }
+}
+
+.cat.demon {
+    background: linear-gradient(45deg, #8B0000, #FF0000);
+    box-shadow: 0 0 20px rgba(139,0,0,0.8);
+    animation: demon-pulse 2s infinite;
+}
+
+@keyframes demon-pulse {
+    0% { box-shadow: 0 0 20px rgba(139,0,0,0.8); }
+    50% { box-shadow: 0 0 30px rgba(255,0,0,0.9); }
+    100% { box-shadow: 0 0 20px rgba(139,0,0,0.8); }
+}
+
+.toggle-shiny-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #FFD700;
+    border: none;
+    color: black;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 100;
+}
+
+.toggle-shiny-btn:hover {
+    background-color: #FFC700;
+}
+
+.store {
+    background: linear-gradient(45deg, #4a9f4a, #3a7f3a);
+    border: 2px solid #2a5f2a;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 15px;
+    color: white;
+}
+
+.store-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.store-item {
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-align: center;
+}
+
+.store-item:hover {
+    transform: scale(1.05);
+    background: rgba(255,255,255,0.2);
+}
+
+.store-item img {
+    width: 40px;
+    height: 40px;
+}
+
+.store-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.coins {
+    font-size: 20px;
+    font-weight: bold;
+    color: gold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.achievements-button {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 100;
+}
+
+.achievements-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 1000;
+    max-height: 80vh;
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.achievement-item {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    background: #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.achievement-item.earned {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white;
+}
+
+.achievement-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 1001;
+    animation: slideDown 0.5s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
+}
+
+@keyframes slideDown {
+    from { transform: translate(-50%, -100%); }
+    to { transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; }
+}
+
+.collection-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    z-index: 1000;
+    max-height: 80vh;
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.collection-button {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background-color: #9370DB;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 100;
+}
+
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.collection-item {
+    background: #f0f0f0;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.collection-item.locked {
+    filter: brightness(0.5);
+}
+
+.cat.inferno {
+    background: linear-gradient(45deg, #FF4500, #FF0000);
+    box-shadow: 0 0 10px #FF4500;
+    animation: inferno-pulse 2s infinite;
+}
+
+@keyframes inferno-pulse {
+    0% { box-shadow: 0 0 15px #FF4500; }
+    50% { box-shadow: 0 0 25px #FF0000; }
+    100% { box-shadow: 0 0 15px #FF4500; }
+}
+
+.cat.angelic {
+    background: linear-gradient(45deg, #FFFFFF, #FFE5CC);
+    box-shadow: 0 0 15px rgba(255,255,255,0.8);
+    animation: angelic-pulse 2s infinite;
+}
+
+@keyframes angelic-pulse {
+    0% { box-shadow: 0 0 15px rgba(255,255,255,0.8); }
+    50% { box-shadow: 0 0 25px rgba(255,255,255,0.9); }
+    100% { box-shadow: 0 0 15px rgba(255,255,255,0.8); }
+}
+
+.extreme-mode-btn {
+    position: fixed;
+    top: 140px;
+    right: 20px;
+    background-color: #ff4444;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 100;
+}
+
+.extreme-mode-btn:hover {
+    background-color: #ff0000;
+}
+
+.extreme-mode-btn:after {
+    content: attr(data-mode);
+    margin-left: 5px;
+}
+
+.cat.dj {
+    background: linear-gradient(45deg, #FF00FF, #00FFFF);
+    box-shadow: 0 0 20px rgba(255,0,255,0.8);
+    animation: dj-pulse 1s infinite;
+}
+
+@keyframes dj-pulse {
+    0% { box-shadow: 0 0 20px rgba(255,0,255,0.8); }
+    50% { box-shadow: 0 0 30px rgba(0,255,255,0.9); }
+    100% { box-shadow: 0 0 20px rgba(255,0,255,0.8); }
+}
+
+.cat.sorcerer {
+    background: linear-gradient(45deg, #9932CC, #4B0082);
+    box-shadow: 0 0 20px rgba(153,50,204,0.8);
+    animation: sorcerer-pulse 2s infinite;
+}
+
+@keyframes sorcerer-pulse {
+    0% { box-shadow: 0 0 20px rgba(153,50,204,0.8); }
+    50% { box-shadow: 0 0 30px rgba(75,0,130,0.9); }
+    100% { box-shadow: 0 0 20px rgba(153,50,204,0.8); }
+}
+
+.cat.sound-mech {
+    background: linear-gradient(45deg, #FF00FF, #2F0F2F);
+    box-shadow: 0 0 20px rgba(255,0,255,0.8);
+    animation: sound-mech-pulse 2s infinite;
+}
+
+@keyframes sound-mech-pulse {
+    0% { box-shadow: 0 0 20px rgba(255,0,255,0.8); }
+    50% { box-shadow: 0 0 30px rgba(47,15,47,0.9); }
+    100% { box-shadow: 0 0 20px rgba(255,0,255,0.8); }
+}
+
+.cat.darkAngel {
+    background: linear-gradient(45deg, #000033, #1a1a3a);
+    box-shadow: 0 0 20px rgba(0,0,51,0.8);
+    animation: darkAngel-pulse 2s infinite;
+}
+
+@keyframes darkAngel-pulse {
+    0% { box-shadow: 0 0 20px rgba(0,0,51,0.8); }
+    50% { box-shadow: 0 0 30px rgba(26,26,58,0.9); }
+    100% { box-shadow: 0 0 20px rgba(0,0,51,0.8); }
+}
+</style>
+</head>
+<body>
+<div class="game-container">
+    <button class="toggle-shiny-btn" onclick="toggleShinyBox()">Toggle Shiny Machine</button>
+    <button class="extreme-mode-btn" onclick="toggleMode()" data-mode="Normal">Mode:</button>
+    <h1>Cat Fusion Battle</h1>
+    <div class="cats-container" id="catsContainer"></div>
+    <div class="shiny-box" id="shinyBox" style="display: none;">
+        <h3>Drag 4 Same Type Cats Here to Make Them Shiny</h3>
+        <div class="battlefield-cats" id="shinyCats"></div>
+        <button id="convertShinyBtn" onclick="convertToShiny()">Convert to Shiny Cat</button>
+    </div>
+    <div class="battlefield" id="fusionZone">
+        <h3>Drag Cats Here to Battle (Max 6)</h3>
+        <div class="battlefield-cats" id="battlefieldCats"></div>
+    </div>
+    <button onclick="addBasicCat()">Add Basic Cat</button>
+    <button onclick="startBattle()">Fight the Dogs!</button>
+    <div class="battle-zone" id="battleZone">
+        <h3>Battle Zone</h3>
+        <div id="dogContainer" class="dog"></div>
+        <div class="battle-result" id="battleResult"></div>
+        <button id="nextWaveBtn" onclick="nextWave()" style="display: none;">Next Wave</button>
+    </div>
+    <div class="store">
+        <h3>Store</h3>
+        <div class="store-grid" id="storeGrid"></div>
+    </div>
+    <div class="coins">Coins: <span id="coinDisplay">0</span></div>
+    <button class="achievements-button" onclick="toggleAchievements()">Achievements</button>
+    <div class="achievements-modal" id="achievementsModal">
+        <h2>Achievements</h2>
+        <div id="achievementsList"></div>
+        <button onclick="toggleAchievements()" style="margin-top: 10px">Close</button>
+    </div>
+    <div class="collection-modal" id="collectionModal">
+        <h2>Cat Collection</h2>
+        <div id="collectionGrid"></div>
+        <button onclick="toggleCollection()" style="margin-top: 10px">Close</button>
+    </div>
+    <button class="collection-button" onclick="toggleCollection()">Collection</button>
+</div>
+
+<script>
+class Cat {
+    constructor(type, power, speed, health) {
+        this.type = type;
+ 
+        this.power = power; 
+        this.speed = speed;
+        this.health = health;
+        this.selected = false;
+        this.isShiny = false;
+        this.isRainbow = false;
+        this.artifacts = [];
+        this.bananaCount = 0;
+        this.speedRings = 0;
+        this.ultimateOrbCount = 0;
+        this.magicBerryCount = 0;
+    }
+
+    static createBasicCat() {
+        return new Cat('basic', 10, 10, 100);
+    }
+
+    static createBlueCat() {
+        return new Cat('blue', 25, 15, 150);
+    }
+
+    static createRedCat() {
+        return new Cat('red', 40, 20, 200);
+    }
+
+    static createThreeHeadedCat() {
+        return new Cat('threeHeaded', 100, 30, 300);
+    }
+
+    static createDiamondCat() {
+        return new Cat('diamond', 150, 40, 400);
+    }
+
+    static createPurpleCat() {
+        return new Cat('purple', 60, 25, 250);
+    }
+
+    static createDiamondHydraCat() {
+        return new Cat('diamondHydra', 200, 50, 500);
+    }
+
+    static createShinyCat(baseType) {
+        const cat = new Cat(baseType, 0, 0, 0);
+        cat.isShiny = true;
+        // Double the stats for shiny cats
+        if (baseType === 'basic') {
+            cat.power = 20;
+            cat.speed = 20;
+            cat.health = 200;
+        } else if (baseType === 'blue') {
+            cat.power = 50;
+            cat.speed = 30;
+            cat.health = 300;
+        } else if (baseType === 'red') {
+            cat.power = 80;
+            cat.speed = 40;
+            cat.health = 400;
+        } else if (baseType === 'purple') {
+            cat.power = 120;
+            cat.speed = 50;
+            cat.health = 500;
+        } else if (baseType === 'threeHeaded') {
+            cat.power = 200;
+            cat.speed = 60;
+            cat.health = 600;
+        } else if (baseType === 'diamond') {
+            cat.power = 300;
+            cat.speed = 80;
+            cat.health = 800;
+        } else if (baseType === 'diamondHydra') {
+            cat.power = 400;
+            cat.speed = 100;
+            cat.health = 1000;
+        }
+        return cat;
+    }
+
+    static createRainbowCat(baseType) {
+        const cat = new Cat(baseType, 0, 0, 0);
+        cat.isRainbow = true;
+        // Double the shiny cat stats for rainbow cats
+        if (baseType === 'basic') {
+            cat.power = 40;
+            cat.speed = 40;
+            cat.health = 400;
+        } else if (baseType === 'blue') {
+            cat.power = 100;
+            cat.speed = 60;
+            cat.health = 600;
+        } else if (baseType === 'red') {
+            cat.power = 160;
+            cat.speed = 80;
+            cat.health = 800;
+        } else if (baseType === 'purple') {
+            cat.power = 240;
+            cat.speed = 100;
+            cat.health = 1000;
+        } else if (baseType === 'threeHeaded') {
+            cat.power = 400;
+            cat.speed = 120;
+            cat.health = 1200;
+        } else if (baseType === 'diamond') {
+            cat.power = 600;
+            cat.speed = 160;
+            cat.health = 1600;
+        } else if (baseType === 'diamondHydra') {
+            cat.power = 800;
+            cat.speed = 200;
+            cat.health = 2000;
+        }
+        return cat;
+    }
+
+    static createWizardCat() {
+        return new Cat('wizard', 250, 60, 600);
+    }
+
+    static createShadowWizardCat() {
+        return new Cat('shadowWizard', 400, 80, 800);
+    }
+
+    static createBananaMechCat() {
+        const cat = new Cat('bananaMech', 300, 200, 700);
+        cat.bananaCount = 0;
+        return cat;
+    }
+    
+    static createBlackCat() {
+        return new Cat('black', 300, 70, 700);
+    }
+
+    static createDarkMechCat() {
+        const cat = new Cat('darkMech', 600, 300, 1000);
+        cat.bananaCount = 0;
+        return cat;
+    }
+
+    static createQuicksilverCat() {
+        const cat = new Cat('quicksilver', 500, 1000, 300);
+        return cat;
+    }
+
+    static createInfernoCat() {
+        const cat = new Cat('inferno', 350, 150, 600);
+        return cat;
+    }
+
+    static createAngelicCat() {
+        const cat = new Cat('angelic', 800, 400, 1500);
+        return cat;
+    }
+
+    static createSorcererCat() {
+        const cat = new Cat('sorcerer', 1000, 500, 2000);
+        return cat;
+    }
+
+    static createDJCat() {
+        const cat = new Cat('dj', 450, 200, 800);
+        return cat;
+    }
+
+    static createSoundMechCat() {
+        return new Cat('soundMech', 800, 400, 1200);
+    }
+    
+    static createPoseidonCat() {
+        return new Cat('poseidon', 300, 200, 700); 
+    }
+
+    static createPhantomCat() {
+        return new Cat('phantom', 900, 450, 1400);
+    }
+
+    static createDarkAngelCat() {
+        return new Cat('darkAngel', 1200, 600, 2500);
+    }
+    
+    static createJellyfishCat() {
+        return new Cat('jellyfish', 1100, 500, 1800);
+    }
+
+    static createDemonCat() {
+        return new Cat('demon', 900, 400, 1600);
+    }
+}
+
+class Dog {
+    constructor(power, speed, health) {
+        this.power = power;
+        this.speed = speed;
+        this.health = health;
+    }
+
+    static getMultiplier(wave) {
+        return 1 + (wave * 0.3); // Original 30% increase
+    }
+
+    static createWaveDogs(wave) {
+        const dogs = [];
+        const basePower = 30;
+        const baseSpeed = 15;
+        const baseHealth = 200;
+        const multiplier = this.getMultiplier(wave);
+        
+        // Determine number of dogs based on wave
+        let numberOfDogs = 1;
+        if (wave % 5 === 0) { // Every 5th wave has 3 dogs
+            numberOfDogs = 3;
+        } else if (wave % 3 === 0) { // Every 3rd wave has 2 dogs
+            numberOfDogs = 2;
+        }
+        
+        // Create dogs for the wave
+        for (let i = 0; i < numberOfDogs; i++) {
+            dogs.push(new Dog(
+                Math.floor(basePower * multiplier),
+                Math.floor(baseSpeed * multiplier),
+                Math.floor(baseHealth * multiplier)
+            ));
+        }
+        
+        return dogs;
+    }
+}
+
+class StoreItem {
+    constructor(name, cost, power, speed, health, type, description) {
+        this.name = name;
+        this.cost = cost;
+        this.power = power || 0;
+        this.speed = speed || 0;
+        this.health = health || 0;
+        this.type = type;
+        this.description = description;
+    }
+
+    static getItems() {
+        return [
+            new StoreItem('Apple', 10, 5, 0, 10, 'fruit', 'Small boost to power and health'),
+            new StoreItem('Banana', 20, 0, 10, 15, 'fruit', 'Boosts speed and health'),
+            new StoreItem('Magic Berry', 50, 15, 15, 30, 'fruit', 'Boosts all stats'),
+            new StoreItem('Power Amulet', 100, 50, 0, 0, 'artifact', 'Large power boost'),
+            new StoreItem('Speed Ring', 100, 0, 50, 0, 'artifact', 'Large speed boost'),
+            new StoreItem('Health Crystal', 100, 0, 0, 100, 'artifact', 'Large health boost'),
+            new StoreItem('Ultimate Orb', 500, 100, 100, 200, 'artifact', 'Massive boost to all stats'),
+            new StoreItem('Shadow Crystal', 1000, 0, 0, 0, 'artifact', 'Can be used with Wizard Cat to create Shadow Wizard')
+        ];
+    }
+}
+
+class Achievement {
+    constructor(id, name, description, condition, reward) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.condition = condition;
+        this.reward = reward;
+        this.earned = false;
+    }
+
+    check(gameState) {
+        if (!this.earned && this.condition(gameState)) {
+            this.earned = true;
+            return true;
+        }
+        return false;
+    }
+}
+
+let cats = [];
+let battlefieldCats = [];
+let shinyBoxCats = [];
+let selectedCats = [];
+let currentWave = 1;
+let maxWave = 30;
+let isWaveComplete = false;
+let coins = 0;
+let selectedItem = null;
+let unlockedCats = new Set(['basic']);
+let isExtremeMode = false;
+
+let achievements = [
+    new Achievement(
+        'first_fusion',
+        'First Fusion',
+        'Create your first fusion cat',
+        (state) => state.fusionCount > 0,
+        50
+    ),
+    new Achievement(
+        'wave_5',
+        'Wave Rider',
+        'Reach wave 5',
+        (state) => state.maxWaveReached >= 5,
+        100
+    ),
+    new Achievement(
+        'shiny_master',
+        'Shiny Master',
+        'Create your first shiny cat',
+        (state) => state.shinyCatsCreated > 0,
+        150
+    ),
+    new Achievement(
+        'rainbow_master',
+        'Rainbow Master',
+        'Create your first rainbow cat',
+        (state) => state.rainbowCatsCreated > 0,
+        200
+    ),
+    new Achievement(
+        'wave_15',
+        'Experienced Commander',
+        'Reach wave 15',
+        (state) => state.maxWaveReached >= 15,
+        300
+    ),
+    new Achievement(
+        'wave_30',
+        'Master Commander',
+        'Complete all 30 waves',
+        (state) => state.maxWaveReached >= 30,
+        500
+    ),
+    new Achievement(
+        'banana_mech',
+        'Going Bananas',
+        'Create a Banana Mech Cat',
+        (state) => state.bananaMechsCreated > 0,
+        250
+    ),
+    new Achievement(
+        'wizard',
+        'Magical Prowess',
+        'Create a Wizard Cat',
+        (state) => state.wizardsCreated > 0,
+        200
+    ),
+    new Achievement(
+        'shadow_wizard',
+        'Master of Shadows',
+        'Create a Shadow Wizard Cat',
+        (state) => state.shadowWizardsCreated > 0,
+        400
+    ),
+    new Achievement(
+        'collector',
+        'Cat Collector',
+        'Have at least one of each cat type',
+        (state) => state.uniqueCatTypes >= 8,
+        300
+    ),
+    new Achievement(
+        'extreme_master',
+        'Extreme Champion',
+        'Complete all waves in Extreme Mode',
+        (state) => state.extremeModeCompleted,
+        1000
+    ),
+    new Achievement(
+        'dark_angel_master',
+        'Master of Darkness',
+        'Create a Dark Angel Cat',
+        (state) => state.darkAngelCreated,
+        800
+    )
+];
+
+let gameState = {
+    fusionCount: 0,
+    maxWaveReached: 0,
+    shinyCatsCreated: 0,
+    rainbowCatsCreated: 0,
+    bananaMechsCreated: 0,
+    wizardsCreated: 0,
+    shadowWizardsCreated: 0,
+    uniqueCatTypes: 0,
+    extremeModeCompleted: false,
+    darkAngelCreated: false
+};
+
+function getCatSVG(type) {
+    const colors = {
+        basic: '#FFD700',
+        blue: '#4169E1', 
+        red: '#FF4444',
+        purple: '#800080',
+        threeHeaded: '#800080',
+        diamond: '#00FFFF',
+        diamondHydra: '#1E90FF',
+        wizard: '#9932CC',
+        shadowWizard: '#1a1a1a',
+        bananaMech: '#FFE135',
+        black: '#000000',
+        darkMech: '#2F0F2F',
+        quicksilver: '#C0C0C0',
+        inferno: '#FF4500',
+        angelic: '#FFE5CC',
+        sorcerer: '#9932CC',
+        dj: '#FF00FF',
+        soundMech: '#FF00FF',
+        poseidon: '#0077be',
+        phantom: '#4B0082',
+        darkAngel: '#000033',
+        jellyfish: '#0077be',
+        demon: '#8B0000'
+    };
+    
+    if (type === 'threeHeaded') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <g transform="translate(20,0)">
+                <circle cx="20" cy="30" r="15" fill="${colors[type]}"/>
+                <circle cx="40" cy="20" r="15" fill="${colors[type]}"/>
+                <circle cx="60" cy="30" r="15" fill="${colors[type]}"/>
+                <path d="M30 50 Q40 60 50 50" stroke="black" fill="none"/>
+                <circle cx="15" cy="25" r="2" fill="black"/>
+                <circle cx="40" cy="15" r="2" fill="black"/>
+                <circle cx="65" cy="25" r="2" fill="black"/>
+            </g>
+        </svg>`;
+    }
+
+    if (type === 'diamond') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <polygon points="50,20 80,50 50,80 20,50" fill="${colors[type]}" stroke="white"/>
+            <circle cx="40" cy="45" r="3" fill="black"/>
+            <circle cx="60" cy="45" r="3" fill="black"/>
+            <path d="M45 55 Q50 60 55 55" stroke="black" fill="none"/>
+            <path d="M35 35 L25 25" stroke="black"/>
+            <path d="M65 35 L75 25" stroke="black"/>
+        </svg>`;
+    }
+
+    if (type === 'diamondHydra') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <g transform="translate(10,0)">
+                <polygon points="40,20 70,50 40,80 10,50" fill="${colors[type]}" stroke="white"/>
+                <circle cx="30" cy="45" r="2" fill="black"/>
+                <circle cx="50" cy="45" r="2" fill="black"/>
+                <path d="M35 55 Q40 60 45 55" stroke="black" fill="none"/>
+                <circle cx="60" cy="35" r="2" fill="black"/>
+                <path d="M25 35 L15 25" stroke="white"/>
+                <path d="M55 35 L65 25" stroke="white"/>
+                <polygon points="80,30 90,40 80,50 70,40" fill="${colors[type]}" stroke="white"/>
+            </g>
+        </svg>`;
+    }
+
+    if (type === 'wizard') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <path d="M50 20 L70 60 L30 60 Z" fill="${colors[type]}"/> 
+            <circle cx="50" cy="65" r="20" fill="${colors[type]}"/> 
+            <circle cx="43" cy="60" r="3" fill="black"/> 
+            <circle cx="57" cy="60" r="3" fill="black"/> 
+            <path d="M47 70 Q50 73 53 70" stroke="black" fill="none"/> 
+            <path d="M30 70 Q50 90 70 70" fill="${colors[type]}" stroke="white"/> 
+            <path d="M35 40 L25 30" stroke="white"/> 
+            <path d="M65 40 L75 30" stroke="white"/> 
+        </svg>`;
+    }
+
+    if (type === 'shadowWizard') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <radialGradient id="shadowGrad">
+                    <stop offset="0%" stop-color="${colors[type]}"/>
+                    <stop offset="100%" stop-color="#000"/>
+                </radialGradient>
+            </defs>
+            <path d="M50 20 L70 60 L30 60 Z" fill="url(#shadowGrad)"/>
+            <circle cx="50" cy="65" r="20" fill="url(#shadowGrad)"/>
+            <circle cx="43" cy="60" r="3" fill="#purple"/>
+            <circle cx="57" cy="60" r="3" fill="#purple"/>
+            <path d="M47 70 Q50 73 53 70" stroke="purple" fill="none"/>
+            <path d="M30 70 Q50 90 70 70" fill="url(#shadowGrad)" stroke="#purple"/>
+            <path d="M35 40 L25 30" stroke="purple"/>
+            <path d="M65 40 L75 30" stroke="purple"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="purple" opacity="0.3"/>
+        </svg>`;
+    }
+
+    if (type === 'bananaMech') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="mechGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FFE135"/>
+                    <stop offset="100%" style="stop-color:#FFB347"/>
+                </linearGradient>
+            </defs>
+            <rect x="25" y="30" width="50" height="50" fill="url(#mechGrad)" rx="5"/>
+            <circle cx="40" cy="45" r="3" fill="black"/>
+            <circle cx="60" cy="45" r="3" fill="black"/>
+            <path d="M45 55 Q50 60 55 55" stroke="black" fill="none"/>
+            <path d="M20 40 L35 40" stroke="#FFB347" stroke-width="3"/>
+            <path d="M65 40 L80 40" stroke="#FFB347" stroke-width="3"/>
+            <circle cx="50" cy="20" r="10" fill="#FFE135"/>
+            <text x="50" y="70" text-anchor="middle" fill="black" style="font-size: 8px">MECH</text>
+        </svg>`;
+    }
+    
+    if (type === 'black') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="25" fill="${colors[type]}"/>
+            <circle cx="40" cy="45" r="3" fill="#530fad"/>
+            <circle cx="60" cy="45" r="3" fill="#530fad"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#530fad" fill="none"/>
+            <path d="M35 35 L25 25" stroke="#530fad"/>
+            <path d="M65 35 L75 25" stroke="#530fad"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="#530fad" opacity="0.3"/>
+        </svg>`;
+    }
+
+    if (type === 'darkMech') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="darkMechGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#2F0F2F"/>
+                    <stop offset="100%" style="stop-color:#530fad"/>
+                </linearGradient>
+                <filter id="shadow">
+                    <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#530fad"/>
+                </filter>
+            </defs>
+            <rect x="25" y="30" width="50" height="50" fill="url(#darkMechGrad)" rx="5" filter="url(#shadow)"/>
+            <circle cx="40" cy="45" r="3" fill="#530fad"/>
+            <circle cx="60" cy="45" r="3" fill="#530fad"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#530fad" fill="none"/>
+            <path d="M20 40 L35 40" stroke="#530fad" stroke-width="3"/>
+            <path d="M65 40 L80 40" stroke="#530fad" stroke-width="3"/>
+            <circle cx="50" cy="20" r="10" fill="#2F0F2F" filter="url(#shadow)"/>
+            <text x="50" y="70" text-anchor="middle" fill="#530fad" style="font-size: 8px">DARK MECH</text>
+        </svg>`;
+    }
+
+    if (type === 'quicksilver') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="quicksilverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#C0C0C0"/>
+                    <stop offset="100%" style="stop-color:#E8E8E8"/>
+                </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#quicksilverGrad)"/>
+            <circle cx="40" cy="45" r="3" fill="#808080"/>
+            <circle cx="60" cy="45" r="3" fill="#808080"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#808080" fill="none"/>
+            <path d="M35 35 L25 25" stroke="#A8A8A8"/>
+            <path d="M65 35 L75 25" stroke="#A8A8A8"/>
+            <path d="M20 50 Q50 70 80 50" stroke="#C0C0C0" fill="none" opacity="0.5"/>
+        </svg>`;
+    }
+
+    if (type === 'inferno') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="infernoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FF4500"/>
+                    <stop offset="50%" style="stop-color:#FF0000"/>
+                    <stop offset="100%" style="stop-color:#8B0000"/>
+                </linearGradient>
+                <filter id="fire">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur"/>
+                    <feColorMatrix in="blur" mode="matrix" 
+                        values="1 0 0 0 0.6   
+                                0 1 0 0 0.2   
+                                0 0 1 0 0.8  
+                                0 0 0 1 0" />
+                </filter>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#infernoGrad)"/>
+            <circle cx="40" cy="45" r="3" fill="#FF0000"/>
+            <circle cx="60" cy="45" r="3" fill="#FF0000"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#FF0000" fill="none"/>
+            <path d="M35 35 L25 25" stroke="#FF0000"/>
+            <path d="M65 35 L75 25" stroke="#FF0000"/>
+            <path d="M30 60 Q50 80 70 60" fill="url(#infernoGrad)" filter="url(#fire)"/>
+        </svg>`;
+    }
+
+    if (type === 'angelic') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <radialGradient id="angelicGrad">
+                    <stop offset="0%" stop-color="#FFFFFF"/>
+                    <stop offset="100%" stop-color="#FFE5CC"/>
+                </radialGradient>
+                <filter id="glow">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+                    <feColorMatrix in="blur" mode="matrix" 
+                        values="1 0 0 0 1  0 1 0 0 1  0 0 1 0 1  0 0 0 18 -7" result="glow"/>
+                </filter>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#angelicGrad)" filter="url(#glow)"/>
+            <circle cx="40" cy="45" r="3" fill="gold"/>
+            <circle cx="60" cy="45" r="3" fill="gold"/>
+            <path d="M45 55 Q50 60 55 55" stroke="gold" fill="none"/>
+            <path d="M30 30 Q50 20 70 30" fill="none" stroke="white" stroke-width="3"/>
+            <path d="M25 40 L35 35" stroke="gold"/>
+            <path d="M65 35 L75 40" stroke="gold"/>
+        </svg>`;
+    }
+
+    if (type === 'sorcerer') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <radialGradient id="sorcererGrad">
+                    <stop offset="0%" stop-color="#9932CC"/>
+                    <stop offset="100%" stop-color="#4B0082"/>
+                </radialGradient>
+                <filter id="magicGlow">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+                    <feColorMatrix type="matrix" 
+                        values="0 0 0 0 0.6   
+                                0 1 0 0 0.2   
+                                0 0 1 0 0.8  
+                                0 0 0 1 0" />
+                </filter>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#sorcererGrad)"/>
+            <circle cx="40" cy="45" r="3" fill="#FFD700"/>
+            <circle cx="60" cy="45" r="3" fill="#FFD700"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#FFD700" fill="none"/>
+            <path d="M25 40 L35 35" stroke="#FFD700"/>
+            <path d="M65 35 L75 40" stroke="#FFD700"/>
+            <path d="M30 30 Q50 20 70 30" fill="none" stroke="#FFD700" stroke-width="2" filter="url(#magicGlow)"/>
+            <path d="M20 50 Q50 70 80 50" fill="none" stroke="#FFD700" stroke-width="2" filter="url(#magicGlow)"/>
+        </svg>`;
+    }
+
+    if (type === 'dj') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="djGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FF00FF"/>
+                    <stop offset="100%" style="stop-color:#00FFFF"/>
+                </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#djGrad)"/>
+            <circle cx="40" cy="45" r="3" fill="white"/>
+            <circle cx="60" cy="45" r="3" fill="white"/>
+            <path d="M45 55 Q50 60 55 55" stroke="white" fill="none"/>
+            <path d="M25 40 L35 35" stroke="white"/>
+            <path d="M65 35 L75 40" stroke="white"/>
+            <path d="M20 20 L80 20" stroke="white" stroke-width="3"/>
+            <circle cx="30" cy="15" r="5" fill="#FF00FF"/>
+            <circle cx="70" cy="15" r="5" fill="#00FFFF"/>
+        </svg>`;
+    }
+
+    if (type === 'soundMech') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="soundMechGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FF00FF"/>
+                    <stop offset="100%" style="stop-color:#2F0F2F"/>
+                </linearGradient>
+                <filter id="soundWave">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+                </filter>
+            </defs>
+            <rect x="25" y="30" width="50" height="50" fill="url(#soundMechGrad)" rx="5"/>
+            <circle cx="40" cy="45" r="3" fill="#FF00FF"/>
+            <circle cx="60" cy="45" r="3" fill="#FF00FF"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#FF00FF" fill="none"/>
+            <path d="M20 40 L35 40" stroke="#FF00FF" stroke-width="3"/>
+            <path d="M65 40 L80 40" stroke="#FF00FF" stroke-width="3"/>
+            <circle cx="50" cy="20" r="10" fill="#FF00FF"/>
+            <path d="M25 50 Q50 70 75 50" stroke="#FF00FF" fill="none" filter="url(#soundWave)"/>
+            <text x="50" y="70" text-anchor="middle" fill="#FF00FF" style="font-size: 8px">SOUND MECH</text>
+        </svg>`;
+    }
+
+    if (type === 'poseidon') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="poseidonGrad">
+                    <stop offset="0%" stop-color="#0077be"/>
+                    <stop offset="100%" stop-color="#004466"/>
+                </linearGradient>
+                <filter id="waterWave">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="1" />
+                    <feColorMatrix type="matrix" 
+                        values="0 0 0 0 0   
+                                0 0 1 0 0.5   
+                                0 0 1 0 1  
+                                0 0 0 1 0" result="glow"/>
+                </filter>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#poseidonGrad)"/>
+            <circle cx="40" cy="45" r="3" fill="#00ffff"/>
+            <circle cx="60" cy="45" r="3" fill="#00ffff"/> 
+            <path d="M45 55 Q50 60 55 55" stroke="#00ffff" fill="none"/>
+            <path d="M25 40 L35 35" stroke="#00ffff"/>
+            <path d="M65 35 L75 40" stroke="#00ffff"/>
+            <path d="M30 60 Q50 80 70 60" stroke="#00ffff" fill="none" filter="url(#waterWave)"/>
+        </svg>`;
+    }
+
+    if (type === 'phantom') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="phantomGrad">
+                    <stop offset="0%" stop-color="#4B0082"/>
+                    <stop offset="100%" stop-color="#9370DB"/>
+                </linearGradient>
+                <filter id="phantomGlow">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+                    <feColorMatrix type="matrix" 
+                        values="0 0 0 0 0.3
+                                0 0 0 0 0.2
+                                0 0 0 0 0.5
+                                0 0 0 1 0" />
+                </filter>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#phantomGrad)" filter="url(#phantomGlow)"/>
+            <circle cx="40" cy="45" r="3" fill="#E6E6FA"/>
+            <circle cx="60" cy="45" r="3" fill="#E6E6FA"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#E6E6FA" fill="none"/>
+            <path d="M25 40 L35 35" stroke="#E6E6FA"/>
+            <path d="M65 35 L75 40" stroke="#E6E6FA"/>
+            <path d="M30 60 Q50 80 70 60" stroke="#E6E6FA" fill="none" filter="url(#phantomGlow)"/>
+        </svg>`;
+    }
+
+    if (type === 'darkAngel') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="darkAngelGrad">
+                    <stop offset="0%" stop-color="#000033"/>
+                    <stop offset="100%" stop-color="#1a1a3a"/>
+                </linearGradient>
+                <filter id="darkGlow">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+                    <feColorMatrix type="matrix" 
+                        values="0 0 0 0 0  
+                                0 0 1 0 0.3  
+                                0 0 1 0 1  
+                                0 0 0 1 0" result="glow"/>
+                </filter>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#darkAngelGrad)" filter="url(#darkGlow)"/>
+            <circle cx="40" cy="45" r="3" fill="#4a0099"/>
+            <circle cx="60" cy="45" r="3" fill="#4a0099"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#4a0099" fill="none"/>
+            <path d="M30 30 Q50 20 70 30" fill="none" stroke="#000033" stroke-width="3"/>
+            <path d="M25 40 L35 35" stroke="#4a0099"/>
+            <path d="M65 35 L75 40" stroke="#4a0099"/>
+            <path d="M30 60 Q50 80 70 60" stroke="#4a0099" fill="none" filter="url(#darkGlow)"/>
+        </svg>`;
+    }
+
+    if (type === 'jellyfish') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="jellyfishGrad">
+                    <stop offset="0%" stop-color="#0077be"/>
+                    <stop offset="100%" stop-color="#4B0082"/>
+                </linearGradient>
+                <filter id="jellyfishGlow">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+                    <feColorMatrix type="matrix" 
+                        values="0 0 0 0 0  
+                                0 0.5 1 0 0   
+                                1 0 1 0 0  
+                                0 0 0 1 0" />
+                </filter>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#jellyfishGrad)" filter="url(#jellyfishGlow)"/>
+            <circle cx="40" cy="45" r="3" fill="#00ffff"/>
+            <circle cx="60" cy="45" r="3" fill="#00ffff"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#00ffff" fill="none"/>
+            <path d="M20 60 Q50 90 80 60" stroke="#00ffff" fill="none" filter="url(#jellyfishGlow)"/>
+            <path d="M30 70 Q50 85 70 70" stroke="#00ffff" fill="none" filter="url(#jellyfishGlow)"/>
+        </svg>`;
+    }
+
+    if (type === 'demon') {
+        return `<svg class="cat-svg" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="demonGrad">
+                    <stop offset="0%" stop-color="#8B0000"/>
+                    <stop offset="100%" stop-color="#FF0000"/>
+                </linearGradient>
+                <filter id="demonGlow">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
+                    <feColorMatrix type="matrix" 
+                        values="1 0 0 0 0.8   
+                                0 0 0 0 0   
+                                0 0 0 0 0  
+                                0 0 0 1 0" />
+                </filter>
+            </defs>
+            <circle cx="50" cy="50" r="25" fill="url(#demonGrad)" filter="url(#demonGlow)"/>
+            <circle cx="40" cy="45" r="3" fill="#FF4500"/>
+            <circle cx="60" cy="45" r="3" fill="#FF4500"/>
+            <path d="M45 55 Q50 60 55 55" stroke="#FF4500" fill="none"/>
+            <path d="M25 35 L35 30" stroke="#FF4500"/>
+            <path d="M65 30 L75 35" stroke="#FF4500"/>
+            <path d="M35 25 L45 15" stroke="#8B0000"/>
+            <path d="M55 15 L65 25" stroke="#8B0000"/>
+            <path d="M30 60 Q50 80 70 60" stroke="#FF4500" fill="none" filter="url(#demonGlow)"/>
+        </svg>`;
+    }
+
+    return `<svg class="cat-svg" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="25" fill="${colors[type]}"/>
+        <circle cx="40" cy="45" r="3" fill="black"/>
+        <circle cx="60" cy="45" r="3" fill="black"/>
+        <path d="M45 55 Q50 60 55 55" stroke="black" fill="none"/>
+        <path d="M35 35 L25 25" stroke="black"/>
+        <path d="M65 35 L75 25" stroke="black"/>
+    </svg>`;
+}
+
+function createCatElement(cat, draggable = true) {
+    const div = document.createElement('div');
+    div.className = `cat${cat.isShiny ? ' shiny' : ''}${cat.isRainbow ? ' rainbow' : ''}${cat.type === 'quicksilver' ? ' quicksilver' : ''}${cat.type === 'inferno' ? ' inferno' : ''}${cat.type === 'angelic' ? ' angelic' : ''}${cat.type === 'sorcerer' ? ' sorcerer' : ''}${cat.type === 'dj' ? ' dj' : ''}${cat.type === 'soundMech' ? ' sound-mech' : ''}${cat.type === 'poseidon' ? ' poseidon' : ''}${cat.type === 'phantom' ? ' phantom' : ''}${cat.type === 'darkAngel' ? ' darkAngel' : ''}${cat.type === 'jellyfish' ? ' jellyfish' : ''}${cat.type === 'demon' ? ' demon' : ''}`;
+    div.innerHTML = `
+        <div class="cat-name">${cat.type}${cat.isShiny ? ' (Shiny)' : ''}${cat.isRainbow ? ' (Rainbow)' : ''}</div>
+        ${getCatSVG(cat.type)}
+        <div class="stats">
+            Power: ${cat.power}<br>
+            Speed: ${cat.speed}<br>
+            Health: ${cat.health}
+            ${cat.type === 'basic' ? `<br>Bananas: ${cat.bananaCount || 0}/10` : ''}
+            ${cat.type === 'blue' ? `<br>Speed Rings: ${cat.speedRings || 0}/10` : ''}
+            ${cat.type === 'wizard' ? `<br>Ultimate Orbs: ${cat.ultimateOrbCount || 0}/3` : ''}
+            ${cat.type === 'black' ? `<br>Magic Berries: ${cat.magicBerryCount || 0}/15` : ''}
+        </div>
+    `;
+
+    if (draggable) {
+        div.draggable = true;
+        div.addEventListener('dragstart', handleDragStart);
+        div.addEventListener('dragend', handleDragEnd);
+    }
+
+    div.onclick = () => {
+        if (selectedItem) {
+            applyItemToCat(cat);
+        }
+    };
+
+    return div;
+}
+
+function handleDragStart(e) {
+    e.target.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', e.target.dataset.index);
+}
+
+function handleDragEnd(e) {
+    e.target.classList.remove('dragging');
+}
+
+const battlefield = document.getElementById('fusionZone');
+battlefield.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    battlefield.classList.add('dragover');
+});
+
+battlefield.addEventListener('dragleave', () => {
+    battlefield.classList.remove('dragover');
+});
+
+battlefield.addEventListener('drop', (e) => {
+    e.preventDefault();
+    battlefield.classList.remove('dragover');
+    
+    if (battlefieldCats.length >= 6) {
+        alert('Maximum 6 cats allowed in battlefield!');
+        return;
+    }
+
+    const index = parseInt(e.dataTransfer.getData('text/plain'));
+    const cat = cats[index];
+    battlefieldCats.push(cat);
+    cats.splice(index, 1);
+    
+    updateDisplay();
+    updateBattlefieldCats();
+});
+
+function updateBattlefieldCats() {
+    const container = document.getElementById('battlefieldCats');
+    container.innerHTML = '';
+    
+    battlefieldCats.forEach((cat, index) => {
+        const catElement = createCatElement(cat, false);
+        catElement.onclick = () => removeCatFromBattlefield(index);
+        container.appendChild(catElement);
+
+        // Check for possible fusion combinations
+        if (index < battlefieldCats.length - 1) {
+            checkForFusion(index);
+        }
+    });
+}
+
+function checkForFusion(index) {
+    const cat1 = battlefieldCats[index];
+    const cat2 = battlefieldCats[index + 1];
+
+    if (cat1 && cat2) {
+        // Don't allow fusion between rainbow and non-rainbow cats
+        if ((cat1.isRainbow && !cat2.isRainbow) || (!cat1.isRainbow && cat2.isRainbow)) {
+            return; 
+        }
+
+        // Check for shiny cat merging
+        if (cat1.isShiny && cat2.isShiny && cat1.type === cat2.type) {
+            let newCat;
+            if (cat1.type === 'basic') {
+                newCat = Cat.createShinyCat('blue');
+                unlockedCats.add('blue');
+            } else if (cat1.type === 'blue') {
+                newCat = Cat.createShinyCat('red');
+                unlockedCats.add('red');
+            } else if (cat1.type === 'red') {
+                newCat = Cat.createShinyCat('threeHeaded');
+                unlockedCats.add('threeHeaded');
+            } else if (cat1.type === 'threeHeaded' && cat2.type === 'blue') {
+                newCat = Cat.createShinyCat('diamond');
+                unlockedCats.add('diamond');
+            }
+            
+            if (newCat) {
+                battlefieldCats.splice(index, 2, newCat);
+                updateBattlefieldCats();
+                gameState.fusionCount++;
+                if (newCat.type === 'wizard') gameState.wizardsCreated++;
+                if (newCat.type === 'shadowWizard') gameState.shadowWizardsCreated++;
+                checkAchievements();
+                return;
+            }
+        }
+
+        // Don't allow fusion between shiny and non-shiny cats
+        if ((cat1.isShiny && !cat2.isShiny) || (!cat1.isShiny && cat2.isShiny)) {
+            return;
+        }
+
+        // Original fusion logic for non-shiny cats
+        if (cat1.type === 'basic' && cat2.type === 'basic') {
+            battlefieldCats.splice(index, 2, Cat.createBlueCat());
+            unlockedCats.add('blue');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        } else if (cat1.type === 'blue' && cat2.type === 'blue') {
+            battlefieldCats.splice(index, 2, Cat.createRedCat());
+            unlockedCats.add('red');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        } else if (cat1.type === 'red' && cat2.type === 'red') {
+            battlefieldCats.splice(index, 2, Cat.createThreeHeadedCat());
+            unlockedCats.add('threeHeaded');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        } else if ((cat1.type === 'blue' && cat2.type === 'red') || 
+                   (cat1.type === 'red' && cat2.type === 'blue')) {
+            battlefieldCats.splice(index, 2, Cat.createPurpleCat());
+            unlockedCats.add('purple');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        } else if ((cat1.type === 'threeHeaded' && cat2.type === 'blue') || 
+                   (cat1.type === 'blue' && cat2.type === 'threeHeaded')) {
+            battlefieldCats.splice(index, 2, Cat.createDiamondCat());
+            unlockedCats.add('diamond');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        } else if ((cat1.type === 'diamond' && cat2.type === 'threeHeaded') || 
+                   (cat1.type === 'threeHeaded' && cat2.type === 'diamond')) {
+            battlefieldCats.splice(index, 2, Cat.createDiamondHydraCat());
+            unlockedCats.add('diamondHydra');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        } else if ((cat1.type === 'diamond' && cat2.type === 'purple') || 
+                   (cat1.type === 'purple' && cat2.type === 'diamond')) {
+            battlefieldCats.splice(index, 2, Cat.createWizardCat());
+            unlockedCats.add('wizard');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            if (cat1.type === 'wizard' || cat2.type === 'wizard') gameState.wizardsCreated++;
+            checkAchievements();
+        } else if ((cat1.type === 'shadowWizard' && cat2.type === 'bananaMech') || 
+                   (cat1.type === 'bananaMech' && cat2.type === 'shadowWizard')) {
+            battlefieldCats.splice(index, 2, Cat.createDarkMechCat());
+            unlockedCats.add('darkMech');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        } else if ((cat1.type === 'dj' && cat2.type === 'darkMech') || 
+                   (cat1.type === 'darkMech' && cat2.type === 'dj')) {
+            battlefieldCats.splice(index, 2, Cat.createSoundMechCat());
+            unlockedCats.add('soundMech');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        } else if ((cat1.type === 'poseidon' && cat2.type === 'phantom') || 
+                   (cat1.type === 'phantom' && cat2.type === 'poseidon')) {
+            battlefieldCats.splice(index, 2, Cat.createJellyfishCat());
+            unlockedCats.add('jellyfish');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        } else if ((cat1.type === 'inferno' && cat2.type === 'dj') || 
+                   (cat1.type === 'dj' && cat2.type === 'inferno')) {
+            battlefieldCats.splice(index, 2, Cat.createDemonCat());
+            unlockedCats.add('demon');
+            updateBattlefieldCats();
+            gameState.fusionCount++;
+            checkAchievements();
+        }
+    }
+}
+
+function removeCatFromBattlefield(index) {
+    const cat = battlefieldCats[index];
+    cats.push(cat);
+    battlefieldCats.splice(index, 1);
+    updateDisplay();
+    updateBattlefieldCats();
+}
+
+function startBattle() {
+    if (battlefieldCats.length === 0) {
+        alert('Add some cats to the battlefield first!');
+        return;
+    }
+
+    const battleZone = document.getElementById('battleZone');
+    battleZone.style.display = 'block';
+    
+    const dogs = Dog.createWaveDogs(currentWave);
+    const dogContainer = document.getElementById('dogContainer');
+    dogContainer.innerHTML = `
+        <h3>Wave ${currentWave}/${maxWave}</h3>
+        <div class="dogs-group">
+            ${dogs.map(dog => `
+                <div class="dog-instance">
+                    ${getDogSVG()}
+                    <div class="stats">
+                        Power: ${dog.power}<br>
+                        Speed: ${dog.speed}<br>
+                        Health: ${dog.health}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    const totalCatPower = battlefieldCats.reduce((sum, cat) => sum + cat.power, 0);
+    const totalCatHealth = battlefieldCats.reduce((sum, cat) => sum + cat.health, 0);
+    const totalCatSpeed = battlefieldCats.reduce((sum, cat) => sum + cat.speed, 0);
+
+    const battlefieldContainer = document.getElementById('battlefieldCats');
+    battlefieldContainer.classList.add('fighting');
+    dogContainer.classList.add('fighting');
+
+    setTimeout(() => {
+        battlefieldContainer.classList.remove('fighting');
+        dogContainer.classList.remove('fighting');
+
+        const catStrength = totalCatPower * totalCatHealth * totalCatSpeed;
+        const dogStrength = dogs.reduce((sum, dog) => sum + (dog.power * dog.health * dog.speed), 0);
+
+        const battleResult = document.getElementById('battleResult');
+        if (catStrength > dogStrength) {
+            battleResult.innerHTML = `Victory! Your cats defeated the Wave ${currentWave} ${dogs.length > 1 ? 'dogs' : 'dog'} in ${isExtremeMode ? 'Extreme' : 'Normal'} Mode!`;
+            battleResult.style.color = "#00aa00";
+            isWaveComplete = true;
+            
+            if (currentWave === maxWave) {
+                battleResult.innerHTML += "<br>Congratulations! You've completed all waves!";
+                document.getElementById('nextWaveBtn').style.display = 'none';
+                // Add this check for extreme mode completion:
+                if (isExtremeMode) {
+                    gameState.extremeModeCompleted = true;
+                    checkAchievements();
+                }
+            } else {
+                document.getElementById('nextWaveBtn').style.display = 'block';
+            }
+            const coinsWon = Math.floor(currentWave * 10 * (dogs.length || 1));
+            addCoins(coinsWon);
+            battleResult.innerHTML += `<br>You won ${coinsWon} coins!`;
+            gameState.maxWaveReached = Math.max(gameState.maxWaveReached, currentWave);
+            checkAchievements();
+        } else {
+            battleResult.innerHTML = `Defeat! The Wave ${currentWave} ${dogs.length > 1 ? 'dogs were' : 'dog was'} too strong!`;
+            battleResult.style.color = "#ff0000";
+            isWaveComplete = false;
+            currentWave = 1; // Reset wave counter on defeat
+            document.getElementById('nextWaveBtn').style.display = 'none';
+        }
+    }, 2000);
+}
+
+function nextWave() {
+    if (!isWaveComplete) {
+        alert('You must defeat the current wave first!');
+        return;
+    }
+    
+    if (currentWave >= maxWave) {
+        alert('You have completed all waves!');
+        return;
+    }
+    
+    currentWave++;
+    isWaveComplete = false;
+    document.getElementById('nextWaveBtn').style.display = 'none';
+    document.getElementById('battleResult').innerHTML = '';
+    startBattle();
+}
+
+function addBasicCat() {
+    cats.push(Cat.createBasicCat());
+    updateDisplay();
+}
+
+function updateDisplay() {
+    const container = document.getElementById('catsContainer');
+    container.innerHTML = '';
+    
+    cats.forEach((cat, index) => {
+        const catElement = createCatElement(cat);
+        catElement.dataset.index = index;
+        container.appendChild(catElement);
+    });
+}
+
+function initializeShinyBox() {
+    const shinyBox = document.getElementById('shinyBox');
+    shinyBox.style.display = 'none';
+    
+    shinyBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        shinyBox.classList.add('dragover');
+    });
+
+    shinyBox.addEventListener('dragleave', () => {
+        shinyBox.classList.remove('dragover');
+    });
+
+    shinyBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        shinyBox.classList.remove('dragover');
+        
+        if (shinyBoxCats.length >= 4) {
+            alert('Maximum 4 cats allowed in shiny box!');
+            return;
+        }
+
+        const index = parseInt(e.dataTransfer.getData('text/plain'));
+        const cat = cats[index];
+        
+        if (shinyBoxCats.length > 0 && cat.type !== shinyBoxCats[0].type) {
+            alert('All cats must be of the same type!');
+            return;
+        }
+
+        shinyBoxCats.push(cat);
+        cats.splice(index, 1);
+        
+        updateDisplay();
+        updateShinyBoxCats();
+    });
+}
+
+function updateShinyBoxCats() {
+    const container = document.getElementById('shinyCats');
+    container.innerHTML = '';
+    
+    const isAllShiny = shinyBoxCats.length > 0 && shinyBoxCats.every(cat => cat.isShiny);
+    
+    // Update the shiny box heading based on cats inside
+    const shinyBoxHeading = document.querySelector('.shiny-box h3');
+    if (isAllShiny) {
+        shinyBoxHeading.textContent = 'Drag 4 Same Type Shiny Cats Here to Make Rainbow Cat';
+    } else {
+        shinyBoxHeading.textContent = 'Drag 4 Same Type Cats Here to Make Them Shiny';
+    }
+    
+    shinyBoxCats.forEach((cat, index) => {
+        const catElement = createCatElement(cat, false);
+        catElement.onclick = () => removeCatFromShinyBox(index);
+        container.appendChild(catElement);
+    });
+
+    document.getElementById('convertShinyBtn').style.display = 
+        shinyBoxCats.length === 4 ? 'block' : 'none';
+}
+
+function removeCatFromShinyBox(index) {
+    const cat = shinyBoxCats[index];
+    cats.push(cat);
+    shinyBoxCats.splice(index, 1);
+    updateDisplay();
+    updateShinyBoxCats();
+}
+
+function convertToShiny() {
+    if (shinyBoxCats.length !== 4) {
+        alert('Need exactly 4 cats to create a new cat!');
+        return;
+    }
+
+    const baseType = shinyBoxCats[0].type;
+    
+    // Check if all cats are shiny
+    const allShiny = shinyBoxCats.every(cat => cat.isShiny);
+
+    // Check for 4 black cats
+    const allBlack = shinyBoxCats.every(cat => cat.type === 'black');
+    
+    let newCat;
+    if (allBlack) {
+        newCat = Cat.createAngelicCat();
+        unlockedCats.add('angelic');
+    } else if (allShiny) {
+        newCat = Cat.createRainbowCat(baseType);
+        gameState.rainbowCatsCreated++;
+        unlockedCats.add(baseType);
+    } else {
+        newCat = Cat.createShinyCat(baseType);
+        gameState.shinyCatsCreated++;
+    }
+    
+    cats.push(newCat);
+    shinyBoxCats = [];
+    
+    updateDisplay();
+    updateShinyBoxCats();
+    checkAchievements();
+}
+
+function toggleShinyBox() {
+    const shinyBox = document.getElementById('shinyBox');
+    if (shinyBox.style.display === 'none') {
+        shinyBox.style.display = 'block';
+    } else {
+        shinyBox.style.display = 'none';
+    }
+}
+
+function getDogSVG() {
+    return `<svg class="cat-svg" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="25" fill="#8B4513"/>
+        <circle cx="40" cy="45" r="3" fill="black"/>
+        <circle cx="60" cy="45" r="3" fill="black"/>
+        <path d="M45 55 Q50 60 55 55" stroke="black" fill="none"/>
+        <path d="M25 40 L35 35" stroke="black"/>
+        <path d="M65 35 L75 40" stroke="black"/>
+        <circle cx="50" cy="58" r="5" fill="#000"/>
+    </svg>`;
+}
+
+function updateStore() {
+    const storeGrid = document.getElementById('storeGrid');
+    storeGrid.innerHTML = '';
+    
+    StoreItem.getItems().forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `store-item${coins < item.cost ? ' disabled' : ''}`;
+        itemDiv.innerHTML = `
+            <div>${item.name}</div>
+            <div>${item.type === 'fruit' ? '🍎' : '🔮'}</div>
+            <div>Cost: ${item.cost}</div>
+            <div class="stats">
+                ${item.power ? `+${item.power} Power<br>` : ''}
+                ${item.speed ? `+${item.speed} Speed<br>` : ''}
+                ${item.health ? `+${item.health} Health` : ''}
+            </div>
+        `;
+        
+        if (coins >= item.cost) {
+            itemDiv.onclick = () => selectStoreItem(item);
+        }
+        
+        storeGrid.appendChild(itemDiv);
+    });
+}
+
+function selectStoreItem(item) {
+    selectedItem = item;
+    alert(`Selected ${item.name}! Click on a cat to apply it.`);
+}
+
+function addCoins(amount) {
+    coins += amount;
+    document.getElementById('coinDisplay').textContent = coins;
+    updateStore();
+}
+
+function applyItemToCat(cat) {
+    if (!selectedItem) return;
+    
+    if (coins >= selectedItem.cost) {
+        if (selectedItem.name === 'Shadow Crystal') {
+            if (cat.type === 'wizard') {
+                // Transform wizard to shadow wizard
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createShadowWizardCat();
+                    gameState.shadowWizardsCreated++;
+                    unlockedCats.add('shadowWizard');
+                    alert('Your Wizard Cat has transformed into a Shadow Wizard Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createShadowWizardCat();
+                        updateBattlefieldCats();
+                    }
+                }
+                checkAchievements();
+            } else if (cat.type === 'basic') {
+                // Transform basic to black cat
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createBlackCat();
+                    unlockedCats.add('black');
+                    alert('Your Basic Cat has transformed into a Black Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createBlackCat();
+                        updateBattlefieldCats();
+                    }
+                }
+                checkAchievements();
+            } else if (cat.type === 'red') {
+                // Transform red cat to inferno cat
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createInfernoCat();
+                    unlockedCats.add('inferno');
+                    alert('Your Red Cat has transformed into an Inferno Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createInfernoCat();
+                        updateBattlefieldCats();
+                    }
+                }
+                checkAchievements();
+            } else if (cat.type === 'blue') {
+                // Transform blue cat to poseidon cat
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createPoseidonCat();
+                    unlockedCats.add('poseidon');
+                    alert('Your Blue Cat has transformed into a Poseidon Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createPoseidonCat();
+                        updateBattlefieldCats();
+                    }
+                }
+                checkAchievements();
+            } else if (cat.type === 'purple') {
+                // Transform purple cat to phantom cat
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createPhantomCat();
+                    unlockedCats.add('phantom');
+                    alert('Your Purple Cat has transformed into a Phantom Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createPhantomCat();
+                        updateBattlefieldCats();
+                    }
+                }
+                checkAchievements();
+            } else if (cat.type === 'angelic') {
+                // Transform angelic cat to dark angel cat
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createDarkAngelCat();
+                    unlockedCats.add('darkAngel');
+                    gameState.darkAngelCreated = true;
+                    alert('Your Angelic Cat has transformed into a Dark Angel Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createDarkAngelCat();
+                        gameState.darkAngelCreated = true;
+                        updateBattlefieldCats();
+                    }
+                }
+                checkAchievements();
+            }
+        } else if (selectedItem.name === 'Magic Berry' && cat.type === 'black') {
+            cat.magicBerryCount = (cat.magicBerryCount || 0) + 1;
+            
+            if (cat.magicBerryCount >= 15) {
+                // Replace the cat with a DJ cat
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createDJCat();
+                    unlockedCats.add('dj');
+                    alert('Your Black Cat has transformed into a DJ Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createDJCat();
+                        updateBattlefieldCats();
+                    }
+                }
+                checkAchievements();
+            }
+        } else if (selectedItem.name === 'Ultimate Orb' && cat.type === 'wizard') {
+            // Track Ultimate Orb count
+            cat.ultimateOrbCount = (cat.ultimateOrbCount || 0) + 1;
+            
+            if (cat.ultimateOrbCount >= 3) {
+                // Transform wizard to sorcerer
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createSorcererCat();
+                    unlockedCats.add('sorcerer');
+                    alert('Your Wizard Cat has ascended into a Sorcerer Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createSorcererCat();
+                        updateBattlefieldCats();
+                    }
+                }
+                checkAchievements();
+            }
+        } else if (selectedItem.name === 'Banana' && cat.type === 'basic') {
+            cat.bananaCount = (cat.bananaCount || 0) + 1;
+            
+            if (cat.bananaCount >= 10) {
+                // Replace the cat with a banana mech cat
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createBananaMechCat();
+                    gameState.bananaMechsCreated++;
+                    unlockedCats.add('bananaMech');
+                    alert('Your cat has transformed into a Banana Mech Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createBananaMechCat();
+                    }
+                }
+                checkAchievements();
+            }
+        } else if (selectedItem.name === 'Speed Ring' && cat.type === 'blue') {
+            cat.speedRings = (cat.speedRings || 0) + 1;
+            
+            if (cat.speedRings >= 10) {
+                // Replace the cat with a quicksilver cat
+                const index = cats.indexOf(cat);
+                if (index !== -1) {
+                    cats[index] = Cat.createQuicksilverCat();
+                    unlockedCats.add('quicksilver');
+                    alert('Your Blue Cat has transformed into a Quicksilver Cat!');
+                    updateDisplay();
+                } else {
+                    // Check battlefield cats
+                    const bfIndex = battlefieldCats.indexOf(cat);
+                    if (bfIndex !== -1) {
+                        battlefieldCats[bfIndex] = Cat.createQuicksilverCat();
+                        updateBattlefieldCats();
+                    }
+                }
+                checkAchievements();
+            }
+        }
+
+        cat.power += selectedItem.power;
+        cat.speed += selectedItem.speed;
+        cat.health += selectedItem.health;
+        
+        if (selectedItem.type === 'artifact') {
+            cat.artifacts.push(selectedItem.name);
+        }
+        
+        coins -= selectedItem.cost;
+        document.getElementById('coinDisplay').textContent = coins;
+        selectedItem = null;
+        
+        updateDisplay();
+        updateStore();
+        updateBattlefieldCats();
+    }
+}
+
+function toggleAchievements() {
+    const modal = document.getElementById('achievementsModal');
+    modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+    updateAchievementsList();
+}
+
+function updateAchievementsList() {
+    const container = document.getElementById('achievementsList');
+    container.innerHTML = '';
+    
+    achievements.forEach(achievement => {
+        const div = document.createElement('div');
+        div.className = `achievement-item${achievement.earned ? ' earned' : ''}`;
+        div.innerHTML = `
+            <div>
+                <div style="font-weight: bold">${achievement.name}</div>
+                <div style="font-size: 0.8em">${achievement.description}</div>
+            </div>
+            <div style="font-weight: bold">+${achievement.reward} coins</div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function showAchievementNotification(achievement) {
+    const notification = document.createElement('div');
+    notification.className = 'achievement-notification';
+    notification.textContent = `Achievement Unlocked: ${achievement.name} (+${achievement.reward} coins)`;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.remove(), 3000);
+}
+
+function checkAchievements() {
+    achievements.forEach(achievement => {
+        if (achievement.check(gameState)) {
+            showAchievementNotification(achievement);
+            addCoins(achievement.reward);
+        }
+    });
+    updateAchievementsList();
+}
+
+function toggleCollection() {
+    const modal = document.getElementById('collectionModal');
+    modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+    updateCollection();
+}
+
+function updateCollection() {
+    const container = document.getElementById('collectionGrid');
+    container.innerHTML = '';
+    
+    const allCatTypes = [
+        'basic', 'blue', 'red', 'purple', 'threeHeaded', 
+        'diamond', 'diamondHydra', 'wizard', 'shadowWizard', 
+        'bananaMech', 'black', 'darkMech', 'quicksilver', 'inferno',
+        'angelic', 'sorcerer', 'dj', 'soundMech', 'poseidon', 'phantom', 
+        'darkAngel', 'jellyfish', 'demon'
+    ];
+    
+    allCatTypes.forEach(type => {
+        const div = document.createElement('div');
+        div.className = `collection-item${unlockedCats.has(type) ? '' : ' locked'}`;
+        
+        if (unlockedCats.has(type)) {
+            div.innerHTML = `
+                ${getCatSVG(type)}
+                <div style="font-weight: bold">${type}</div>
+                <div style="font-size: 0.8em">Unlocked!</div>
+            `;
+        } else {
+            div.innerHTML = `
+                ${getCatSVG(type)}
+                <div style="font-weight: bold">???</div>
+                <div style="font-size: 0.8em">Not discovered</div>
+            `;
+        }
+        container.appendChild(div);
+    });
+}
+
+initializeShinyBox();
+addBasicCat();
+addBasicCat();
+updateDisplay();
+updateStore();
+updateCollection();
+
+function toggleMode() {
+    isExtremeMode = !isExtremeMode;
+    const btn = document.querySelector('.extreme-mode-btn');
+    btn.dataset.mode = isExtremeMode ? 'Extreme' : 'Normal';
+    
+    if (isExtremeMode) {
+        // Make game harder in extreme mode
+        maxWave = 50; // Increase max waves
+        Dog.getMultiplier = function(wave) {
+            return 1 + (wave * 0.5); // 50% stronger increase per wave
+        };
+    } else {
+        // Reset to normal mode
+        maxWave = 30;
+        Dog.getMultiplier = function(wave) {
+            return 1 + (wave * 0.3); // Original 30% increase
+        };
+    }
+}
+</script>
+</body></html>
