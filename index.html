@@ -1,0 +1,352 @@
+<title>Fish Tank Party</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #87CEEB, #1E90FF);
+    font-family: Arial, sans-serif;
+  }
+  #game-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    cursor: pointer;
+  }
+  .fish, .food, .heart {
+    position: absolute;
+    user-select: none;
+    transition: 0.1s;
+  }
+  .speech-bubble {
+    position: absolute;
+    background-color: white;
+    border-radius: 10px;
+    padding: 5px;
+    font-size: 12px;
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  #controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+  }
+  button {
+    margin: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  #shop {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .shop-item {
+    margin: 5px 0;
+  }
+</style>
+</head>
+<body>
+<div id="game-container"></div>
+<div id="controls">
+  <div>Fish count: <span id="fish-count">0</span>/100</div>
+  <div>Food count: <span id="food-count">0</span></div>
+  <div>Money: $<span id="money">0</span></div>
+  <button id="pause-btn">Pause</button>
+  <button id="buy-random-fish-btn">Buy Random Fish ($25)</button>
+  <button id="sell-fish-btn">Sell Fish ($50)</button>
+</div>
+<div id="shop">
+  <h3>Fish Shop</h3>
+  <div id="shop-items"></div>
+</div>
+
+<script>
+const gameContainer = document.getElementById('game-container');
+const fishCount = document.getElementById('fish-count');
+const foodCount = document.getElementById('food-count');
+const moneyDisplay = document.getElementById('money');
+const pauseBtn = document.getElementById('pause-btn');
+const buyRandomFishBtn = document.getElementById('buy-random-fish-btn');
+const sellFishBtn = document.getElementById('sell-fish-btn');
+const shopItems = document.getElementById('shop-items');
+
+const fishEmojis = ['🐙', '🦑', '🦐', '🦞', '🦀', '🪼', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈'];
+const foodEmoji = '🫘';
+let fishes = [];
+let foods = [];
+let isPaused = false;
+let money = 100;
+
+const fishPrices = {
+  '🐙': 50, '🦑': 50, '🦐': 30, '🦞': 40, '🦀': 35, '🪼': 45,
+  '🐡': 25, '🐠': 20, '🐟': 15, '🐬': 70, '🐳': 80, '🐋': 85, '🦈': 100
+};
+
+function createFish(emoji, x, y, size = 24, canBreed = true) {
+  if (fishes.length >= 100) return;
+  
+  const fish = document.createElement('div');
+  fish.className = 'fish';
+  fish.textContent = emoji;
+  fish.style.left = `${x}px`;
+  fish.style.top = `${y}px`;
+  fish.style.fontSize = `${size}px`;
+  
+  const fishObj = {
+    element: fish,
+    x,
+    y,
+    dx: Math.random() * 4 - 2,
+    dy: Math.random() * 4 - 2,
+    size,
+    emoji,
+    originalSize: size,
+    canBreed
+  };
+  
+  fishes.push(fishObj);
+  gameContainer.appendChild(fish);
+  updateFishCount();
+}
+
+function createFood(x, y) {
+  const food = document.createElement('div');
+  food.className = 'food';
+  food.textContent = foodEmoji;
+  food.style.left = `${x}px`;
+  food.style.top = `${y}px`;
+  food.style.fontSize = '16px';
+  
+  const foodObj = { element: food, x, y };
+  foods.push(foodObj);
+  gameContainer.appendChild(food);
+  updateFoodCount();
+}
+
+function updateFishCount() {
+  fishCount.textContent = fishes.length;
+}
+
+function updateFoodCount() {
+  foodCount.textContent = foods.length;
+}
+
+function updateMoney() {
+  moneyDisplay.textContent = money;
+}
+
+function moveFish(fish) {
+  fish.x += fish.dx;
+  fish.y += fish.dy;
+  
+  if (fish.x < 0 || fish.x > gameContainer.clientWidth) fish.dx *= -1;
+  if (fish.y < 0 || fish.y > gameContainer.clientHeight) fish.dy *= -1;
+  
+  fish.element.style.left = `${fish.x}px`;
+  fish.element.style.top = `${fish.y}px`;
+  fish.element.style.transform = `scaleX(${fish.dx > 0 ? -1 : 1})`; // Mirror emojis along vertical axis
+}
+
+function checkCollisions() {
+  for (let i = fishes.length - 1; i >= 0; i--) {
+    const fish1 = fishes[i];
+    
+    // Fish-food collision
+    for (let j = foods.length - 1; j >= 0; j--) {
+      const food = foods[j];
+      if (isColliding(fish1, food)) {
+        if (['🐙', '🦑', '🦐', '🦞', '🦀', '🪼', '🐡', '🐠', '🐟'].includes(fish1.emoji)) {
+          eatFood(fish1, food, j);
+        }
+      }
+    }
+    
+    // Fish-fish interactions
+    for (let k = i - 1; k >= 0; k--) {
+      const fish2 = fishes[k];
+      if (isColliding(fish1, fish2)) {
+        if (fish1.emoji === fish2.emoji && fish1.canBreed && fish2.canBreed && isOverlapping50Percent(fish1, fish2)) {
+          breed(fish1, fish2);
+        } else if (['🦈', '🐳', '🐋'].includes(fish1.emoji) && ['🐙', '🦑', '🦐', '🦞', '🦀', '🪼', '🐡', '🐠', '🐟'].includes(fish2.emoji)) {
+          eatFish(fish1, fish2, k);
+        } else if (fish1.emoji === '🦈') {
+          eatFish(fish1, fish2, k);
+        } else {
+          speak(fish1, fish2);
+        }
+      }
+    }
+  }
+}
+
+function isColliding(obj1, obj2) {
+  const dx = obj1.x - obj2.x;
+  const dy = obj1.y - obj2.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  return distance < (obj1.size + 16) / 2;  // 16 is the food size
+}
+
+function isOverlapping50Percent(fish1, fish2) {
+  const dx = Math.abs(fish1.x - fish2.x);
+  const dy = Math.abs(fish1.y - fish2.y);
+  return dx < fish1.size / 2 && dy < fish1.size / 2;
+}
+
+function eatFood(fish, food, foodIndex) {
+  if (fish.size < fish.originalSize * 10) {
+    fish.size += 1;
+    fish.element.style.fontSize = `${fish.size}px`;
+  }
+  gameContainer.removeChild(food.element);
+  foods.splice(foodIndex, 1);
+  updateFoodCount();
+}
+
+function eatFish(predator, prey, preyIndex) {
+  if (predator.size < predator.originalSize * 10) {
+    predator.size += 1;
+    predator.element.style.fontSize = `${predator.size}px`;
+  }
+  gameContainer.removeChild(prey.element);
+  fishes.splice(preyIndex, 1);
+  updateFishCount();
+}
+
+function breed(fish1, fish2) {
+  if (fishes.length < 100 && Math.random() < 0.01) {
+    const x = (fish1.x + fish2.x) / 2;
+    const y = (fish1.y + fish2.y) / 2;
+    
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.textContent = '❤️‍🔥';
+    heart.style.left = `${x}px`;
+    heart.style.top = `${y}px`;
+    heart.style.fontSize = '24px';
+    gameContainer.appendChild(heart);
+    
+    setTimeout(() => {
+      gameContainer.removeChild(heart);
+      createFish(fish1.emoji, x, y, fish1.originalSize, false);
+      setTimeout(() => {
+        const newFish = fishes[fishes.length - 1];
+        if (newFish && newFish.emoji === fish1.emoji) {
+          newFish.canBreed = true;
+        }
+      }, 10000);
+    }, 3000);
+  }
+}
+
+function speak(fish1, fish2) {
+  if (Math.random() < 0.01) {
+    const speech = document.createElement('div');
+    speech.className = 'speech-bubble';
+    speech.textContent = generateGibberish();
+    speech.style.left = `${fish1.x}px`;
+    speech.style.top = `${fish1.y - 30}px`;
+    gameContainer.appendChild(speech);
+    setTimeout(() => gameContainer.removeChild(speech), 2000);
+  }
+}
+
+function generateGibberish() {
+  const vowels = 'aeiou';
+  const consonants = 'bcdfghjklmnpqrstvwxyz';
+  let result = '';
+  for (let i = 0; i < 5; i++) {
+    result += consonants[Math.floor(Math.random() * consonants.length)];
+    result += vowels[Math.floor(Math.random() * vowels.length)];
+  }
+  return result;
+}
+
+function gameLoop() {
+  if (!isPaused) {
+    fishes.forEach(moveFish);
+    checkCollisions();
+  }
+  requestAnimationFrame(gameLoop);
+}
+
+function buyRandomFish() {
+  if (money >= 25 && fishes.length < 100) {
+    const emoji = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
+    const x = Math.random() * gameContainer.clientWidth;
+    const y = Math.random() * gameContainer.clientHeight;
+    createFish(emoji, x, y);
+    money -= 25;
+    updateMoney();
+  }
+}
+
+function sellFish() {
+  if (fishes.length > 0) {
+    const index = Math.floor(Math.random() * fishes.length);
+    const fish = fishes[index];
+    gameContainer.removeChild(fish.element);
+    fishes.splice(index, 1);
+    money += 50;
+    updateMoney();
+    updateFishCount();
+  }
+}
+
+function buySpecificFish(emoji) {
+  if (money >= fishPrices[emoji] && fishes.length < 100) {
+    const x = Math.random() * gameContainer.clientWidth;
+    const y = Math.random() * gameContainer.clientHeight;
+    createFish(emoji, x, y);
+    money -= fishPrices[emoji];
+    updateMoney();
+  }
+}
+
+function createShop() {
+  fishEmojis.forEach(emoji => {
+    const item = document.createElement('div');
+    item.className = 'shop-item';
+    item.innerHTML = `${emoji} - $${fishPrices[emoji]} <button onclick="buySpecificFish('${emoji}')">Buy</button>`;
+    shopItems.appendChild(item);
+  });
+}
+
+gameContainer.addEventListener('click', (e) => {
+  if (!isPaused) {
+    createFood(e.clientX, e.clientY);
+  }
+});
+
+pauseBtn.addEventListener('click', () => {
+  isPaused = !isPaused;
+  pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
+});
+
+buyRandomFishBtn.addEventListener('click', buyRandomFish);
+sellFishBtn.addEventListener('click', sellFish);
+
+// Initialize game
+fishEmojis.forEach(emoji => {
+  const count = ['🐡', '🐠', '🐟'].includes(emoji) ? 4 : 2;
+  for (let i = 0; i < count; i++) {
+    const x = Math.random() * gameContainer.clientWidth;
+    const y = Math.random() * gameContainer.clientHeight;
+    createFish(emoji, x, y);
+  }
+});
+
+createShop();
+gameLoop();
+updateMoney();
+</script>
+</body></html>
