@@ -1,0 +1,205 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Arena Legends</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="loading-screen" id="loading-screen">
+    <div class="loading-content">
+      <div class="loading-logo">RNG</div>
+      <div class="loading-progress">
+        <div class="loading-bar">
+          <div class="loading-bar-fill"></div>
+        </div>
+        <div class="loading-text">Loading assets...</div>
+      </div>
+      <div class="loading-tips">
+        <p class="loading-tip">Tip: You can unlock new skins by completing special challenges!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-menu active" id="main-menu">
+    <div class="menu-content">
+      <div class="game-title">
+        <h1>RNG</h1>
+        <h2>BATTLEGROUNDS</h2>
+      </div>
+      <div class="featured-characters">
+        <!-- Characters will be dynamically inserted here -->
+      </div>
+      <button id="start-game-btn" class="start-btn">
+        <span class="btn-text">Start Game</span>
+        <span class="btn-icon">▶</span>
+      </button>
+      <div class="menu-footer">
+        <p class="version">v1.0.0</p>
+        <p class="credits">Created by WebSim</p>
+      </div>
+    </div>
+    <div class="menu-particles"></div>
+  </div>
+
+  <div class="game-container" id="game-container" style="display: none;">
+    <div class="container">
+      <div class="nav">
+        <button id="battle-btn" class="nav-btn active">Battle</button>
+        <button id="custom-battle-btn" class="nav-btn">Custom Battle</button>
+        <button id="spinner-btn" class="nav-btn">Daily Spinner</button>
+        <button id="battlepass-btn" class="nav-btn">Battle Pass</button>
+        <button id="collection-btn" class="nav-btn">Collection</button>
+        <button id="settings-btn" class="nav-btn">Settings</button>
+      </div>
+
+      <div id="battle-screen" class="screen active">
+        <div class="commentary-box" id="commentary-box"></div>
+        <div class="battle-controls">
+          <button id="rng-btn">SPIN RNG!</button>
+          <div class="slots-container">
+            <div class="slot" id="slot1"></div>
+            <div class="slot" id="slot2"></div>
+            <div class="slot" id="slot3"></div>
+          </div>
+        </div>
+        <div class="arena">
+          <div class="arena-floor"></div>
+        </div>
+      </div>
+
+      <div id="spinner-screen" class="screen">
+        <div class="spinner-info">
+          <h2>Daily Character Spinner</h2>
+          <p>Spins remaining today: <span id="spins-remaining">3</span></p>
+          <p class="coin-spin-info">Or spin for <span id="coin-spin-cost">10</span> </p>
+          <p class="holiday-bonus"></p>
+        </div>
+        <div class="spinner-wheel-container">
+          <canvas id="spinner-wheel"></canvas>
+          <div class="spinner-arrow"></div>
+        </div>
+        <div class="spinner-buttons">
+          <button id="spin-wheel-btn" class="spin-button">SPIN THE WHEEL!</button>
+          <button id="coin-spin-btn" class="spin-button coin-spin">SPIN WITH COINS</button>
+          <button id="coin-spin-5x-btn" class="spin-button coin-spin mega">SPIN x5 (50 )</button>
+        </div>
+        <div id="spinner-result" class="spinner-result"></div>
+      </div>
+
+      <div id="custom-battle-screen" class="screen">
+        <div class="commentary-box" id="custom-commentary-box"></div>
+        <div class="battle-controls">
+          <button id="start-custom-battle" disabled>Start Battle</button>
+          <div class="custom-slots-container">
+            <div class="custom-slot-wrapper">
+              <div class="custom-slot" id="custom-slot1" data-slot="1"></div>
+              <button class="select-character-btn" data-slot="1">Select</button>
+            </div>
+            <div class="custom-slot-wrapper">
+              <div class="custom-slot" id="custom-slot2" data-slot="2"></div>
+              <button class="select-character-btn" data-slot="2">Select</button>
+            </div>
+            <div class="custom-slot-wrapper">
+              <div class="custom-slot" id="custom-slot3" data-slot="3"></div>
+              <button class="select-character-btn" data-slot="3">Select</button>
+            </div>
+          </div>
+        </div>
+        <div class="arena custom-arena">
+          <div class="arena-floor"></div>
+        </div>
+      </div>
+
+      <div id="collection-screen" class="screen">
+        <h2>Unlocked Characters</h2>
+        <div class="collection-grid unlocked"></div>
+        <h2>Locked Characters</h2>
+        <div class="collection-grid locked"></div>
+      </div>
+
+      <div id="settings-screen" class="screen">
+        <h2>Settings</h2>
+        <div class="settings-container">
+          <div class="setting-item">
+            <label>
+              <input type="checkbox" id="commentary-toggle" checked>
+              Show Commentary
+            </label>
+          </div>
+          <div class="setting-item">
+            <label>
+              <input type="checkbox" id="tts-toggle">
+              Text-to-Speech Commentary
+            </label>
+          </div>
+          <div class="setting-item">
+            <h3>Commentary Style</h3>
+            <div class="commentary-styles">
+              <label>
+                <input type="radio" name="commentary-style" value="enthusiastic" checked>
+                Enthusiastic (HYPE OVERLOAD! )
+              </label>
+              <label>
+                <input type="radio" name="commentary-style" value="sarcastic">
+                Sarcastic (Oh great, another fight... )
+              </label>
+              <label>
+                <input type="radio" name="commentary-style" value="dramatic">
+                Dramatic (BEHOLD THE EPIC BATTLE! )
+              </label>
+              <label>
+                <input type="radio" name="commentary-style" value="chill">
+                Chill (Just vibin' with the fights... )
+              </label>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label>
+              <input type="checkbox" id="win-screen-toggle" checked>
+              Show Detailed Win Screen
+            </label>
+            <p class="setting-description">When disabled, shows simple winner announcement instead of detailed placements</p>
+          </div>
+          <div class="setting-item">
+            <label>
+              <input type="checkbox" id="bp-notifications-toggle" checked>
+              Show Battle Pass Notifications
+            </label>
+            <p class="setting-description">When disabled, hides XP gain and reward notifications from Battle Pass</p>
+          </div>
+          <div class="setting-item danger-zone">
+            <h3>Danger Zone</h3>
+            <button id="reset-progress" class="danger-btn">Delete All Progress</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="battlepass-screen" class="screen">
+        <!-- Content will be populated by BattlePass class -->
+      </div>
+    </div>
+  </div>
+
+  <div id="character-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <div class="card-container">
+        <!-- Card content will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <div id="character-select-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Select Character</h2>
+      <div class="character-select-grid">
+        <!-- Characters will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
