@@ -1,0 +1,101 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Neon Snake Extreme</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+</head>
+<body>
+  <div id="particleBackground" class="particle-background"></div>
+  
+  <div id="titleScreen" class="title-screen animate__animated animate__fadeIn">
+    <div class="title-content">
+      <h1 class="glitch-title">Neon Snake</h1>
+      <div class="high-score-display">High Score: <span id="highScoreDisplay" class="score-pulse">0</span></div>
+      <div class="button-container">
+        <button id="startButton" class="spicy-button">
+          <span class="button-text">Start Game</span>
+          <div class="button-gradient"></div>
+        </button>
+        <button id="settingsButton" class="spicy-button settings-button">
+          <span class="button-text">Settings</span>
+          <div class="button-gradient"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameContainer" class="game-container hidden animate__animated">
+    <div class="game-header">
+      <div class="score-section">
+        <div class="score-label">Score</div>
+        <div class="score-value"><span id="scoreDisplay">0</span></div>
+      </div>
+      <div class="high-score-section">
+        <div class="high-score-label">High Score</div>
+        <div class="high-score-value"><span id="currentHighScoreDisplay">0</span></div>
+      </div>
+      <div class="game-controls">
+        <button id="restartButton" class="control-button restart-btn" title="Restart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
+          </svg>
+        </button>
+        <button id="pauseButton" class="control-button pause-btn" title="Pause">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="6" y="4" width="4" height="16" rx="1" />
+            <rect x="14" y="4" width="4" height="16" rx="1" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <canvas id="gameCanvas" width="400" height="400" class="game-canvas"></canvas>
+
+    <div id="pauseOverlay" class="pause-overlay hidden animate__animated">
+      <div class="pause-content">
+        <h2 class="pulse-text">PAUSED</h2>
+        <div class="pause-buttons">
+          <button id="resumeButton" class="spicy-button">
+            <span class="button-text">Resume</span>
+            <div class="button-gradient"></div>
+          </button>
+          <button id="quitButton" class="spicy-button quit-button">
+            <span class="button-text">Quit</span>
+            <div class="button-gradient"></div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="settings-modal hidden animate__animated">
+    <div class="settings-content">
+      <h2>Game Settings</h2>
+      <div class="setting-item">
+        <label>Difficulty</label>
+        <select id="difficultySelect">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>Theme</label>
+        <div class="theme-selector">
+          <button class="theme-button active" data-theme="neon-blue">Neon Blue</button>
+          <button class="theme-button" data-theme="cyberpunk">Cyberpunk</button>
+          <button class="theme-button" data-theme="retro-green">Retro Green</button>
+        </div>
+      </div>
+      <div class="settings-actions">
+        <button id="saveSettingsButton" class="spicy-button">Save</button>
+        <button id="closeSettingsButton" class="spicy-button quit-button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="snake.js"></script>
+</body>
+</html>
