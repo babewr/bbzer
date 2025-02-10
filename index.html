@@ -1,0 +1,276 @@
+Shop:<br>
+<div class="colorOption" data-color="red" data-cost="100">Red (100 coins)</div>
+<div class="colorOption" data-color="yellow" data-cost="150">Yellow (150 coins)</div>
+<div class="colorOption" data-color="green" data-cost="200">Green (200 coins)</div>
+<div class="colorOption" data-color="blue" data-cost="250">Blue (250 coins)</div>
+</div><div class="gameOver">
+<h1>Game Over!</h1>
+<p>Final Score: <span id="finalScore">0</span></p>
+<button onclick="restartGame()">Restart</button>
+<button onclick="spectateMode()">Spectate</button>
+</div><script>const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let player={
+  x:canvas.width/2,
+  y:canvas.height/2,
+  segments:[],
+  length:20,
+  speed:5,
+  angle:0,
+  color:'#fff',
+  score:0,
+  coins:0,
+  size:10
+};
+
+let npcs=[];
+let food=[];
+const NUM_NPCS=10;
+const NUM_FOOD=100;
+
+let gameActive=true;
+let spectating=false;
+
+function initGame(){
+  // Initialize player segments
+  player.segments=[];
+  for(let i=0;i<player.length;i++){
+    player.segments.push({
+      x:player.x-i*player.size,
+      y:player.y
+    });
+  }
+  
+  // Initialize NPCs
+  npcs=[];
+  for(let i=0;i<NUM_NPCS;i++){
+    npcs.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      segments:[],
+      length:Math.floor(Math.random()*30)+10,
+      speed:Math.random()*3+2,
+      angle:Math.random()*Math.PI*2,
+      color:`hsl(${Math.random()*360},100%,50%)`,
+      size:Math.random()*5+8
+    });
+  }
+  
+  // Initialize food
+  food=[];
+  for(let i=0;i<NUM_FOOD;i++){
+    food.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      color:`hsl(${Math.random()*360},100%,50%)`
+    });
+  }
+}
+
+function drawEyes(x,y,angle,size){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(angle);
+  
+  // Eyes
+  ctx.fillStyle='#fff';
+  ctx.beginPath();
+  ctx.arc(size/2,-size/2,size/4,0,Math.PI*2);
+  ctx.arc(size/2,size/2,size/4,0,Math.PI*2);
+  ctx.fill();
+  
+  // Pupils
+  ctx.fillStyle='#000';
+  ctx.beginPath();
+  ctx.arc(size/2+size/8,-size/2,size/8,0,Math.PI*2);
+  ctx.arc(size/2+size/8,size/2,size/8,0,Math.PI*2);
+  ctx.fill();
+  
+  ctx.restore();
+}
+
+function update(){
+  if(!gameActive && !spectating) return;
+  
+  // Update player
+  if(!spectating){
+    let dx=mouse.x-player.x;
+    let dy=mouse.y-player.y;
+    player.angle=Math.atan2(dy,dx);
+    
+    player.x+=Math.cos(player.angle)*player.speed;
+    player.y+=Math.sin(player.angle)*player.speed;
+    
+    player.segments.unshift({x:player.x,y:player.y});
+    if(player.segments.length>player.length){
+      player.segments.pop();
+    }
+  }
+  
+  // Update NPCs
+  npcs.forEach(npc=>{
+    npc.angle+=Math.random()*0.2-0.1;
+    npc.x+=Math.cos(npc.angle)*npc.speed;
+    npc.y+=Math.sin(npc.angle)*npc.speed;
+    
+    // Keep NPCs in bounds
+    if(npc.x<0) npc.x=canvas.width;
+    if(npc.x>canvas.width) npc.x=0;
+    if(npc.y<0) npc.y=canvas.height;
+    if(npc.y>canvas.height) npc.y=0;
+    
+    npc.segments.unshift({x:npc.x,y:npc.y});
+    if(npc.segments.length>npc.length){
+      npc.segments.pop();
+    }
+  });
+  
+  // Collision detection
+  if(!spectating){
+    // Food collision
+    food.forEach((f,i)=>{
+      let dx=player.x-f.x;
+      let dy=player.y-f.y;
+      let dist=Math.sqrt(dx*dx+dy*dy);
+      
+      if(dist<player.size+5){
+        food.splice(i,1);
+        player.length++;
+        player.score+=10;
+        player.coins+=1;
+        food.push({
+          x:Math.random()*canvas.width,
+          y:Math.random()*canvas.height,
+          color:`hsl(${Math.random()*360},100%,50%)`
+        });
+      }
+    });
+    
+    // NPC collision
+    npcs.forEach((npc,i)=>{
+      let dx=player.x-npc.x;
+      let dy=player.y-npc.y;
+      let dist=Math.sqrt(dx*dx+dy*dy);
+      
+      if(dist<player.size+npc.size){
+        if(player.length>npc.length){
+          npcs.splice(i,1);
+          player.length+=5;
+          player.score+=100;
+          player.coins+=10;
+        }else{
+          gameOver();
+        }
+      }
+    });
+  }
+  
+  // Check win condition
+  if(player.score>=200000){
+    win();
+  }
+  
+  document.getElementById('score').textContent=player.score;
+  document.getElementById('coins').textContent=player.coins;
+}
+
+function draw(){
+  ctx.fillStyle='#111';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  
+  // Draw food
+  food.forEach(f=>{
+    ctx.fillStyle=f.color;
+    ctx.beginPath();
+    ctx.arc(f.x,f.y,5,0,Math.PI*2);
+    ctx.fill();
+  });
+  
+  // Draw NPCs
+  npcs.forEach(npc=>{
+    npc.segments.forEach((seg,i)=>{
+      ctx.fillStyle=npc.color;
+      ctx.beginPath();
+      ctx.arc(seg.x,seg.y,npc.size*(1-i/npc.segments.length*0.5),0,Math.PI*2);
+      ctx.fill();
+    });
+    drawEyes(npc.x,npc.y,npc.angle,npc.size);
+  });
+  
+  // Draw player
+  if(!spectating){
+    player.segments.forEach((seg,i)=>{
+      ctx.fillStyle=player.color;
+      ctx.beginPath();
+      ctx.arc(seg.x,seg.y,player.size*(1-i/player.segments.length*0.5),0,Math.PI*2);
+      ctx.fill();
+    });
+    drawEyes(player.x,player.y,player.angle,player.size);
+  }
+}
+
+function gameLoop(){
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+function gameOver(){
+  gameActive=false;
+  document.querySelector('.gameOver').style.display='block';
+  document.getElementById('finalScore').textContent=player.score;
+}
+
+function win(){
+  gameActive=false;
+  document.querySelector('.gameOver').style.display='block';
+  document.getElementById('finalScore').textContent=player.score+" - YOU WIN!";
+}
+
+function restartGame(){
+  gameActive=true;
+  spectating=false;
+  player.x=canvas.width/2;
+  player.y=canvas.height/2;
+  player.length=20;
+  player.score=0;
+  player.segments=[];
+  document.querySelector('.gameOver').style.display='none';
+  initGame();
+}
+
+function spectateMode(){
+  spectating=true;
+  document.querySelector('.gameOver').style.display='none';
+}
+
+let mouse={x:0,y:0};
+canvas.addEventListener('mousemove',e=>{
+  mouse.x=e.clientX;
+  mouse.y=e.clientY;
+});
+
+document.querySelectorAll('.colorOption').forEach(option=>{
+  option.addEventListener('click',()=>{
+    let color=option.dataset.color;
+    let cost=parseInt(option.dataset.cost);
+    
+    if(player.coins>=cost){
+      player.coins-=cost;
+      player.color=color;
+      document.getElementById('coins').textContent=player.coins;
+    }
+  });
+});
+
+window.addEventListener('resize',()=>{
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+});
+
+initGame();
+gameLoop();</script></body></html>
