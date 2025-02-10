@@ -1,0 +1,932 @@
+<meta charset="UTF-8">
+<style>
+:root {
+  --primary: #00ff00;
+  --bg: #000000;
+  --text: #00ff00;
+  --surface: #001100;
+}
+
+body {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  background: var(--bg);
+  color: var(--text);
+  text-shadow: 0 0 5px var(--text);
+}
+
+.profile {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  border: 1px solid var(--text);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  border-bottom: 1px dashed var(--text);
+  padding-bottom: 1rem;
+}
+
+.header::before {
+  content: "C:\\>";
+  font-weight: bold;
+}
+
+.avatar {
+  width: 128px;
+  height: 128px;
+  border-radius: 0;
+  border: 2px solid var(--text);
+  image-rendering: pixelated;
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+  margin: 1rem 0;
+  font-family: 'Courier New', monospace;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid var(--text);
+  padding: 0.5rem;
+}
+
+.stat::before {
+  content: ">";
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.stat-label {
+  color: var(--text);
+  opacity: 0.7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--text);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.card:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  image-rendering: pixelated;
+  border-bottom: 1px solid var(--text);
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+.card h3 {
+  margin: 0 0 0.5rem 0;
+}
+
+.card h3::before {
+  content: ">";
+  margin-right: 0.5rem;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.social-links a {
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid var(--text);
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.social-links a:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg);
+  border: 2px solid var(--text);
+  padding: 2rem;
+  display: none;
+  z-index: 100;
+  text-align: center;
+}
+
+.popup.show {
+  display: block;
+}
+
+.link-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg);
+  border: 2px solid var(--text);
+  padding: 2rem;
+  z-index: 100;
+  text-align: center;
+  max-width: 80%;
+  word-break: break-all;
+  display: none;
+}
+
+.link-popup.show {
+  display: block;
+}
+
+h2::before {
+  content: "DIR /";
+  margin-right: 0.5rem;
+}
+
+.about-section {
+  margin-top: 3rem;
+  border: 1px solid var(--text);
+  padding: 1rem;
+}
+
+.about-section::before {
+  content: "C:\\>TYPE ABOUT.TXT";
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.featured-projects {
+  margin-top: 3rem;
+  border: 1px solid var(--text);
+  padding: 2rem;
+}
+
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.featured-card {
+  background: var(--surface);
+  border: 1px solid var(--text);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.featured-card:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.featured-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  image-rendering: pixelated;
+  border-bottom: 1px solid var(--text);
+}
+
+.featured-card-content {
+  padding: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.featured-card h3::before {
+  content: ">";
+  margin-right: 0.5rem;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.profile::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+}
+
+/* Add new checkers styles */
+.checkers-section {
+  margin-top: 3rem;
+  border: 1px solid var(--text);
+  padding: 2rem;
+}
+
+.checkers-board {
+  display: grid;
+  grid-template-columns: repeat(8, 50px);
+  gap: 0;
+  width: fit-content;
+  margin: 2rem auto;
+  border: 2px solid var(--text);
+}
+
+.checkers-cell {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkers-cell.black {
+  background: var(--surface);
+}
+
+.checkers-cell.white {
+  background: var(--bg);
+}
+
+.checker {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--text);
+}
+
+.checker.player {
+  background: #00ff00;
+}
+
+.checker.ai {
+  background: #ff0000;
+}
+
+.checker.king::after {
+  content: "K";
+  color: #000;
+  font-weight: bold;
+  text-align: center;
+  line-height: 40px;
+}
+
+.checkers-status {
+  text-align: center;
+  margin: 1rem 0;
+  min-height: 2em;
+}
+
+.checkers-controls {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.reset-button {
+  background: var(--surface);
+  border: 1px solid var(--text);
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.reset-button:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* Calculator styles */
+.calculator-section {
+  margin-top: 3rem;
+  border: 1px solid var(--text);
+  padding: 2rem;
+}
+
+.calculator-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.calc-button {
+  background: var(--surface);
+  border: 1px solid var(--text);
+  color: var(--text);
+  padding: 1rem 2rem;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.calc-button:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.calc-button:active {
+  transform: translateY(2px);
+}
+
+.calculation-result {
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px solid var(--text);
+  min-height: 100px;
+  white-space: pre-wrap;
+  font-family: 'Courier New', monospace;
+  position: relative;
+}
+
+/* Improve loading state visibility */
+.calculation-result::before {
+  content: "RUNNING CALCULATION SUBROUTINE...";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  color: var(--text);
+  text-shadow: 0 0 5px var(--text);
+  animation: blink 1s step-end infinite;
+}
+
+.calculation-result.loading::before {
+  opacity: 1;
+}
+
+/* Add these styles to the existing CSS */
+.hidden-button {
+  position: relative; /* Change to relative positioning */
+  width: 24px; /* Match size of social icons */
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 1000;
+  margin-left: 1rem; /* Add margin to match social link spacing */
+}
+
+.fullscreen-dog {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 9999;
+}
+</style>
+</head>
+<body>
+
+<img src="/dog.gif" id="dogOverlay" class="fullscreen-dog" alt="fullscreen dog">
+
+<main class="profile">
+  <div id="popup" class="popup">
+    I dont even have a profile on this website lol
+  </div>
+  
+  <div id="linkPopup" class="link-popup"></div>
+  
+  <header class="header">
+    <img class="avatar" src="https://images.websim.ai/avatar/Theguy27" alt="@Theguy27's profile picture">
+    <div>
+      <h1>@Theguy27</h1>
+      <div class="social-links">
+        <a href="#" class="social-link" data-platform="twitter">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+          </svg>
+        </a>
+        <a href="#" class="social-link" data-platform="discord">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
+          </svg>
+        </a>
+        <button id="hiddenButton" class="hidden-button" title="???"></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-value" id="projectCount">0</span>
+      <span class="stat-label">Projects.exe</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="followersCount">0</span>
+      <span class="stat-label">Followers.dat</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="followingCount">0</span>
+      <span class="stat-label">Following.dat</span>
+    </div>
+  </div>
+
+  <h2>Recent Projects</h2>
+  <div class="grid" id="projects"></div>
+
+  <div class="about-section">
+    Hey guys its me, the real guy27!!1!1 I make some funny things on websim, i have made some goofy ahh hell games, and have spent way too much time on some things. Theres some cool things i have made, one i am particularly proud of is the "Epic molerat boss fight!" game. So instead of spending alotta time reading this profile, why dont ya check out some of my funny games???
+  </div>
+
+  <div class="featured-projects">
+    <h2>Projects I Particularly Like</h2>
+    <div class="featured-grid" id="featuredProjects"></div>
+  </div>
+
+  <div class="checkers-section">
+    <h2>Checkers Conflict Intermediate</h2>
+    <div id="checkersStatus" class="checkers-status">Your turn! Good luck...</div>
+    <div id="checkersBoard" class="checkers-board"></div>
+    <div class="checkers-controls">
+      <button id="resetCheckers" class="reset-button">Reset Game</button>
+    </div>
+  </div>
+
+  <div class="calculator-section">
+    <h2>Out of Touch Calculator</h2>
+    <div class="calculator-buttons">
+      <button id="nextProjectBtn" class="calc-button">Calculate next project</button>
+      <button id="maidensBtn" class="calc-button">Calculate chances of getting maidens</button>
+    </div>
+    <div id="calculationResult" class="calculation-result"></div>
+  </div>
+
+</main>
+
+<script>
+const audio = new Audio('/engineer_no01.wav');
+const backgroundMusic = new Audio('/upgrade station musicEXTENDED.ogg');
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.5; // Set to 50% volume by default
+
+// Start playing music when the page loads
+window.addEventListener('load', () => {
+  // Attempt to play - this may fail due to autoplay policies
+  backgroundMusic.play().catch(() => {
+    // Add click-to-play functionality if autoplay fails
+    document.body.addEventListener('click', () => {
+      backgroundMusic.play().catch(err => console.log('Music playback failed:', err));
+    }, { once: true }); // Remove listener after first click
+  });
+});
+
+const klaxonSound = new Audio('/klaxonbeat.mp3');
+
+function showPopup() {
+  const popup = document.getElementById('popup');
+  popup.classList.add('show');
+  audio.play();
+  
+  setTimeout(() => {
+    popup.classList.remove('show');
+  }, 3000);
+}
+
+function showLinkPopup(link) {
+  const popup = document.getElementById('linkPopup');
+  popup.textContent = `I have no clue why, but the shortcuts don't seem to work normally, please just copy/paste this link instead: ${link}`;
+  popup.classList.add('show');
+  
+  setTimeout(() => {
+    popup.classList.remove('show');
+  }, 5000); // Show for 5 seconds
+}
+
+document.getElementById('hiddenButton').addEventListener('click', async () => {
+  const dogOverlay = document.getElementById('dogOverlay');
+  
+  // Show dog gif
+  dogOverlay.style.display = 'block';
+  
+  // Mute background music and play klaxon
+  backgroundMusic.volume = 0;
+  
+  // Play klaxon sound
+  try {
+    await klaxonSound.play();
+    
+    // Wait for klaxon to finish
+    klaxonSound.addEventListener('ended', () => {
+      // Hide dog gif
+      dogOverlay.style.display = 'none';
+      
+      // Resume background music
+      backgroundMusic.volume = 0.5;
+    }, {once: true});
+  } catch (err) {
+    console.error('Error playing klaxon sound:', err);
+  }
+});
+
+document.querySelectorAll('.social-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    showPopup();
+  });
+});
+
+// Replace the featuredProjectIds array with the working IDs
+const featuredProjectIds = [
+  'gj33nl5emjj85rtx3uqa', // molerat bossfight
+  '4cen49s6_ifxhiyutt36', // hangout game
+  'friwl4hru5elk97lgx8s', // name generator
+  '1etree1kgk6xn4uiah7e', // linux command simulator
+  '117a5n0j7p2j0wmbyf24'  // sandwich roguelike
+];
+
+// Update loadFeaturedProjects function to properly handle clicks
+async function loadFeaturedProjects() {
+  const featuredGrid = document.getElementById('featuredProjects');
+  
+  for (const projectId of featuredProjectIds) {
+    try {
+      const response = await fetch(`/api/v1/projects/${projectId}`);
+      const data = await response.json();
+      
+      const card = document.createElement('div');
+      card.className = 'featured-card';
+      
+      const image = data.project_revision?.current_screenshot_url || 'https://via.placeholder.com/600x400?text=No+Preview';
+      
+      card.innerHTML = `
+        <img src="${image}" alt="Preview of ${data.project.title || 'Untitled Project'}">
+        <div class="featured-card-content">
+          <h3>${data.project.title || 'Untitled Project'}</h3>
+          <p>${new Date(data.project.created_at).toLocaleDateString()} - <span style="color: var(--text); word-break: break-all;">https://websim.ai/p/${projectId}</span></p>
+        </div>
+      `;
+      
+      card.addEventListener('click', () => {
+        showLinkPopup(`https://websim.ai/p/${projectId}`);
+      });
+      
+      featuredGrid.appendChild(card);
+    } catch (error) {
+      console.error(`Error loading featured project ${projectId}:`, error);
+    }
+  }
+}
+
+// Update loadProfile function to properly handle clicks
+async function loadProfile() {
+  // Load user projects
+  const projectsResponse = await fetch('/api/v1/users/Theguy27/projects?first=6');
+  const projectsData = await projectsResponse.json();
+  
+  const projectsGrid = document.getElementById('projects');
+  
+  projectsData.projects.data
+    .filter(({project}) => {
+      const title = project.title?.toLowerCase() || '';
+      return !title.includes('chess battle advanced') && 
+             !title.includes('profile page');
+    })
+    .forEach(({project, project_revision}) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      const image = project_revision?.current_screenshot_url || 'https://via.placeholder.com/600x400?text=No+Preview';
+      
+      card.innerHTML = `
+        <img src="${image}" alt="Preview of ${project.title || 'Untitled Project'}">
+        <div class="card-content">
+          <h3>${project.title || 'Untitled Project'}</h3>
+          <p>${new Date(project.created_at).toLocaleDateString()} - <span style="color: var(--text); word-break: break-all;">https://websim.ai/p/${project.id}</span></p>
+        </div>
+      `;
+      
+      card.addEventListener('click', () => {
+        showLinkPopup(`https://websim.ai/p/${project.id}`);
+      });
+      
+      projectsGrid.appendChild(card);
+    });
+
+  // Load follower count
+  const followersResponse = await fetch('/api/v1/users/Theguy27/followers?count=true');
+  const followersData = await followersResponse.json();
+  document.getElementById('followersCount').textContent = followersData.followers.meta.count || 0;
+
+  // Load following count
+  const followingResponse = await fetch('/api/v1/users/Theguy27/following?count=true');
+  const followingData = await followingResponse.json();
+  document.getElementById('followingCount').textContent = followingData.following.meta.count || 0;
+
+  // Set project count
+  document.getElementById('projectCount').textContent = projectsData.projects.meta.count || 0;
+}
+
+// Checkers game implementation
+class CheckersGame {
+  constructor() {
+    this.board = [];
+    this.selectedCell = null;
+    this.isPlayerTurn = true;
+    this.validMoves = [];
+    this.initialize();
+  }
+
+  initialize() {
+    // Create empty board
+    this.board = Array(8).fill().map(() => Array(8).fill(null));
+    
+    // Place initial pieces
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        if ((row + col) % 2 === 1) {
+          if (row < 3) {
+            this.board[row][col] = { type: 'ai', isKing: false };
+          } else if (row > 4) {
+            this.board[row][col] = { type: 'player', isKing: false };
+          }
+        }
+      }
+    }
+  }
+
+  isValidMove(fromRow, fromCol, toRow, toCol) {
+    if (toRow < 0 || toRow > 7 || toCol < 0 || toCol > 7) return false;
+    if (this.board[toRow][toCol]) return false;
+
+    const piece = this.board[fromRow][fromCol];
+    if (!piece) return false;
+
+    const rowDiff = toRow - fromRow;
+    const colDiff = Math.abs(toCol - fromCol);
+
+    if (piece.type === 'player' && !piece.isKing && rowDiff >= 0) return false;
+    if (piece.type === 'ai' && !piece.isKing && rowDiff <= 0) return false;
+    
+    if (colDiff === 1 && Math.abs(rowDiff) === 1) return true;
+    
+    if (colDiff === 2 && Math.abs(rowDiff) === 2) {
+      const jumpedRow = fromRow + rowDiff/2;
+      const jumpedCol = fromCol + (toCol - fromCol)/2;
+      const jumpedPiece = this.board[jumpedRow][jumpedCol];
+      return jumpedPiece && jumpedPiece.type !== piece.type;
+    }
+
+    return false;
+  }
+
+  getValidMoves(row, col) {
+    const moves = [];
+    const directions = [-1, 1];
+    const piece = this.board[row][col];
+
+    if (!piece) return moves;
+
+    for (let rowDir of piece.isKing ? [-1, 1] : [piece.type === 'player' ? -1 : 1]) {
+      for (let colDir of directions) {
+        // Check single moves
+        if (this.isValidMove(row, col, row + rowDir, col + colDir)) {
+          moves.push([row + rowDir, col + colDir]);
+        }
+        // Check jumps
+        if (this.isValidMove(row, col, row + rowDir * 2, col + colDir * 2)) {
+          moves.push([row + rowDir * 2, col + colDir * 2]);
+        }
+      }
+    }
+
+    return moves;
+  }
+
+  makeMove(fromRow, fromCol, toRow, toCol) {
+    const piece = this.board[fromRow][fromCol];
+    this.board[toRow][toCol] = piece;
+    this.board[fromRow][fromCol] = null;
+
+    // Handle jumps
+    if (Math.abs(toRow - fromRow) === 2) {
+      const jumpedRow = fromRow + (toRow - fromRow)/2;
+      const jumpedCol = fromCol + (toCol - fromCol)/2;
+      this.board[jumpedRow][jumpedCol] = null;
+    }
+
+    // King promotion
+    if ((piece.type === 'player' && toRow === 0) || 
+        (piece.type === 'ai' && toRow === 7)) {
+      piece.isKing = true;
+    }
+  }
+
+  aiMove() {
+    // AI cheating mechanism: 20% chance to make a piece into a king
+    if (Math.random() < 0.2) {
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          if (this.board[row][col]?.type === 'ai' && !this.board[row][col].isKing) {
+            this.board[row][col].isKing = true;
+            return;
+          }
+        }
+      }
+    }
+
+    // Find all possible AI moves
+    const moves = [];
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        if (this.board[row][col]?.type === 'ai') {
+          const validMoves = this.getValidMoves(row, col);
+          validMoves.forEach(([toRow, toCol]) => {
+            moves.push({
+              fromRow: row,
+              fromCol: col,
+              toRow,
+              toCol
+            });
+          });
+        }
+      }
+    }
+
+    if (moves.length > 0) {
+      const move = moves[Math.floor(Math.random() * moves.length)];
+      this.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
+    }
+  }
+
+  checkWinner() {
+    let playerPieces = 0;
+    let aiPieces = 0;
+    
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        if (this.board[row][col]?.type === 'player') playerPieces++;
+        if (this.board[row][col]?.type === 'ai') aiPieces++;
+      }
+    }
+
+    if (playerPieces === 0) return 'ai';
+    if (aiPieces === 0) return 'player';
+    return null;
+  }
+}
+
+// Initialize checkers game
+let game = new CheckersGame();
+
+function renderBoard() {
+  const board = document.getElementById('checkersBoard');
+  board.innerHTML = '';
+
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const cell = document.createElement('div');
+      cell.className = `checkers-cell ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
+      
+      const piece = game.board[row][col];
+      if (piece) {
+        const checker = document.createElement('div');
+        checker.className = `checker ${piece.type}${piece.isKing ? ' king' : ''}`;
+        cell.appendChild(checker);
+      }
+
+      if (game.validMoves.some(([vRow, vCol]) => vRow === row && vCol === col)) {
+        cell.style.backgroundColor = '#004400';
+      }
+
+      cell.addEventListener('click', () => handleCellClick(row, col));
+      board.appendChild(cell);
+    }
+  }
+}
+
+function handleCellClick(row, col) {
+  if (!game.isPlayerTurn) return;
+
+  const piece = game.board[row][col];
+  
+  if (piece?.type === 'player') {
+    game.selectedCell = [row, col];
+    game.validMoves = game.getValidMoves(row, col);
+    renderBoard();
+  } else if (game.selectedCell && game.validMoves.some(([vRow, vCol]) => vRow === row && vCol === col)) {
+    game.makeMove(game.selectedCell[0], game.selectedCell[1], row, col);
+    game.selectedCell = null;
+    game.validMoves = [];
+    game.isPlayerTurn = false;
+    renderBoard();
+
+    const winner = game.checkWinner();
+    if (winner) {
+      document.getElementById('checkersStatus').textContent = 
+        winner === 'player' ? 'You win!' : 'AI wins!';
+      return;
+    }
+
+    document.getElementById('checkersStatus').textContent = "AI is thinking...";
+    
+    setTimeout(() => {
+      game.aiMove();
+      game.isPlayerTurn = true;
+      renderBoard();
+      
+      const winner = game.checkWinner();
+      if (winner) {
+        document.getElementById('checkersStatus').textContent = 
+          winner === 'player' ? 'You win!' : 'AI wins!';
+      } else {
+        document.getElementById('checkersStatus').textContent = 'Your turn!';
+      }
+    }, 1000);
+  }
+}
+
+document.getElementById('resetCheckers').addEventListener('click', () => {
+  game = new CheckersGame();
+  game.isPlayerTurn = true;
+  document.getElementById('checkersStatus').textContent = 'Your turn! Good luck...';
+  renderBoard();
+});
+
+// Out of Touch Calculator functionality
+document.getElementById('nextProjectBtn').addEventListener('click', async () => {
+  const result = document.getElementById('calculationResult');
+  result.classList.add('loading');
+  result.textContent = '';
+  
+  try {
+    const response = await fetch('/api/ai_completion', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: `You are a defective calculator AI attempting to predict Theguy27's next project based on his existing games:
+        - Sandwich based roguelike! (competitive update!)
+        - Epic molerat bossfight! (3D with grappling hooks!)
+        - Epic 3D Hangout game! (With gambling and landmines!) 
+        - Goofy ahh hell name generator
+        - Type "sudo rm -fr ./*" command prompt simulator
+        - Chess battle advanced (CBA)
+
+        Analyze these games and predict his next bizarre project in a humorous way. Include silly features or mechanics it might have.
+
+        Please provide responses in completely plain text without any special formatting such as Markdown (e.g., **, ###), line breaks, or symbols AT ALL. Avoid using bullet points, headings, or bold/italic text, headers, or any of the related things. Responses should consist of sentences written in standard prose, with no additional styling or structure AT ALL. also do NOT format things like this example \"exampletext\" EVER`,
+        data: ""
+      })
+    });
+
+    const data = await response.json();
+    result.textContent = JSON.stringify(data, null, 2);
+
+  } catch (error) {
+    console.error('Calculator error:', error);
+    result.textContent = "ERROR: CALCULATOR.EXE HAS STOPPED WORKING\nREASON: DIVISION BY CHEESE\n\nPLEASE REBOOT UNIVERSE AND TRY AGAIN.";
+  } finally {
+    result.classList.remove('loading');
+  }
+});
+
+// Update maidens button handler to remove debug output references 
+document.getElementById('maidensBtn').addEventListener('click', () => {
+  const result = document.getElementById('calculationResult');
+  result.textContent = "ERROR: CALCULATOR DIED FROM CRINGE\nPLEASE TOUCH GRASS AND TRY AGAIN";
+});
+
+loadProfile();
+loadFeaturedProjects();
+renderBoard();
+</script>
+
+</body>
+</html>
