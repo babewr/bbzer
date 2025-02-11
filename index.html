@@ -1,0 +1,254 @@
+<meta charset="UTF-8">
+<style>
+body {
+    font-family: 'Comic Sans MS', cursive;
+    background: #ffe6e6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.kitchen {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    background: #fff7f7;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    margin: 20px;
+    overflow: hidden;
+}
+
+.mama {
+    width: 200px;
+    height: 200px;
+}
+
+.ingredient {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.ingredient:hover {
+    transform: scale(1.1);
+}
+
+.pot {
+    width: 300px;
+    height: 200px;
+    position: absolute;
+    bottom: 50px;
+    left: 250px;
+}
+
+.score {
+    font-size: 24px;
+    color: #ff6b6b;
+    margin: 20px;
+}
+
+.instructions {
+    font-size: 20px;
+    color: #ff8080;
+    margin: 10px;
+}
+
+.food-select {
+    display: flex;
+    gap: 10px;
+    margin: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.food-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #ffb6c1;
+    cursor: pointer;
+    font-family: 'Comic Sans MS', cursive;
+    transition: transform 0.2s;
+}
+
+.food-button:hover {
+    transform: scale(1.1);
+    background: #ff9aaf;
+}
+
+</style>
+</head>
+<body>
+    <h1>Cooking Mama!</h1>
+    <div class="score">Score: <span id="scoreValue">0</span></div>
+    <div class="instructions">Select ingredients and drag them into the pot to cook!</div>
+    <div class="food-select">
+        <button class="food-button" data-food="carrot">🥕 Carrot</button>
+        <button class="food-button" data-food="potato">🥔 Potato</button>
+        <button class="food-button" data-food="tomato">🍅 Tomato</button>
+        <button class="food-button" data-food="mushroom">🍄 Mushroom</button>
+        <button class="food-button" data-food="broccoli">🥦 Broccoli</button>
+    </div>
+    <div class="kitchen" id="kitchen">
+        <!-- Mama SVG -->
+        <svg class="mama" viewBox="0 0 100 100" style="position: absolute; right: 50px; top: 50px;">
+            <circle cx="50" cy="40" r="25" fill="#FFB6C1"/> <!-- Face -->
+            <circle cx="40" cy="35" r="3" fill="#000"/> <!-- Left eye -->
+            <circle cx="60" cy="35" r="3" fill="#000"/> <!-- Right eye -->
+            <path d="M45 45 Q50 50 55 45" stroke="#000" fill="none" stroke-width="2"/> <!-- Smile -->
+            <rect x="35" y="15" width="30" height="15" fill="#fff"/> <!-- Chef hat -->
+        </svg>
+
+        <!-- Pot SVG -->
+        <svg class="pot" viewBox="0 0 100 100">
+            <path d="M10 40 Q50 30 90 40 L100 80 Q50 90 0 80 Z" fill="#silver"/>
+            <ellipse cx="50" cy="40" rx="40" ry="10" fill="#gray"/>
+        </svg>
+    </div>
+
+<script>
+let score = 0;
+const kitchen = document.getElementById('kitchen');
+const pot = document.querySelector('.pot');
+const scoreElement = document.getElementById('scoreValue');
+
+const foodColors = {
+    carrot: '#ff7f00',
+    potato: '#d4a017',
+    tomato: '#ff0000',
+    mushroom: '#8b4513',
+    broccoli: '#228b22'
+};
+
+const foodShapes = {
+    carrot: (svg) => {
+        svg.innerHTML = `<rect width="60" height="20" fill="${foodColors.carrot}" rx="5"/>`;
+    },
+    potato: (svg) => {
+        svg.innerHTML = `<circle cx="30" cy="30" r="25" fill="${foodColors.potato}"/>`;
+    },
+    tomato: (svg) => {
+        svg.innerHTML = `<circle cx="30" cy="30" r="25" fill="${foodColors.tomato}"/>`;
+    },
+    mushroom: (svg) => {
+        svg.innerHTML = `
+            <path d="M15 40 Q30 20 45 40" fill="${foodColors.mushroom}"/>
+            <circle cx="30" cy="25" r="15" fill="${foodColors.mushroom}"/>
+        `;
+    },
+    broccoli: (svg) => {
+        svg.innerHTML = `
+            <circle cx="30" cy="30" r="20" fill="${foodColors.broccoli}"/>
+            <circle cx="20" cy="20" r="10" fill="${foodColors.broccoli}"/>
+            <circle cx="40" cy="20" r="10" fill="${foodColors.broccoli}"/>
+        `;
+    }
+};
+
+document.querySelectorAll('.food-button').forEach(button => {
+    button.addEventListener('click', () => {
+        const foodType = button.dataset.food;
+        createIngredient(foodType);
+    });
+});
+
+function createIngredient(foodType) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add('ingredient');
+    svg.setAttribute('data-type', foodType);
+    svg.style.top = Math.random() * 300 + 100 + 'px';
+    svg.style.left = Math.random() * 200 + 50 + 'px';
+    
+    foodShapes[foodType](svg);
+    kitchen.appendChild(svg);
+    svg.addEventListener('mousedown', startDragging);
+}
+
+let selectedIngredient = null;
+let offset = { x: 0, y: 0 };
+
+function startDragging(e) {
+    selectedIngredient = e.target.closest('.ingredient');
+    const rect = selectedIngredient.getBoundingClientRect();
+    offset.x = e.clientX - rect.left;
+    offset.y = e.clientY - rect.top;
+
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDragging);
+}
+
+function drag(e) {
+    if (!selectedIngredient) return;
+
+    const kitchenRect = kitchen.getBoundingClientRect();
+
+    let x = e.clientX - kitchenRect.left - offset.x;
+    let y = e.clientY - kitchenRect.top - offset.y;
+
+    x = Math.max(0, Math.min(x, kitchenRect.width - 80));
+    y = Math.max(0, Math.min(y, kitchenRect.height - 80));
+
+    selectedIngredient.style.left = x + 'px';
+    selectedIngredient.style.top = y + 'px';
+}
+
+function stopDragging() {
+    if (!selectedIngredient) return;
+
+    const ingredientRect = selectedIngredient.getBoundingClientRect();
+    const potRect = pot.getBoundingClientRect();
+
+    if (isColliding(ingredientRect, potRect)) {
+        score += 100;
+        scoreElement.textContent = score;
+        createCookingEffect(selectedIngredient);
+        selectedIngredient.remove();
+    }
+
+    selectedIngredient = null;
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', stopDragging);
+}
+
+function isColliding(rect1, rect2) {
+    return !(rect1.right < rect2.left || 
+        rect1.left > rect2.right || 
+        rect1.bottom < rect2.top || 
+        rect1.top > rect2.bottom);
+}
+
+function createCookingEffect(ingredient) {
+    const bubbles = document.createElement('div');
+    bubbles.style.position = 'absolute';
+    bubbles.style.left = ingredient.style.left;
+    bubbles.style.top = ingredient.style.top;
+    bubbles.innerHTML = '✨';
+    bubbles.style.animation = 'float 1s ease-out';
+    kitchen.appendChild(bubbles);
+    
+    setTimeout(() => bubbles.remove(), 1000);
+}
+
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes float {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(-100px); opacity: 0; }
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .mama {
+        animation: bounce 2s infinite;
+    }
+`;
+document.head.appendChild(style);
+</script>
+</body></html>
