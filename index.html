@@ -1,0 +1,1492 @@
+@font-face {
+    font-family: 'SMB3';
+    src: url('smb3.ttf') format('truetype');
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+    background: linear-gradient(180deg, #3498db 0%, #87ceeb 100%); 
+    overflow: hidden;
+    font-family: 'SMB3', Arial, sans-serif;
+}
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background: linear-gradient(180deg, #3498db 0%, #87ceeb 100%); 
+    overflow: hidden;
+}
+.particle {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    cursor: grab;
+    border-radius: 0;
+    transition: background-color 0.2s;
+    animation: colorPulse 2s ease-in-out infinite; /* Add color variation animation */
+}
+.particle.glow {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.7); }
+    50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.9); }
+}
+
+@keyframes colorPulse {
+    0% { filter: brightness(0.95); }
+    50% { filter: brightness(1.05); }
+    100% { filter: brightness(0.95); }
+}
+
+/* New particle styles */
+.milk { 
+    background: rgba(255, 255, 255, 0.9);
+    opacity: 0.8;
+}
+
+.vinegar {
+    background: rgba(245, 245, 220, 0.7);
+    opacity: 0.8;
+}
+
+.milk-curdle {
+    background: rgba(255, 253, 208, 0.9);
+    animation: curdle 20s linear;
+}
+
+.cheese {
+    background: #f4d03f;
+}
+
+.time {
+    background: linear-gradient(45deg, #4a90e2, #87ceeb);
+    animation: timePulse 2s infinite alternate;
+}
+
+@keyframes curdle {
+    0% { background: rgba(255, 255, 255, 0.9); }
+    100% { background: rgba(255, 253, 208, 0.9); }
+}
+
+@keyframes timePulse {
+    0% { 
+        box-shadow: 0 0 10px #4a90e2;
+        transform: scale(1);
+    }
+    100% { 
+        box-shadow: 0 0 20px #87ceeb;
+        transform: scale(1.1);
+    }
+}
+
+.controls {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: rgba(255,255,255,0.2);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 400px;
+    max-height: 80vh; 
+    overflow-y: auto; 
+    overflow-x: hidden;
+    font-family: 'SMB3', Arial, sans-serif;
+}
+.controls::-webkit-scrollbar {
+    width: 8px;
+}
+.controls::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+.controls::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+.controls::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+.controls button {
+    margin: 2px; /* Reduced margin */
+    padding: 3px 6px; /* Reduced padding */
+    flex-shrink: 0; 
+    min-width: fit-content; 
+    font-family: 'SMB3', Arial, sans-serif;
+}
+.color-picker {
+    position: fixed;
+    top: 120px;
+    left: 10px;
+    background: rgba(255,255,255,0.2);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    display: none;
+    font-family: 'SMB3', Arial, sans-serif;
+}
+.audio-controls {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.2);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-family: 'SMB3', Arial, sans-serif;
+}
+.audio-controls select {
+    padding: 5px;
+    margin: 5px 0;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+}
+button {
+    padding: 3px 6px;  /* Reduced padding */
+    margin: 2px;       /* Reduced margin */
+    cursor: pointer;
+    background: #4CAF50;
+    border: none;
+    color: white;
+    border-radius: 3px;
+    font-size: 0.85em;  /* Slightly smaller font */
+    font-family: 'SMB3', Arial, sans-serif;
+}
+.settings-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    z-index: 1000;
+    color: #333;
+    min-width: 300px;
+    max-height: 80vh;  
+    overflow-y: auto;  
+    overflow-x: hidden; 
+    font-family: 'SMB3', Arial, sans-serif;
+}
+.settings-panel::-webkit-scrollbar {
+    width: 10px;
+}
+.settings-panel::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+.settings-panel::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+.settings-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+.cloud {
+    position: absolute;
+    opacity: 0.4; 
+    animation: floatCloud linear infinite;
+    filter: blur(2px);
+    z-index: -1; 
+}
+@keyframes floatCloud {
+    from { 
+        transform: translateX(-200px); 
+    }
+    to { 
+        transform: translateX(calc(100vw + 200px)); 
+    }
+}
+.sand { background: #f4d03f; }
+.water { background: #3498db; opacity: 0.8; }
+.stone { background: #7f8c8d; }
+.stone-wall { background: #5f6c6d; }
+.wet-sand { background: #c5a431; }
+.grass { background: #67a836; }
+.dirt { background: #8B4513; }
+.mud { background: #3d1f09; }
+.art { background: #ff0000; }
+.oak-wood { background: #8a5c25; }
+.birch-wood { background: #d9c7b2; }
+.acacia-wood { background: #cf650e; }
+.cherry-wood { background: #e8c1e0; }
+.custom-wood { background: #a0522d; }
+.redwood { background: #d9390d; }
+.basswood { 
+    background: linear-gradient(45deg, #e6cfaa, #ad9979);
+}
+.poplarwood {
+    background: linear-gradient(45deg, #b3a58f, #e0d6c5);
+}
+.birch {
+    background: linear-gradient(45deg, #ffffff, #000000);
+}
+.ashwood {
+    background: linear-gradient(45deg, #c94b0c, #c97b0c);
+}
+button.oak-wood-btn { background: #8a5c25; }
+button.birch-wood-btn { background: #d9c7b2; color: #333; }
+button.acacia-wood-btn { background: #cf650e; }
+button.cherry-wood-btn { background: #e8c1e0; color: #333; }
+button.custom-wood-btn { background: #a0522d; }
+button.wet-sand-btn { background: #c5a431; }
+button.grass-btn { background: #67a836; }
+button.dirt-btn { background: #8B4513; }
+button.mud-btn { background: #3d1f09; }
+button.stone-wall-btn { background: #5f6c6d; }
+button#artBtn { background: #ff0000; transition: background-color 0.3s; }
+button.redwood-btn { background: #d9390d; }
+button.basswood-btn { 
+    background: linear-gradient(45deg, #e6cfaa, #ad9979);
+}
+button.poplarwood-btn {
+    background: linear-gradient(45deg, #b3a58f, #e0d6c5);
+}
+button.birch-btn {
+    background: linear-gradient(45deg, #ffffff, #000000);
+    color: white;
+}
+button.ashwood-btn {
+    background: linear-gradient(45deg, #c94b0c, #c97b0c);
+}
+.saltwater { 
+    background: #afdee3;
+    opacity: 0.8;
+}
+.wall {
+    background: #808080;
+}
+.brick-wall {
+    background-image: url('brick2.png');
+    background-size: 30px 30px; 
+}
+button.wall-btn { background: #808080; }
+button.saltwater-btn { background: #afdee3; color: #333; }
+button.brick-wall-btn { 
+    background-image: url('brick2.png');
+    background-size: 30px 30px;
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+.rainbow-btn {
+    background: linear-gradient(90deg, 
+        #ff0000, #ff7f00, #ffff00, #00ff00, 
+        #0000ff, #4b0082, #8f00ff);
+    background-size: 200% auto;
+    animation: rainbow 3s linear infinite;
+}
+@keyframes rainbow {
+    to {
+        background-position: 200% center;
+    }
+}
+.settings-panel button {
+    margin: 10px 5px;
+}
+input[type="range"] {
+    width: 100px;
+}
+input[type="color"] {
+    width: 50px;
+    height: 25px;
+    margin: 5px;
+}
+.save-slots {
+    margin: 15px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.save-form {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+.save-form input, .save-form select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+.save-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.save-slot {
+    background: rgba(255,255,255,0.5);
+    padding: 8px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.save-slot button {
+    padding: 2px 5px;
+    margin: 0 2px;
+}
+.debug-btn {
+    background: linear-gradient(to right, #ba5f38, #e3e2af);
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+.unknown { 
+    background: #ffffff; 
+    opacity: 0.8;
+}
+.random-element-btn {
+    background: linear-gradient(90deg, 
+        violet, indigo, blue, green,
+        yellow, orange, red);
+    background-size: 200% auto;
+    animation: rainbow 3s linear infinite;
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+.prop-btn {
+    background: linear-gradient(to right, #cf7f00, #e800a2);
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+.brush-size-control {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(255,255,255,0.2);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1001; 
+    font-family: 'SMB3', Arial, sans-serif;
+}
+.brush-size-control input[type="range"] {
+    width: 100px;
+}
+.brush-size-control label {
+    font-size: 14px;
+}
+.brush-size-control span {
+    min-width: 20px;
+    text-align: center;
+}
+.fill-btn {
+    background: linear-gradient(45deg, #ff7f50, #ff6b6b);
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+.advanced-settings {
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+}
+.setting-item {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.setting-item label {
+    min-width: 120px;
+}
+.setting-item input[type="range"] {
+    flex: 1;
+    max-width: 150px;
+}
+.setting-item select {
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+.setting-item span {
+    min-width: 60px;
+    text-align: right;
+}
+.snow { 
+    background: #bee4e6;
+    opacity: 0.9;
+}
+.rainbow {
+    animation: rainbowShift 2s linear infinite;
+}
+.gold {
+    background: #d99400;
+    opacity: 0.9;
+}
+.glass {
+    background-image: url('glass.svg');
+    background-size: cover;
+    opacity: 0.7;
+}
+@keyframes rainbowShift {
+    0% { background: red; }
+    17% { background: orange; }
+    33% { background: yellow; }
+    50% { background: green; }
+    67% { background: blue; }
+    83% { background: indigo; }
+    100% { background: violet; }
+}
+button.snow-btn { background: #bee4e6; color: #333; }
+button.rainbow-particle-btn { 
+    background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+button.gold-btn { background: #d99400; }
+button.glass-btn { 
+    background-image: url('glass.svg');
+    background-size: cover;
+    color: #333;
+}
+.cloud-normal { background: #e0e0e0; }  
+.thundercloud { background: #858585; }  
+.raincloud { background: #bdbdbd; }     
+.rat { background: #919191; }
+.meat { background: #7d5d47; }
+.cooked-meat { background: #5c4332; }
+.blue-gold { background: #9ee5ff; }
+.mulch { background: #801700; }
+button.rat-btn { background: #919191; }
+button.meat-btn { background: #7d5d47; }
+button.cooked-meat-btn { background: #5c4332; }
+button.blue-gold-btn { background: #9ee5ff; color: #333; }
+button.mulch-btn { background: #801700; }
+button.eraser-btn { 
+    background: linear-gradient(45deg, #ff6b6b, #ff4757);
+    color: white;
+}
+.human {
+    position: absolute; 
+    width: 20px;        
+    height: 30px;       
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    opacity: 1; /* Ensure full opacity */
+}
+.human .head {
+    background-color: #e3ba7d; /* Default skin tone */
+    width: 8px;         
+    height: 8px;        
+    border-radius: 50%;
+    opacity: 1;
+}
+.human .body {
+    background-color: #6390b8; /* Default clothing color */
+    width: 14px;        
+    height: 16px;       
+    border-radius: 2px;
+    opacity: 1;
+}
+.human .hair {
+    background-color: #4a342f; /* Default hair color */
+    width: 10px;        
+    height: 4px;        
+    border-radius: 4px 4px 0 0;
+    position: absolute;
+    top: -2px;
+    opacity: 1;
+}
+.cat { 
+    background-color: #ffffff;
+    border-radius: 5px;
+    transition: transform 0.2s;
+}
+button.cat-btn { 
+    background: linear-gradient(45deg, #ffffff, #858585, #784a25);
+    color: #333;
+}
+.cloner { 
+    background: #ffff00;
+    box-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+.fire {
+    background: #ff4500;
+    animation: fireFlicker 0.3s ease-in-out infinite alternate;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    filter: blur(1px);
+}
+@keyframes fireFlicker {
+    0% { 
+        opacity: 0.8;
+        transform: scaleY(1) translateY(0);
+    }
+    100% { 
+        opacity: 1;
+        transform: scaleY(1.1) translateY(-2px);
+    }
+}
+.fire-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 150, 50, 0.6);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: riseAndFade 1s ease-out forwards;
+}
+@keyframes riseAndFade {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-30px) scale(0.2);
+        opacity: 0;
+    }
+}
+.cat-food {
+    background-color: #a85816;
+}
+.dog-food {
+    background-color: #a85816;
+}
+.hail-cloud {
+    background-color: #e3f9ff;
+}
+.snow-cloud {
+    background-color: #bec9cc;
+}
+.category-container {
+    background: rgba(255,255,255,0.15);
+    padding: 5px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    margin-bottom: 5px;
+    padding: 5px;
+    cursor: pointer;
+    font-family: 'SMB3', Arial, sans-serif;
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+.category-content {
+    display: none;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+.category-content.show {
+    display: flex;
+}
+.category-header::after {
+    content: '▼';
+    font-size: 0.8em;
+    transition: transform 0.3s;
+}
+.category-header.collapsed::after {
+    transform: rotate(-90deg);
+}
+.sugarwater { 
+    background: #cbecf5; 
+    opacity: 0.8;
+}
+.saltwater-blue { 
+    background: #5179e8;
+    opacity: 0.8;
+}
+button.sugarwater-btn { background: #cbecf5; color: #333; }
+button.saltwater-blue-btn { background: #5179e8; }
+.ball { 
+    background: #a158b0;
+}
+
+.bedrock { 
+    background: linear-gradient(45deg, #333333, #4a4a4a);
+    border: 1px solid #222222;
+}
+
+button.bedrock-btn { 
+    background: linear-gradient(45deg, #333333, #4a4a4a);
+    color: white;
+}
+
+.butterfly {
+    background: transparent;
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.butterfly::before,
+.butterfly::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 12px;
+    background: currentColor;
+    border-radius: 50% 50% 0 0;
+    animation: flapWings 0.8s ease-in-out infinite alternate;
+}
+
+.butterfly::before {
+    left: 0;
+    transform-origin: right center;
+}
+
+.butterfly::after {
+    right: 0;
+    transform-origin: left center;
+}
+
+@keyframes flapWings {
+    0% { transform: rotate(-20deg); }
+    100% { transform: rotate(20deg); }
+}
+
+button.ball-btn { 
+    background: #a158b0;
+}
+
+button.butterfly-btn {
+    background: linear-gradient(90deg, 
+        violet, indigo, blue, green,
+        yellow, orange, red);
+    background-size: 200% auto;
+    animation: rainbow 3s linear infinite;
+    color: white;
+}
+
+.glizzy {
+    background: linear-gradient(60deg, #bd5000, #c96c25); /* Hot dog meat color */
+    border: 2px solid #f8bd80; /* Bun color */
+    border-radius: 10px;
+}
+
+button.glizzy-btn {
+    background: linear-gradient(60deg, #bd5000, #c96c25);
+    border: 2px solid #f8bd80;
+    color: white;
+}
+
+.changelog {
+    margin: 15px 0;
+    padding: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    color: #333;
+}
+
+.changelog-panel {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    color: #333;
+    font-family: 'SMB3', Arial, sans-serif;
+    display: none;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.changelog-panel h3 {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 5px;
+}
+
+.changelog-panel .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* Moved CSS from JavaScript */
+.particle {
+    animation: colorPulse 2s ease-in-out infinite;
+}
+
+/* Exclude certain particles from the animation */
+.particle.human,
+.particle.cat,
+.particle.art {
+    animation: none;
+}
+</style></head><body>
+<div id="game-container"></div>
+<div class="controls">
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('basicElements')">Basic Elements</div>
+        <div id="basicElements" class="category-content show">
+            <button onclick="setParticleType('sand')">Sand</button>
+            <button onclick="setParticleType('water')">Water</button>
+            <button onclick="setParticleType('stone')">Stone</button>
+            <button onclick="setParticleType('dirt')" class="dirt-btn">Dirt</button>
+            <button onclick="setParticleType('mud')" class="mud-btn">Mud</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('nature')">Nature</div>
+        <div id="nature" class="category-content">
+            <button onclick="setParticleType('grass')" class="grass-btn">Grass</button>
+            <button onclick="setParticleType('wet-sand')" class="wet-sand-btn">Wet Sand</button>
+            <button onclick="setParticleType('mulch')" class="mulch-btn">Mulch</button>
+            <button onclick="setParticleType('snow')" class="snow-btn">Snow</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('building')">Building Materials</div>
+        <div id="building" class="category-content">
+            <button onclick="setParticleType('stone-wall')" class="stone-wall-btn">Stone Wall</button>
+            <button onclick="setParticleType('wall')" class="wall-btn">Wall</button>
+            <button onclick="setParticleType('brick-wall')" class="brick-wall-btn">Brick Wall</button>
+            <button onclick="setParticleType('glass')" class="glass-btn">Glass</button>
+            <button onclick="setParticleType('bedrock')" class="bedrock-btn">Bedrock</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('wood')">Wood Types</div>
+        <div id="wood" class="category-content">
+            <button onclick="setParticleType('oak-wood')" class="oak-wood-btn">Oak Wood</button>
+            <button onclick="setParticleType('birch-wood')" class="birch-wood-btn">Birch Wood</button>
+            <button onclick="setParticleType('acacia-wood')" class="acacia-wood-btn">Acacia Wood</button>
+            <button onclick="setParticleType('cherry-wood')" class="cherry-wood-btn">Cherry Wood</button>
+            <button onclick="setParticleType('custom-wood')" class="custom-wood-btn">Custom Wood</button>
+            <button onclick="setParticleType('redwood')" class="redwood-btn">Red Wood</button>
+            <button onclick="setParticleType('basswood')" class="basswood-btn">Bass Wood</button>
+            <button onclick="setParticleType('poplarwood')" class="poplarwood-btn">Poplar Wood</button>
+            <button onclick="setParticleType('birch')" class="birch-btn">Birch</button>
+            <button onclick="setParticleType('ashwood')" class="ashwood-btn">Ash Wood</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('weather')">Weather</div>
+        <div id="weather" class="category-content">
+            <button onclick="setParticleType('cloud-normal')" class="cloud-normal-btn">Cloud</button>
+            <button onclick="setParticleType('thundercloud')" class="thundercloud-btn">Thundercloud</button>
+            <button onclick="setParticleType('raincloud')" class="raincloud-btn">Raincloud</button>
+            <button onclick="setParticleType('hail-cloud')" class="hail-cloud-btn">Hail Cloud</button>
+            <button onclick="setParticleType('snow-cloud')" class="snow-cloud-btn">Snow Cloud</button>
+            <button onclick="setParticleType('sugarwater')" class="sugarwater-btn">Sugar Water</button>
+            <button onclick="setParticleType('saltwater-blue')" class="saltwater-blue-btn">Salt Water</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('creatures')">Creatures</div>
+        <div id="creatures" class="category-content">
+            <button onclick="setParticleType('human')" class="human-btn">Human</button>
+            <button onclick="setParticleType('rat')" class="rat-btn">Rat</button>
+            <button onclick="setParticleType('cat')" class="cat-btn">Cat</button>
+            <button onclick="setParticleType('ball')" class="ball-btn">Ball</button>
+            <button onclick="setParticleType('butterfly')" class="butterfly-btn">Butterfly</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('special')">Special Elements</div>
+        <div id="special" class="category-content">
+            <button onclick="setParticleType('fire')" class="fire-btn">Fire</button>
+            <button onclick="setParticleType('rainbow')" class="rainbow-particle-btn">Rainbow</button>
+            <button onclick="setParticleType('gold')" class="gold-btn">Gold</button>
+            <button onclick="setParticleType('blue-gold')" class="blue-gold-btn">Blue Gold</button>
+            <button onclick="setParticleType('cloner')" class="cloner-btn">Cloner</button>
+            <button onclick="setParticleType('art')" id="artBtn">Art</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('food')">Food</div>
+        <div id="food" class="category-content">
+            <button onclick="setParticleType('meat')" class="meat-btn">Meat</button>
+            <button onclick="setParticleType('cooked-meat')" class="cooked-meat-btn">Cooked Meat</button>
+            <button onclick="setParticleType('cat-food')" class="cat-food-btn">Cat Food</button>
+            <button onclick="setParticleType('dog-food')" class="dog-food-btn">Dog Food</button>
+            <button onclick="setParticleType('glizzy')" class="glizzy-btn">Glizzy</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('dairy')">Dairy & Ingredients</div>
+        <div id="dairy" class="category-content">
+            <button onclick="setParticleType('milk')" class="milk-btn">Milk</button>
+            <button onclick="setParticleType('vinegar')" class="vinegar-btn">Vinegar</button>
+        </div>
+    </div>
+
+    <div class="category-container">
+        <div class="category-header" onclick="toggleCategory('tools')">Tools</div>
+        <div id="tools" class="category-content">
+            <button onclick="setRandomParticleType()" class="random-element-btn">Random</button>
+            <button onclick="setParticleType('prop')" class="prop-btn">Prop</button>
+            <button onclick="clearParticles()">Clear</button>
+            <button onclick="toggleColorPicker()">Paint</button>
+            <button onclick="openSettings()" class="settings-btn">Settings</button>
+            <button onclick="toggleChangelog()" class="changelog-btn">Changelog</button>
+            <button onclick="toggleDebugMode()" class="debug-btn">Debug</button>
+            <button onclick="setFillMode()" class="fill-btn">Fill</button>
+            <button onclick="setParticleType('eraser')" class="eraser-btn">Eraser</button>
+            <button onclick="setParticleType('time')" class="time-btn">Time</button>
+        </div>
+    </div>
+</div>
+
+<div class="color-picker" id="colorPicker">
+    <label for="artColor">Choose Paint Color:</label>
+    <input type="color" id="artColor" value="#ff0000">
+</div>
+
+<div class="audio-controls">
+    <label for="musicSelect">Music:</label>
+    <select id="musicSelect">
+        <option value="mii">Mii Editor</option>
+        <option value="mario">Super Mario World</option>
+        <option value="minecraft">C418 - Sweden</option>
+    </select>
+    <button id="playMusic" style="margin: 5px 0;">Play Music</button>
+    <label for="volume">Volume</label>
+    <input type="range" id="volume" min="0" max="100" value="50">
+    <span id="volume-value">50</span>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="Mii Editor - Mii Maker (Wii U) Music [ ezmp3.cc ].mp3" type="audio/mp3" data-music="mii">
+</audio>
+
+<div class="settings-panel" id="settingsPanel">
+    <h3>Settings</h3>
+    <div>
+        <label for="bgColorTop">Sky Color (Top):</label>
+        <input type="color" id="bgColorTop" value="#87CEEB">
+    </div>
+    <div>
+        <label for="bgColorBottom">Sky Color (Bottom):</label>
+        <input type="color" id="bgColorBottom" value="#B0E2FF">
+    </div>
+    
+    <div class="advanced-settings">
+        <div class="setting-item">
+            <label for="particleSize">Particle Size:</label>
+            <input type="range" id="particleSize" min="5" max="20" value="10">
+            <span id="particleSizeValue">10px</span>
+        </div>
+        
+        <div class="setting-item">
+            <label for="gravityStrength">Gravity Strength:</label>
+            <input type="range" id="gravityStrength" min="1" max="20" value="10">
+            <span id="gravityValue">Normal</span>
+        </div>
+        
+        <div class="setting-item">
+            <label for="particleOpacity">Particle Opacity:</label>
+            <input type="range" id="particleOpacity" min="20" max="100" value="100">
+            <span id="opacityValue">100%</span>
+        </div>
+        
+        <div class="setting-item">
+            <label>Auto-Save:</label>
+            <select id="autoSaveInterval">
+                <option value="0">Disabled</option>
+                <option value="30">Every 30 seconds</option>
+                <option value="60">Every minute</option>
+                <option value="300">Every 5 minutes</option>
+            </select>
+        </div>
+        
+        <div class="setting-item">
+            <label>Performance Mode:</label>
+            <select id="performanceMode">
+                <option value="high">High Quality</option>
+                <option value="balanced">Balanced</option>
+                <option value="low">Low Quality (Better Performance)</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label for="particleSpeed">Particle Speed:</label>
+            <input type="range" id="particleSpeed" min="1" max="10" value="5">
+            <span id="particleSpeedValue">Normal</span>
+        </div>
+
+        <div class="setting-item">
+            <label for="waterFlow">Water Flow Rate:</label>
+            <input type="range" id="waterFlow" min="1" max="10" value="5">
+            <span id="waterFlowValue">Normal</span>
+        </div>
+
+        <div class="setting-item">
+            <label for="cloudDensity">Cloud Density:</label>
+            <input type="range" id="cloudDensity" min="1" max="10" value="5">
+            <span id="cloudDensityValue">Normal</span>
+        </div>
+
+        <div class="setting-item">
+            <label>Wind Direction:</label>
+            <select id="windDirection">
+                <option value="none">None</option>
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+                <option value="random">Random</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label>Temperature:</label>
+            <select id="temperature">
+                <option value="freeze">Freezing</option>
+                <option value="cold">Cold</option>
+                <option value="normal" selected>Normal</option>
+                <option value="hot">Hot</option>
+                <option value="veryHot">Very Hot</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label>Particle Effects:</label>
+            <select id="particleEffects">
+                <option value="none">None</option>
+                <option value="glow">Glow</option>
+                <option value="trail">Trail</option>
+                <option value="sparkle">Sparkle</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label for="ratSpeed">Rat Speed:</label>
+            <input type="range" id="ratSpeed" min="1" max="10" value="5">
+            <span id="ratSpeedValue">Normal</span>
+        </div>
+
+        <div class="setting-item">
+            <label for="humanSpeed">Human Speed:</label>
+            <input type="range" id="humanSpeed" min="1" max="10" value="5">
+            <span id="humanSpeedValue">Normal</span>
+        </div>
+
+        <div class="setting-item">
+            <label>Time of Day:</label>
+            <select id="timeOfDay">
+                <option value="dawn">Dawn</option>
+                <option value="day">Day</option>
+                <option value="dusk">Dusk</option>
+                <option value="night">Night</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label>Grid Visibility:</label>
+            <select id="gridVisibility">
+                <option value="hidden">Hidden</option>
+                <option value="light">Light</option>
+                <option value="medium">Medium</option>
+                <option value="dark">Dark</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="save-slots">
+        <h4>Save Slots</h4>
+        <div class="save-form">
+            <input type="text" id="saveName" placeholder="Save name" maxlength="20">
+            <input type="text" id="authorName" placeholder="Author name" maxlength="20">
+            <select id="slotSelect">
+                <option value="0">Slot 1</option>
+                <option value="1">Slot 2</option>
+                <option value="2">Slot 3</option>
+                <option value="3">Slot 4</option>
+                <option value="4">Slot 5</option>
+                <option value="5">Slot 6</option>
+                <option value="6">Slot 7</option>
+                <option value="7">Slot 8</option>
+                <option value="8">Slot 9</option>
+                <option value="9">Slot 10</option>
+            </select>
+        </div>
+        <div class="save-info" id="saveInfo">
+            <!-- Save slot info will be displayed here -->
+        </div>
+    </div>
+    
+    <button onclick="saveGame()" class="rainbow-btn">Save Game</button>
+    <button onclick="loadGame()" class="rainbow-btn">Load Game</button>
+    <button onclick="closeSettings()">Close</button>
+</div>
+
+<div class="changelog-panel" id="changelogPanel">
+    <button class="close-btn" onclick="toggleChangelog()">✕</button>
+    <h3>Changelog</h3>
+    <div class="changelog">
+        <div class="changelog-entry">
+            <div class="changelog-date">2024-01-10</div>
+            <div class="changelog-title">v1.4.0 - Chemistry Update</div>
+            <div class="changelog-description">
+                - Added milk and vinegar reaction system<br>
+                - Added cheese making process<br>
+                - Added time manipulation tool
+            </div>
+        </div>
+        <div class="changelog-entry">
+            <div class="changelog-date">2024-01-09</div>
+            <div class="changelog-title">v1.3.0 - Food Update</div>
+            <div class="changelog-description">
+                - Added Glizzy element<br>
+                - Added new food interactions
+            </div>
+        </div>
+        <div class="changelog-entry">
+            <div class="changelog-date">2024-01-08</div>
+            <div class="changelog-title">v1.2.0 - Building Update</div>
+            <div class="changelog-description">
+                - Added Bedrock element<br>
+                - Improved gravity system<br>
+                - Added new wood types (Redwood, Basswood, Poplarwood, Birch, Ashwood)
+            </div>
+        </div>
+        <div class="changelog-entry">
+            <div class="changelog-date">2024-01-07</div>
+            <div class="changelog-title">v1.1.0 - AI Update</div>
+            <div class="changelog-description">
+                - Added Ball with AI behavior<br>
+                - Added Butterfly with AI behavior<br>
+                - Added new particle effects
+            </div>
+        </div>
+        <div class="changelog-entry">
+            <div class="changelog-date">2024-01-06</div>
+            <div class="changelog-title">v1.0.0 - Initial Release</div>
+            <div class="changelog-description">
+                - Basic particle system<br>
+                - Element categories<br>
+                - Water and weather system<br>
+                - Save/Load functionality
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="brush-size-control">
+    <label for="brushSize">Brush Size:</label>
+    <input type="range" id="brushSize" min="1" max="10" value="1">
+    <span id="brushSizeValue">1</span>
+</div>
+
+<script>
+let brushSize = 1; // Default brush size
+let particles = []; // Define the particles array
+const container = document.getElementById('game-container');
+const audio = document.getElementById('bgMusic');
+const volumeSlider = document.getElementById('volume');
+const volumeValue = document.getElementById('volume-value');
+const colorPicker = document.getElementById('colorPicker');
+const artColorInput = document.getElementById('artColor');
+const artBtn = document.getElementById('artBtn');
+const brushSizeInput = document.getElementById('brushSize');
+const brushSizeValue = document.getElementById('brushSizeValue');
+
+let isDrawing = false;
+let currentParticleType = 'sand'; // Default particle type
+let fillMode = false; // Add this variable declaration at the top with other variables
+const GRID_SIZE = 10; // Grid size constant
+
+// Add human color constants
+const HUMAN_COLORS = {
+    skin: ['#e3ba7d', '#8d5524', '#c68642', '#ffdbac'],
+    body: ['#6390b8', '#e74c3c', '#2ecc71', '#f1c40f'],
+    hair: ['#4a342f', '#111111', '#b58143', '#71491e']
+};
+
+const PARTICLE_COLORS = {
+    milk: ['rgba(255, 255, 255, 0.9)'],
+    vinegar: ['rgba(245, 245, 220, 0.7)'],
+    'milk-curdle': ['rgba(255, 253, 208, 0.9)'],
+    cheese: ['#f4d03f'],
+    time: ['#4a90e2', '#87ceeb'],
+    ball: ['#a158b0'],
+    butterfly: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#8f00ff'], // Rainbow colors
+    sand: ['#f4d03f'],
+    water: ['#3498db'],
+    stone: ['#7f8c8d'],
+    'stone-wall': ['#5f6c6d'],
+    'wet-sand': ['#c5a431'],
+    grass: ['#67a836'],
+    dirt: ['#8B4513'],
+    mud: ['#3d1f09'],
+    'oak-wood': ['#8a5c25'],
+    'birch-wood': ['#d9c7b2'],
+    'acacia-wood': ['#cf650e'],
+    'cherry-wood': ['#e8c1e0'],
+    'custom-wood': ['#a0522d'],
+    wall: ['#808080'],
+    saltwater: ['#afdee3'],
+    'brick-wall': ['#8B4513'],
+    snow: ['#bee4e6'],
+    rainbow: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#8f00ff'],
+    gold: ['#d99400'],
+    glass: ['rgba(255, 255, 255, 0.7)'],
+    'cloud-normal': ['#e0e0e0'],
+    thundercloud: ['#858585'],
+    raincloud: ['#bdbdbd'],
+    rat: ['#919191'],
+    meat: ['#7d5d47'],
+    'cooked-meat': ['#5c4332'],
+    'blue-gold': ['#9ee5ff'],
+    mulch: ['#801700'],
+    cat: ['#ffffff', '#858585', '#784a25'],
+    cloner: ['#ffff00'],
+    fire: ['#ff4500'],
+    'cat-food': ['#a85816'],
+    'dog-food': ['#a85816'],
+    'hail-cloud': ['#e3f9ff'],
+    'snow-cloud': ['#bec9cc'],
+    sugarwater: ['#cbecf5'],
+    'saltwater-blue': ['#5179e8'],
+    redwood: ['#d9390d'],
+    basswood: ['#e6cfaa'],
+    poplarwood: ['#b3a58f'],
+    birch: ['#ffffff'],
+    ashwood: ['#c94b0c'],
+    bedrock: ['#333333'],
+    glizzy: ['#bd5000']
+};
+
+// Add this helper function after PARTICLE_COLORS declaration
+function adjustColorLightness(color, amount) {
+    // Convert hex to RGB if needed
+    if (color.startsWith('#')) {
+        color = color.replace('#', '');
+        var r = parseInt(color.substr(0,2),16);
+        var g = parseInt(color.substr(2,2),16);
+        var b = parseInt(color.substr(4,2),16);
+    } else if (color.startsWith('rgb')) {
+        // Extract RGB values
+        const rgb = color.match(/\d+/g);
+        r = parseInt(rgb[0]);
+        g = parseInt(rgb[1]);
+        b = parseInt(rgb[2]);
+    } else {
+        return color; // Return original if format not supported
+    }
+    
+    // Convert to HSL
+    r /= 255, g /= 255, b /= 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+
+    if (max === min) {
+        h = s = 0;
+    } else {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    // Adjust lightness
+    l = Math.max(0, Math.min(1, l + amount));
+
+    // Convert back to RGB
+    let r1, g1, b1;
+    if (s === 0) {
+        r1 = g1 = b1 = l;
+    } else {
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        };
+
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r1 = hue2rgb(p, q, h + 1/3);
+        g1 = hue2rgb(p, q, h);
+        b1 = hue2rgb(p, q, h - 1/3);
+    }
+
+    // Convert back to RGB values 0-255
+    return `rgb(${Math.round(r1 * 255)}, ${Math.round(g1 * 255)}, ${Math.round(b1 * 255)})`;
+}
+
+// Modify the Particle updateColor method:
+Particle.prototype.updateColor = function() {
+    if (this.type === 'art') {
+        this.element.style.backgroundColor = artColorInput.value;
+    } else if (this.type === 'human') {
+        return;
+    } else if (this.type === 'cat') {
+        return;
+    } else {
+        const colors = PARTICLE_COLORS[this.type] || PARTICLE_COLORS.unknown;
+        const baseColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Randomly adjust lightness between -0.1 and 0.1
+        const lightnessAdjustment = (Math.random() - 0.5) * 0.2;
+        const adjustedColor = adjustColorLightness(baseColor, lightnessAdjustment);
+        
+        this.element.style.backgroundColor = adjustedColor;
+    }
+};
+
+// Add toggleColorPicker function that was missing
+function toggleColorPicker() {
+    const colorPicker = document.getElementById('colorPicker');
+    if (colorPicker.style.display === 'none' || colorPicker.style.display === '') {
+        colorPicker.style.display = 'block';
+    } else {
+        colorPicker.style.display = 'none';
+    }
+}
+
+// Add openSettings function that was missing
+function openSettings() {
+    const settingsPanel = document.getElementById('settingsPanel');
+    settingsPanel.style.display = 'block';
+}
+
+// Add closeSettings function that was missing
+function closeSettings() {
+    const settingsPanel = document.getElementById('settingsPanel');
+    settingsPanel.style.display = 'none';
+}
+
+// Add variable for debugInfoPanel that was missing
+let debugInfoPanel = null;
+let selectedParticle = null;
+
+// Add updateBackground function that was missing
+function updateBackground() {
+    const topColor = document.getElementById('bgColorTop').value;
+    const bottomColor = document.getElementById('bgColorBottom').value;
+    container.style.background = `linear-gradient(180deg, ${topColor} 0%, ${bottomColor} 100%)`;
+}
+
+// Initialize variables
+window.onload = function() {
+    // Create initial color inputs reference
+    const bgColorTop = document.getElementById('bgColorTop');
+    const bgColorBottom = document.getElementById('bgColorBottom');
+    
+    // Set initial background
+    updateBackground();
+    
+    // Update save info
+    updateSaveInfo();
+    
+    // Set up cloud generation
+    setInterval(createCloud, 10000);
+    
+    // Particle class definition
+    class Particle {
+        constructor(x, y, type) {
+            this.x = x;
+            this.y = y;
+            this.type = type;
+            this.element = document.createElement('div');
+            this.element.className = `particle ${type}`;
+            this.updateColor();
+            
+            if (type === 'human') {
+                this.createHuman();
+            } else {
+                container.appendChild(this.element);
+            }
+            
+            this.update();
+        }
+
+        createHuman() {
+            this.element.innerHTML = `
+                <div class="hair"></div>
+                <div class="head"></div>
+                <div class="body"></div>
+            `;
+            container.appendChild(this.element);
+            
+            // Randomly select colors
+            const skinColor = HUMAN_COLORS.skin[Math.floor(Math.random() * HUMAN_COLORS.skin.length)];
+            const bodyColor = HUMAN_COLORS.body[Math.floor(Math.random() * HUMAN_COLORS.body.length)];
+            const hairColor = HUMAN_COLORS.hair[Math.floor(Math.random() * HUMAN_COLORS.hair.length)];
+            
+            this.element.querySelector('.head').style.backgroundColor = skinColor;
+            this.element.querySelector('.body').style.backgroundColor = bodyColor;
+            this.element.querySelector('.hair').style.backgroundColor = hairColor;
+        }
+
+        update() {
+            if (this.type === 'milk' || this.type === 'vinegar') {
+                checkMilkVinegarInteraction(this);
+            }
+            this.element.style.left = this.x + 'px';
+            this.element.style.top = this.y + 'px';
+        }
+    }
+
+    // Function to handle particle type selection
+    function setParticleType(type) {
+        currentParticleType = type;
+        if (type === 'art') {
+            colorPicker.style.display = 'block';
+            artBtn.style.backgroundColor = artColorInput.value;
+        } else {
+            colorPicker.style.display = 'none';
+        }
+    }
+
+    // Function to handle category toggling
+    function toggleCategory(categoryId) {
+        const content = document.getElementById(categoryId);
+        const header = content.previousElementSibling;
+        content.classList.toggle('show');
+        header.classList.toggle('collapsed');
+    }
+
+    // Function to toggle changelog
+    function toggleChangelog() {
+        const changelogPanel = document.getElementById('changelogPanel');
+        changelogPanel.style.display = changelogPanel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Function to toggle debug mode
+    function toggleDebugMode() {
+        if (!debugInfoPanel) {
+            debugInfoPanel = document.createElement('div');
+            debugInfoPanel.style.position = 'fixed';
+            debugInfoPanel.style.top = '50%';
+            debugInfoPanel.style.right = '10px';
+            debugInfoPanel.style.background = 'rgba(0,0,0,0.7)';
+            debugInfoPanel.style.color = 'white';
+            debugInfoPanel.style.padding = '10px';
+            debugInfoPanel.style.borderRadius = '5px';
+            document.body.appendChild(debugInfoPanel);
+        }
+        debugInfoPanel.style.display = debugInfoPanel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Function to set fill mode
+    function setFillMode() {
+        fillMode = !fillMode;
+        document.querySelector('.fill-btn').style.background = fillMode ? '#ff4757' : 'linear-gradient(45deg, #ff7f50, #ff6b6b)';
+    }
+
+    // Function to check milk and vinegar interaction
+    function checkMilkVinegarInteraction(particle) {
+        const nearby = particles.filter(p => 
+            p !== particle && 
+            Math.abs(p.x - particle.x) < 20 && 
+            Math.abs(p.y - particle.y) < 20
+        );
+
+        if (particle.type === 'milk' && nearby.some(p => p.type === 'vinegar')) {
+            particle.type = 'milk-curdle';
+            particle.element.className = 'particle milk-curdle';
+            setTimeout(() => {
+                if (particle.element) {
+                    particle.type = 'cheese';
+                    particle.element.className = 'particle cheese';
+                    particle.updateColor();
+                }
+            }, 20000);
+        }
+    }
+
+    // Function to add particles
+    function addParticle(event) {
+        if (!isDrawing) return;
+        
+        const rect = container.getBoundingClientRect();
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+        
+        // Create particles based on brush size
+        for (let i = 0; i < brushSize; i++) {
+            for (let j = 0; j < brushSize; j++) {
+                const offsetX = (i - Math.floor(brushSize/2)) * GRID_SIZE;
+                const offsetY = (j - Math.floor(brushSize/2)) * GRID_SIZE;
+                
+                const particle = new Particle(
+                    mouseX + offsetX, 
+                    mouseY + offsetY, 
+                    currentParticleType
+                );
+                particles.push(particle);
+            }
+        }
+    }
+
+    // Add event listeners for mouse interaction
+    container.addEventListener('mousedown', () => isDrawing = true);
+    container.addEventListener('mouseup', () => isDrawing = false);
+    container.addEventListener('mousemove', addParticle);
+    container.addEventListener('mouseleave', () => isDrawing = false);
+
+    // Update brush size handler
+    brushSizeInput.addEventListener('input', (e) => {
+        brushSize = parseInt(e.target.value);
+        brushSizeValue.textContent = brushSize;
+    });
+
+    // Game loop
+    function gameLoop() {
+        particles.forEach(particle => particle.update());
+        requestAnimationFrame(gameLoop);
+    }
+    gameLoop();
+
+    // Function to clear particles
+    function clearParticles() {
+        particles.forEach(particle => {
+            if (particle.element && particle.element.parentNode) {
+                particle.element.parentNode.removeChild(particle.element);
+            }
+        });
+        particles = [];
+    }
+
+    // Function to create clouds
+    function createCloud() {
+        const cloud = document.createElement('div');
+        cloud.className = 'cloud';
+        cloud.style.top = Math.random() * (window.innerHeight / 2) + 'px';
+        cloud.style.width = (Math.random() * 100 + 50) + 'px';
+        cloud.style.height = (Math.random() * 40 + 20) + 'px';
+        cloud.style.animationDuration = (Math.random() * 20 + 30) + 's';
+        container.appendChild(cloud);
+        
+        setTimeout(() => {
+            if (cloud.parentNode) {
+                cloud.parentNode.removeChild(cloud);
+            }
+        }, 50000);
+    }
+};
+</script></body></html>
