@@ -1,0 +1,47 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Shooter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="main-menu" class="screen active">
+    <div class="title">SPACE SHOOTER</div>
+    <button id="start-btn" class="menu-btn">START GAME</button>
+    <div id="skins-container" class="skins-container"></div>
+    <div class="controls-list">
+      <table class="controls-table">
+        <tr>
+          <td>Move:</td>
+          <td>WASD or Arrow Keys</td>
+        </tr>
+        <tr>
+          <td>Shoot:</td>
+          <td>Space / Left Click</td>
+        </tr>
+        <tr>
+          <td>Pause:</td>
+          <td>ESC</td>
+        </tr>
+      </table>
+      <div class="powerups-info">
+        <p>Power-ups:</p>
+        <span class="powerup speed">⚡ Speed Boost</span>
+        <span class="powerup weapon">💥 Weapon Power</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="game-screen" class="screen">
+    <canvas id="gameCanvas"></canvas>
+    <div class="hud">
+      <div id="score">Score: 0</div>
+      <div id="health">Health: 100</div>
+    </div>
+    <button id="pause-btn" class="game-btn">⏸</button>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
