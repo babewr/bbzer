@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Kitten Care</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="game-container">
+    <div class="kitten-container">
+      <svg id="kitten" viewBox="0 0 200 200">
+        <g id="body">
+          <circle cx="100" cy="100" r="50" fill="#gray"/>
+          <g id="eyes">
+            <circle class="eye" cx="80" cy="85" r="15" fill="white"/>
+            <circle class="eye" cx="120" cy="85" r="15" fill="white"/>
+            <circle class="pupil" cx="80" cy="85" r="8" fill="black"/>
+            <circle class="pupil" cx="120" cy="85" r="8" fill="black"/>
+            <circle class="shine" cx="75" cy="80" r="3" fill="white"/>
+            <circle class="shine" cx="115" cy="80" r="3" fill="white"/>
+          </g>
+          <circle id="nose" cx="100" cy="105" r="5" fill="#ffb6c1"/>
+          <g id="ears">
+            <path d="M60 60 L70 30 L90 50 Z" fill="gray"/>
+            <path d="M140 60 L130 30 L110 50 Z" fill="gray"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+    
+    <div class="stats">
+      <div class="stat-bar">
+        <label>Hunger</label>
+        <div class="progress">
+          <div id="hunger-bar" class="progress-bar"></div>
+        </div>
+      </div>
+      <div class="stat-bar">
+        <label>Happiness</label>
+        <div class="progress">
+          <div id="happiness-bar" class="progress-bar"></div>
+        </div>
+      </div>
+      <div class="stat-bar">
+        <label>Energy</label>
+        <div class="progress">
+          <div id="energy-bar" class="progress-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="feed-btn">Feed 🐟</button>
+      <button id="pet-btn">Pet 🤚</button>
+      <button id="play-btn">Play 🧶</button>
+      <button id="sleep-btn">Sleep 💤</button>
+      <button id="customize-btn">Customize 🎨</button>
+    </div>
+  </div>
+
+  <div id="customize-modal" class="modal">
+    <div class="modal-content">
+      <div class="customize-form">
+        <div class="color-input">
+          <label>Head Color:</label>
+          <input type="color" id="head-color" value="#808080">
+        </div>
+        <div class="color-input">
+          <label>Ear Color:</label>
+          <input type="color" id="ear-color" value="#808080">
+        </div>
+        <div class="color-input">
+          <label>Nose Color:</label>
+          <input type="color" id="nose-color" value="#ffb6c1">
+        </div>
+        <div>
+          <label>Accessory (emoji):</label>
+          <input type="text" id="accessory-input" placeholder="Enter an emoji">
+        </div>
+        <div class="modal-buttons">
+          <button id="save-customization">Save</button>
+          <button id="cancel-customization">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>
