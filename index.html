@@ -1,0 +1,77 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angy Kitty meets Pufferfish!</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Angy Kitty meets Pufferfish!</h1>
+  </header>
+  
+  <!-- Add audio context permission button -->
+  <div id="audio-permission" style="text-align: center; margin: 10px;">
+    <button onclick="initAudio()" style="padding: 10px; background: #FF1493; color: white; border: none; border-radius: 5px;">
+      Enable Sound 
+    </button>
+  </div>
+
+  <div class="container">
+    <div class="characters">
+      <div class="kitty-container">
+        <div class="kitty">
+          <div class="ear ear-left"></div>
+          <div class="ear ear-right"></div>
+          <div class="eye eye-left"><div class="pupil"></div></div>
+          <div class="eye eye-right"><div class="pupil"></div></div>
+          <div class="nose"></div>
+          <div class="mouth"></div>
+        </div>
+        <div class="angy-meter">
+          <div class="angy-level"></div>
+        </div>
+        <button class="angy-button" onclick="makeKittyAngier()">Make Kitty Angier</button>
+      </div>
+
+      <div class="fish-container">
+        <div class="fish">
+          <div class="fin fin-top"></div>
+          <div class="fin fin-bottom"></div>
+          <div class="tail"></div>
+          <div class="eye eye-left"><div class="pupil"></div></div>
+          <div class="eye eye-right"><div class="pupil"></div></div>
+          <div class="mouth"></div>
+        </div>
+        <div class="puff-meter">
+          <div class="puff-level"></div>
+        </div>
+        <button class="puff-button" onclick="makeFishPuffer()">Make Fish Puffer</button>
+      </div>
+    </div>
+
+    <div class="interaction-zone">
+      <button class="interaction-button" onclick="startInteraction()">Make Them Meet!</button>
+      <div class="dialogue-box"></div>
+    </div>
+  </div>
+  
+  <footer>
+    <p>&copy; 2023 Angy Kitty & Puffer Fish Inc. All rights reserved. No pets or water allowed.</p>
+  </footer>
+
+  <script>
+    // Function to initialize audio context (helps with browser autoplay policies)
+    function initAudio() {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioContext = new AudioContext();
+      document.getElementById('audio-permission').style.display = 'none';
+      
+      // Test TTS after permission
+      speechManager.speak("Sound enabled! Let's talk!", 'narrator');
+    }
+  </script>
+  <script src="tts.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
