@@ -1,0 +1,43 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Dreams</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="loading-screen">
+            <div class="loading-content pixel-border">
+                <div class="glitch-container">
+                    <div class="loading-title glitch-text">Infinite Dreams</div>
+                </div>
+                <div class="loading-subtitle">A Yume Nikki inspired experience</div>
+                <div class="loading-message">Generating dream world...</div>
+                <div class="loading-progress-container">
+                    <div class="loading-progress-bar" style="width: 70%"></div>
+                </div>
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+        <div id="intro-screen">
+            <div class="intro-content pixel-border">
+                <div class="glitch-container">
+                    <div class="intro-title glitch-text">Infinite Dreams</div>
+                </div>
+                <div class="intro-text">
+                    <p>You find yourself trapped in an endless dream.</p>
+                    <p>Explore surreal rooms inspired by Yume Nikki that shift and change with every door.</p>
+                    <p>Use WASD or arrow keys to move.</p>
+                    <p>Find the doors to travel between dream spaces.</p>
+                    <p>Press H to toggle the interface.</p>
+                </div>
+                <button id="start-button">Enter Dream</button>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
