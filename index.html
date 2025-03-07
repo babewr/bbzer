@@ -1,0 +1,1035 @@
+<html>
+<head>
+    <title>Solana Wallet Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
+    <style>
+        body {
+            background: #000000 url('Sat Dec 14 2024 04_28_30 GM(9-0).webp') no-repeat center center fixed; 
+            background-size: cover;
+            color: #a388f5;
+            position: relative;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Add an overlay to improve readability */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 0;
+        }
+
+        /* Ensure content stays above the overlay */
+        .max-w-7xl {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Adjust card backgrounds for better contrast */
+        .bg-white {
+            background: rgba(39, 40, 54, 0.9) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(39, 40, 54, 0.9);
+            backdrop-filter: blur(10px);
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4),
+                        -5px -5px 15px rgba(163, 136, 245, 0.1);
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .chart-container {
+            background: rgba(39, 40, 54, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .dropzone {
+            padding: 2rem;
+            background: rgba(39, 40, 54, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px dashed rgba(163, 136, 245, 0.3);
+            border-radius: 16px;
+            margin: 2rem 0;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dropzone:hover {
+            transform: translateY(-2px);
+            border-color: rgba(163, 136, 245, 0.6);
+            box-shadow: 0 10px 20px rgba(163, 136, 245, 0.2);
+        }
+
+        .dropzone i {
+            font-size: 2.5rem;
+            color: #a388f5;
+            margin-bottom: 1rem;
+        }
+
+        .dropzone p {
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+
+        body {
+            background: #000000; 
+            color: #a388f5;
+        }
+
+        /* Add new styles for copy button */
+        .copy-btn {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background: rgba(163, 136, 245, 0.1);
+            border: 1px solid rgba(163, 136, 245, 0.3);
+        }
+
+        .copy-btn:hover {
+            background: rgba(163, 136, 245, 0.2);
+        }
+
+        .copy-btn i {
+            font-size: 1.1em;
+        }
+
+        .copy-btn span {
+            font-weight: 500;
+        }
+
+        /* Update table header styles */
+        table thead tr th div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #a388f5;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        table thead tr th i {
+            font-size: 1.2em;
+            color: #a388f5;
+        }
+
+        /* Update the existing table header styles */
+        table thead tr th {
+            background-color: rgba(39, 40, 54, 0.95) !important;
+            color: #a388f5 !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1rem !important;
+            border-bottom: 1px solid rgba(163, 136, 245, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        table thead tr th:hover {
+            background-color: rgba(163, 136, 245, 0.1) !important;
+        }
+
+        /* Update table body styles */
+        table tbody tr {
+            background-color: rgba(39, 40, 54, 0.9) !important;
+            border-bottom: 1px solid rgba(163, 136, 245, 0.1);
+        }
+
+        table tbody tr:hover {
+            background-color: rgba(163, 136, 245, 0.1) !important;
+        }
+
+        table tbody td {
+            color: #ffffff !important;
+            padding: 1rem !important;
+        }
+
+        /* Remove previous bg-gray-50 class effect */
+        .bg-gray-50 {
+            background-color: transparent !important;
+        }
+
+        /* Ensure divide colors match theme */
+        .divide-gray-200 > * + * {
+            border-color: rgba(163, 136, 245, 0.1) !important;
+        }
+
+        .divide-y {
+            border-color: rgba(163, 136, 245, 0.1) !important;
+        }
+
+        .icon-3d {
+            filter: drop-shadow(2px 4px 6px rgba(163, 136, 245, 0.3));
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .icon-3d:hover {
+            transform: translateY(-5px) rotateX(10deg);
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1.5rem;
+        }
+
+        .loading {
+            position: relative;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 27, 35, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(163, 136, 245, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(163, 136, 245, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(163, 136, 245, 0);
+            }
+        }
+
+        .text-gradient {
+            background: linear-gradient(45deg, #a388f5, #7c5ed6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-accent {
+            color: #8b6fdd;
+        }
+
+        .text-muted {
+            color: #6c7293;
+        }
+
+        /* Better responsive grid layout */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .metric-card {
+                margin-bottom: 1rem;
+            }
+            
+            .chart-container {
+                margin-bottom: 2rem;
+            }
+        }
+
+        /* Improve form layout */
+        #configForm {
+            gap: 1.5rem;
+            padding: 0.5rem;
+        }
+
+        /* Better input styling */
+        input[type="number"] {
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(163, 136, 245, 0.3);
+            background: rgba(39, 40, 54, 0.9);
+            color: white;
+            width: 80px;
+        }
+
+        /* Update reset button styling */
+        .reset-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(163, 136, 245, 0.1);
+            border: 1px solid rgba(163, 136, 245, 0.3);
+            color: #a388f5;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: rgba(163, 136, 245, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Improve table responsiveness */
+        .overflow-x-auto {
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Better spacing for table cells */
+        table th, table td {
+            padding: 1rem !important;
+        }
+
+        /* Add smooth transitions */
+        * {
+            transition: all 0.3s ease;
+        }
+
+        /* Better chart container styling */
+        .chart-container {
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Add these styles to the existing <style> section */
+        header {
+            overflow: hidden; /* Ensure content doesn't leak out during animation */
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: scrollHeader 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes scrollHeader {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .price-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .price-value {
+            color: #22c55e;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .last-update {
+            color: #6c7293;
+            font-size: 1rem;
+            margin-left: 1rem;
+        }
+
+        /* Update price change indicators */
+        .price-up {
+            background: rgba(34, 197, 94, 0.2);
+            color: rgb(34, 197, 94);
+        }
+
+        .price-down {
+            background: rgba(239, 68, 68, 0.2);
+            color: rgb(239, 68, 68);
+        }
+
+        h1.title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 3.5rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(45deg, #a388f5, #7c5ed6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from {
+                text-shadow: 0 0 20px rgba(163, 136, 245, 0.1);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(163, 136, 245, 0.3);
+            }
+        }
+
+        .metric-card a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(163, 136, 245, 0.2);
+        }
+
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 10px 30px rgba(163, 136, 245, 0.2);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <header class="w-full mb-8 bg-[rgba(39,40,54,0.9)] backdrop-blur-md border-b border-[rgba(163,136,245,0.2)] p-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="header-content">
+                <!-- Solana Section -->
+                <img src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png" alt="Solana Logo" class="w-6 h-6">
+                <span class="text-lg font-bold text-[#a388f5]">Solana</span>
+                <div class="price-display">
+                    <span class="price-value" id="solanaPrice">$0.00</span>
+                    <span class="text-lg" id="solanaPriceChange">0.00%</span>
+                </div>
+
+                <span class="mx-4 text-[#6c7293]">|</span>
+
+                <!-- Bitcoin Section -->
+                <img src="https://bitcoin.org/img/icons/opengraph.png" alt="Bitcoin Logo" class="w-6 h-6">
+                <span class="text-lg font-bold text-[#a388f5]">Bitcoin</span>
+                <div class="price-display">
+                    <span class="price-value" id="bitcoinPrice">$0.00</span>
+                    <span class="text-lg" id="bitcoinPriceChange">0.00%</span>
+                </div>
+
+                <span class="mx-4 text-[#6c7293]">|</span>
+
+                <!-- Ethereum Section -->
+                <img src="ETH1.png" alt="Ethereum Logo" class="w-6 h-6">
+                <span class="text-lg font-bold text-[#a388f5]">Ethereum</span>
+                <div class="price-display">
+                    <span class="price-value" id="ethereumPrice">$0.00</span>
+                    <span class="text-lg" id="ethereumPriceChange">0.00%</span>
+                </div>
+
+                <span class="last-update" id="lastUpdate">Last updated: --:--</span>
+            </div>
+        </div>
+    </header>
+    <div class="max-w-7xl mx-auto">
+        <!-- Best Copytrading Bots Section MOVED HERE -->
+        <div class="mt-12 mb-8">
+            <div class="flex items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gradient">⚡️ Best Copytrading Bots</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- OdinBot Card -->
+                <div class="metric-card transform hover:scale-105 transition-transform">
+                    <h3 class="text-xl font-semibold mb-4">OdinBot</h3>
+                    <p class="text-gray-300 mb-4">Nuestro preferido, fácil de usar, muy rápido y con interfaz web.</p>
+                    <div class="flex items-center mb-4">
+                        <span class="text-sm text-gray-400">Experiencia requerida:</span>
+                        <span class="ml-2 px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded-full text-sm">Baja</span>
+                    </div>
+                    <a href="https://app.odinbot.io/join?code=78thcp" target="_blank" class="inline-block w-full px-6 py-3 bg-[rgba(163,136,245,0.1)] hover:bg-[rgba(163,136,245,0.2)] text-[#a388f5] rounded-lg text-center transition-colors duration-300 border border-[rgba(163,136,245,0.3)]">
+                        <span class="flex items-center justify-center gap-2">
+                            <i class="ph-arrow-right"></i>
+                            <span>Learn More</span>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Trojan Card -->
+                <div class="metric-card transform hover:scale-105 transition-transform">
+                    <h3 class="text-xl font-semibold mb-4">Trojan</h3>
+                    <p class="text-gray-300 mb-4">Bot muy popular con interfaz en Telegram, cuenta con opción de Autobuy + Snipe.</p>
+                    <div class="flex items-center mb-4">
+                        <span class="text-sm text-gray-400">Experiencia requerida:</span>
+                        <span class="ml-2 px-3 py-1 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded-full text-sm">Media</span>
+                    </div>
+                    <a href="https://t.me/solana_trojanbot?start=r-angelforexdz" target="_blank" class="inline-block w-full px-6 py-3 bg-[rgba(163,136,245,0.1)] hover:bg-[rgba(163,136,245,0.2)] text-[#a388f5] rounded-lg text-center transition-colors duration-300 border border-[rgba(163,136,245,0.3)]">
+                        <span class="flex items-center justify-center gap-2">
+                            <i class="ph-arrow-right"></i>
+                            <span>Learn More</span>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Maestro Bot Card -->
+                <div class="metric-card transform hover:scale-105 transition-transform">
+                    <h3 class="text-xl font-semibold mb-4">Maestro Bot</h3>
+                    <p class="text-gray-300 mb-4">Uno de los bots más rápidos y completos, sólo interfaz en Telegram.</p>
+                    <div class="flex items-center mb-4">
+                        <span class="text-sm text-gray-400">Experiencia requerida:</span>
+                        <span class="ml-2 px-3 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded-full text-sm">Alta</span>
+                    </div>
+                    <a href="https://t.me/maestro?start=r-angelforexdz" target="_blank" class="inline-block w-full px-6 py-3 bg-[rgba(163,136,245,0.1)] hover:bg-[rgba(163,136,245,0.2)] text-[#a388f5] rounded-lg text-center transition-colors duration-300 border border-[rgba(163,136,245,0.3)]">
+                        <span class="flex items-center justify-center gap-2">
+                            <i class="ph-arrow-right"></i>
+                            <span>Learn More</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <h1 class="title">SOLANA CSV WALLETS FILTER</h1>
+        
+        <!-- File Upload -->
+        <div class="dropzone flex flex-col items-center justify-center" id="dropzone">
+            <div class="icon-container icon-3d mb-4 text-5xl">
+                <i class="ph-upload-simple"></i>
+            </div>
+            <p class="text-lg mb-2">Drag and drop your CSV file here</p>
+            <p class="text-sm text-gray-400">or click to select</p>
+            <input type="file" id="fileInput" accept=".csv" class="hidden">
+        </div>
+
+        <!-- Configuration Form -->
+        <div class="bg-white p-8 rounded-lg shadow-lg mb-8">
+            <div class="flex items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gradient">⚙️ Analysis Configuration</h2>
+            </div>
+            <form id="configForm" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium">📈 Minimum ROI (%)</label>
+                    <div class="flex gap-2 items-center mt-1">
+                        <input type="number" name="minRoi" value="0" class="block w-20 rounded-md shadow-sm">
+                        <button type="button" class="reset-btn" onclick="resetInput(this)">Reset</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">🎯 Minimum Win Rate (%)</label>
+                    <div class="flex gap-2 items-center mt-1">
+                        <input type="number" name="minWinrate" value="0" class="block w-20 rounded-md shadow-sm">
+                        <button type="button" class="reset-btn" onclick="resetInput(this)">Reset</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">📊 Minimum Unique Tokens</label>
+                    <div class="flex gap-2 items-center mt-1">
+                        <input type="number" name="minUniqueTokens" value="0" class="block w-20 rounded-md shadow-sm">
+                        <button type="button" class="reset-btn" onclick="resetInput(this)">Reset</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">🛡️ Minimum Good Tokens (%)</label>
+                    <div class="flex gap-2 items-center mt-1">
+                        <input type="number" name="minGoodTokens" value="0" class="block w-20 rounded-md shadow-sm">
+                        <button type="button" class="reset-btn" onclick="resetInput(this)">Reset</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">💰 Minimum Balance (SOL)</label>
+                    <div class="flex gap-2 items-center mt-1">
+                        <input type="number" name="minBalance" value="0" step="0.1" class="block w-20 rounded-md shadow-sm">
+                        <button type="button" class="reset-btn" onclick="resetInput(this)">Reset</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">✴️ Flag Soldmore (%)</label>
+                    <div class="flex gap-2 items-center mt-1">
+                        <input type="number" name="flagSoldmore" value="0" class="block w-20 rounded-md shadow-sm">
+                        <button type="button" class="reset-btn" onclick="resetInput(this)">Reset</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">🟩 Green Emoji (%)</label>
+                    <div class="flex gap-2 items-center mt-1">
+                        <input type="number" name="emoji_green" value="0" class="block w-20 rounded-md shadow-sm">
+                        <button type="button" class="reset-btn" onclick="resetInput(this)">Reset</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">🚀 Rocket Emoji (%)</label>
+                    <div class="flex gap-2 items-center mt-1">
+                        <input type="number" name="emoji_rocket" value="0" class="block w-20 rounded-md shadow-sm">
+                        <button type="button" class="reset-btn" onclick="resetInput(this)">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="mt-8 hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <div class="flex items-center mb-6">
+                    <h2 class="text-2xl font-semibold text-gradient">📊 Analysis Results</h2>
+                </div>
+
+                <!-- Metrics -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="metric-card">
+                        <h3 class="text-lg font-medium">🔎 Total Wallets</h3>
+                        <p id="totalWallets" class="text-3xl font-bold mt-2">-</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3 class="text-lg font-medium">📈 Average ROI</h3>
+                        <p id="avgRoi" class="text-3xl font-bold mt-2">-</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3 class="text-lg font-medium">🎯 Success Rate</h3>
+                        <p id="successRate" class="text-3xl font-bold mt-2">-</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="chart-container">
+                        <div class="flex items-center mb-4">
+                            <div class="icon-container icon-3d mr-3">
+                                <i class="ph-chart-histogram-duotone"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gradient">ROI Distribution</h3>
+                        </div>
+                        <div id="roiDistribution"></div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="flex items-center mb-4">
+                            <div class="icon-container icon-3d mr-3">
+                                <i class="ph-chart-bar-duotone"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gradient">Strategy Performance</h3>
+                        </div>
+                        <div id="strategyPerformance"></div>
+                    </div>
+                </div>
+
+                <!-- Top Wallets Table -->
+                <div class="mt-8">
+                    <div class="flex items-center mb-4">
+                        <h3 class="text-xl font-semibold text-gradient">🏆 Top Performing Wallets</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Wallet
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Copy
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        ROI
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Fresh Balance
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Old Balance
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Check Balance
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Win Rate
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Soldmore
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Last Trade
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Uniq Tokens
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Avg Time
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                        Strategy
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="walletsTable" class="divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Existing script content, with modifications to the updateTopWalletsTable function
+
+            const SOLANA_RPC_HTTP = 'https://autumn-prettiest-surf.solana-mainnet.quiknode.pro/fe870ee3f3a289e65161494a17b72d6946f64b75';
+            const connection = new solanaWeb3.Connection(SOLANA_RPC_HTTP, 'confirmed');
+
+            async function checkSolanaBalance(walletAddress) {
+                try {
+                    // Convert string address to PublicKey
+                    const publicKey = new solanaWeb3.PublicKey(walletAddress);
+                    
+                    // Get SOL balance
+                    const balance = await connection.getBalance(publicKey);
+                    
+                    // Convert lamports to SOL (1 SOL = 10^9 lamports)
+                    const solBalance = new Decimal(balance).dividedBy(1_000_000_000);
+                    
+                    return solBalance.toFixed(4); // Return balance with 4 decimal places
+                } catch (error) {
+                    console.error('Error checking balance:', error);
+                    return 'Error';
+                }
+            }
+
+            let analysisData = null;
+
+            // File upload handling
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+
+            // Load the default CSV file
+            fetch('full.csv')
+                .then(response => response.text())
+                .then(csvData => {
+                    Papa.parse(csvData, {
+                        header: true,
+                        dynamicTyping: false,
+                        complete: function(results) {
+                            analysisData = results.data.map(row => ({
+                                wallet: row.wallet,
+                                native_balance: parseFloat(row.native_balance?.replace(',', '.') || 0),
+                                hashtag: row.hashtag,
+                                profit: parseFloat(row.profit?.replace(',', '.') || 0),
+                                roi: parseFloat(row.roi?.replace(',', '.') || 0),
+                                winrate: parseFloat(row.winrate?.replace(',', '.') || 0),
+                                uniq_tokens: parseInt(row.uniq_tokens || 0),
+                                good_tokens_pct: parseFloat(row.good_tokens_pct?.replace(',', '.') || 0),
+                                flag3_soldmore: parseFloat(row['flag3_soldmore%']?.replace(',', '.') || 0),
+                                last_trade: row.last_trade,
+                                avg_time: row.avg_time,
+                                emoji_green: parseFloat(row['emoji%_green']?.replace(',', '.') || 0),
+                                emoji_rocket: parseFloat(row['emoji%_rocket']?.replace(',', '.') || 0)
+                            }));
+                            analyzeData();
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading CSV:', error));
+
+            dropzone.addEventListener('click', () => fileInput.click());
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+            dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+            dropzone.addEventListener('drop', handleFileDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+
+            function handleFileDrop(e) {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type === 'text/csv') {
+                    processFile(file);
+                }
+            }
+
+            function handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    processFile(file);
+                }
+            }
+
+            function showLoading() {
+                document.getElementById('results').classList.add('loading');
+            }
+
+            function hideLoading() {
+                document.getElementById('results').classList.remove('loading');
+            }
+
+            function processFile(file) {
+                showLoading();
+                Papa.parse(file, {
+                    header: true,
+                    dynamicTyping: false,
+                    complete: function(results) {
+                        try {
+                            analysisData = results.data.map(row => ({
+                                wallet: row.wallet,
+                                native_balance: parseFloat(row.native_balance?.replace(',', '.') || 0),
+                                hashtag: row.hashtag,
+                                profit: parseFloat(row.profit?.replace(',', '.') || 0),
+                                roi: parseFloat(row.roi?.replace(',', '.') || 0),
+                                winrate: parseFloat(row.winrate?.replace(',', '.') || 0),
+                                uniq_tokens: parseInt(row.uniq_tokens || 0),
+                                good_tokens_pct: parseFloat(row.good_tokens_pct?.replace(',', '.') || 0),
+                                flag3_soldmore: parseFloat(row['flag3_soldmore%']?.replace(',', '.') || 0),
+                                last_trade: row.last_trade,
+                                avg_time: row.avg_time,
+                                emoji_green: parseFloat(row['emoji%_green']?.replace(',', '.') || 0),
+                                emoji_rocket: parseFloat(row['emoji%_rocket']?.replace(',', '.') || 0)
+                            }));
+                            analyzeData();
+                        } catch (error) {
+                            console.error('Error processing data:', error);
+                            alert('Error processing CSV file. Please check the format.');
+                        } finally {
+                            hideLoading();
+                        }
+                    }
+                });
+            }
+
+            function analyzeData() {
+                if (!analysisData || !Array.isArray(analysisData)) {
+                    console.error('No valid analysis data available');
+                    return;
+                }
+
+                const validData = analysisData.filter(wallet => 
+                    !isNaN(wallet.roi) && 
+                    !isNaN(wallet.winrate) && 
+                    !isNaN(wallet.uniq_tokens) && 
+                    !isNaN(wallet.good_tokens_pct)
+                );
+
+                if (validData.length === 0) {
+                    console.error('No valid wallet data found after filtering');
+                    return;
+                }
+
+                const config = {
+                    minRoi: parseFloat(document.querySelector('[name="minRoi"]').value) || 0,
+                    minWinrate: parseFloat(document.querySelector('[name="minWinrate"]').value) || 0,
+                    minUniqueTokens: parseInt(document.querySelector('[name="minUniqueTokens"]').value) || 0,
+                    minGoodTokens: parseFloat(document.querySelector('[name="minGoodTokens"]').value) || 0,
+                    minBalance: parseFloat(document.querySelector('[name="minBalance"]').value) || 0,
+                    flagSoldmore: parseFloat(document.querySelector('[name="flagSoldmore"]').value) || 0,
+                    emojiGreen: parseFloat(document.querySelector('[name="emoji_green"]').value) || 0,
+                    emojiRocket: parseFloat(document.querySelector('[name="emoji_rocket"]').value) || 0
+                };
+
+                const filteredData = validData.filter(wallet => {
+                    const soldmoreValue = wallet.flag3_soldmore || 0;
+                    const greenEmoji = wallet.emoji_green || 0;
+                    const rocketEmoji = wallet.emoji_rocket || 0;
+                    
+                    return wallet.roi >= config.minRoi &&
+                           wallet.winrate >= config.minWinrate &&
+                           wallet.uniq_tokens >= config.minUniqueTokens &&
+                           wallet.good_tokens_pct >= config.minGoodTokens &&
+                           wallet.native_balance >= config.minBalance &&
+                           soldmoreValue >= config.flagSoldmore &&
+                           greenEmoji >= config.emojiGreen &&
+                           rocketEmoji >= config.emojiRocket;
+                });
+
+                const metrics = {
+                    totalWallets: filteredData.length,
+                    totalOriginalWallets: validData.length,
+                    avgRoi: filteredData.reduce((acc, w) => acc + w.roi, 0) / filteredData.length,
+                    successRate: (filteredData.filter(w => w.profit > 0).length / filteredData.length) * 100
+                };
+
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('totalWallets').textContent = `${metrics.totalWallets}/${metrics.totalOriginalWallets}`;
+                document.getElementById('avgRoi').textContent = `${metrics.avgRoi.toFixed(2)}%`;
+                document.getElementById('successRate').textContent = `${metrics.successRate.toFixed(2)}%`;
+
+                const darkTheme = {
+                    paper_bgcolor: '#232430',
+                    plot_bgcolor: '#232430',
+                    font: {
+                        color: '#a388f5'
+                    },
+                    xaxis: {
+                        gridcolor: '#2d2e3d'
+                    },
+                    yaxis: {
+                        gridcolor: '#2d2e3d'
+                    }
+                };
+
+                generateRoiDistribution(filteredData, darkTheme);
+                generateStrategyPerformance(filteredData, darkTheme);
+                updateTopWalletsTable(filteredData);
+            }
+
+            function generateRoiDistribution(data, theme) {
+                const trace = {
+                    x: data.map(d => d.roi),
+                    type: 'histogram',
+                    name: 'ROI Distribution',
+                    marker: {
+                        color: '#a388f5'
+                    }
+                };
+
+                const layout = {
+                    ...theme,
+                    title: 'ROI Distribution',
+                    xaxis: { ...theme.xaxis, title: 'ROI (%)' },
+                    yaxis: { ...theme.yaxis, title: 'Count' }
+                };
+
+                Plotly.newPlot('roiDistribution', [trace], layout);
+            }
+
+            function generateStrategyPerformance(data, theme) {
+                const strategies = {};
+                data.forEach(wallet => {
+                    if (!strategies[wallet.hashtag]) {
+                        strategies[wallet.hashtag] = [];
+                    }
+                    strategies[wallet.hashtag].push(wallet.roi);
+                });
+
+                const trace = {
+                    x: Object.keys(strategies),
+                    y: Object.values(strategies).map(rois => rois.reduce((a, b) => a + b, 0) / rois.length),
+                    type: 'bar',
+                    name: 'Average ROI by Strategy',
+                    marker: {
+                        color: '#a388f5'
+                    }
+                };
+
+                const layout = {
+                    ...theme,
+                    title: 'Strategy Performance',
+                    xaxis: { ...theme.xaxis, title: 'Strategy' },
+                    yaxis: { ...theme.yaxis, title: 'Average ROI (%)' }
+                };
+
+                Plotly.newPlot('strategyPerformance', [trace], layout);
+            }
+
+            function updateTopWalletsTable(data) {
+                const sortedWallets = [...data].sort((a, b) => b.roi - a.roi).slice(0, 25);
+                const tableBody = document.getElementById('walletsTable');
+                tableBody.innerHTML = '';
+
+                sortedWallets.forEach(wallet => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${wallet.wallet}</td>
+                        <td>
+                            <button class="copy-btn" onclick="copyWalletAddress('${wallet.wallet}')">
+                                <i class="ph-copy-simple"></i>
+                                <span>Copy</span>
+                            </button>
+                        </td>
+                        <td>${wallet.roi.toFixed(2)}%</td>
+                        <td id="freshBalance_${wallet.wallet}">
+                            <button onclick="updateFreshBalance('${wallet.wallet}')" class="bg-blue-500 text-white px-2 py-1 rounded">
+                                Check Balance
+                            </button>
+                        </td>
+                        <td>${wallet.native_balance.toFixed(2)} SOL</td>
+                        <td>${wallet.native_balance.toFixed(2)} SOL</td>
+                        <td>${wallet.winrate.toFixed(2)}%</td>
+                        <td>${(wallet.flag3_soldmore || 0).toFixed(2)}%</td>
+                        <td>${wallet.last_trade || 'N/A'}</td>
+                        <td>${wallet.uniq_tokens || 0}</td>
+                        <td>${wallet.avg_time || 'N/A'}</td>
+                        <td>${wallet.hashtag || 'N/A'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            async function updateFreshBalance(walletAddress) {
+                const balanceCell = document.getElementById(`freshBalance_${walletAddress}`);
+                
+                try {
+                    balanceCell.innerHTML = '<span class="text-yellow-500">Checking...</span>';
+                    const balance = await checkSolanaBalance(walletAddress);
+                    balanceCell.textContent = `${balance} SOL`;
+                } catch (error) {
+                    balanceCell.innerHTML = '<span class="text-red-500">Error</span>';
+                    console.error('Balance check failed:', error);
+                }
+            }
+
+            // Update the copyWalletAddress function to handle both icon and text:
+            function copyWalletAddress(address) {
+                navigator.clipboard.writeText(address).then(() => {
+                    const btn = event.currentTarget;
+                    const originalContent = btn.innerHTML;
+                    btn.innerHTML = '<i class="ph-check"></i><span>Copied!</span>';
+                    setTimeout(() => {
+                        btn.innerHTML = originalContent;
+                    }, 1000);
+                });
+            }
+
+            // Add this new function to the JavaScript section
+            function resetInput(btn) {
+                const input = btn.parentElement.querySelector('input');
+                input.value = "0";
+                analyzeData(); // Trigger reanalysis with new value
+            }
+
+            // Update analysis when configuration changes
+            document.querySelectorAll('#configForm input').forEach(input => {
+                input.addEventListener('change', () => {
+                    if (analysisData) {
+                        analyzeData();
+                    }
+                });
+            });
+            async function fetchPrices() {
+                try {
+                    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana,bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true');
+                    const data = await response.json();
+                    
+                    // Update Solana price
+                    const solPrice = data.solana.usd;
+                    const solChange = data.solana.usd_24h_change;
+                    document.getElementById('solanaPrice').textContent = `$${solPrice.toFixed(2)}`;
+                    const solChangeElement = document.getElementById('solanaPriceChange');
+                    solChangeElement.textContent = `${solChange.toFixed(2)}%`;
+                    solChangeElement.className = solChange >= 0 ? 'text-lg price-up' : 'text-lg price-down';
+                    
+                    // Update Bitcoin price
+                    const btcPrice = data.bitcoin.usd;
+                    const btcChange = data.bitcoin.usd_24h_change;
+                    document.getElementById('bitcoinPrice').textContent = `$${btcPrice.toLocaleString()}`;
+                    const btcChangeElement = document.getElementById('bitcoinPriceChange');
+                    btcChangeElement.textContent = `${btcChange.toFixed(2)}%`;
+                    btcChangeElement.className = btcChange >= 0 ? 'text-lg price-up' : 'text-lg price-down';
+                    
+                    // Update Ethereum price
+                    const ethPrice = data.ethereum.usd;
+                    const ethChange = data.ethereum.usd_24h_change;
+                    document.getElementById('ethereumPrice').textContent = `$${ethPrice.toFixed(2)}`;
+                    const ethChangeElement = document.getElementById('ethereumPriceChange');
+                    ethChangeElement.textContent = `${ethChange.toFixed(2)}%`;
+                    ethChangeElement.className = ethChange >= 0 ? 'text-lg price-up' : 'text-lg price-down';
+                    
+                    const now = new Date();
+                    document.getElementById('lastUpdate').textContent = `Last updated: ${now.toLocaleTimeString()}`;
+                } catch (error) {
+                    console.error('Error fetching prices:', error);
+                }
+            }
+
+            // Update price immediately and then every 30 seconds
+            fetchPrices();
+            setInterval(fetchPrices, 30000);
+        </script>
+    </div>
+</body>
+</html>
