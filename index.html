@@ -1,0 +1,235 @@
+<style>
+    body {
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        background-color: #FFF0F5;
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    header {
+        background-color: #FFB6C1;
+        padding: 20px 0;
+        text-align: center;
+    }
+    h1 {
+        font-size: 3em;
+        color: #FF1493;
+        margin: 0;
+        text-shadow: 2px 2px #FFC0CB;
+    }
+    .kitty-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: 50px auto;
+    }
+    .kitty {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: #808080;
+        border-radius: 50%;
+    }
+    .ear {
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-left: 30px solid transparent;
+        border-right: 30px solid transparent;
+        border-bottom: 60px solid #808080;
+    }
+    .ear-left {
+        top: -30px;
+        left: 40px;
+        transform: rotate(-30deg);
+    }
+    .ear-right {
+        top: -30px;
+        right: 40px;
+        transform: rotate(30deg);
+    }
+    .eye {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background-color: #FFFF00;
+        border-radius: 50%;
+        top: 90px;
+    }
+    .eye-left {
+        left: 70px;
+    }
+    .eye-right {
+        right: 70px;
+    }
+    .pupil {
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        background-color: #000;
+        border-radius: 50%;
+        top: 12.5px;
+        left: 12.5px;
+    }
+    .nose {
+        position: absolute;
+        width: 25px;
+        height: 15px;
+        background-color: #FFC0CB;
+        border-radius: 50%;
+        top: 160px;
+        left: 137.5px;
+    }
+    .mouth {
+        position: absolute;
+        width: 80px;
+        height: 40px;
+        border: 8px solid #000;
+        border-radius: 0 0 80px 80px;
+        border-top: none;
+        top: 180px;
+        left: 110px;
+        transition: all 0.3s ease;
+    }
+    .angy-meter {
+        background-color: #FFF;
+        border: 2px solid #FF69B4;
+        border-radius: 20px;
+        height: 30px;
+        margin: 20px auto;
+        position: relative;
+        width: 80%;
+    }
+    .angy-level {
+        background-color: #FF69B4;
+        border-radius: 20px;
+        height: 100%;
+        width: 0%;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { opacity: 0.7; }
+        50% { opacity: 1; }
+        100% { opacity: 0.7; }
+    }
+    .angy-button {
+        background-color: #FF1493;
+        border: none;
+        border-radius: 25px;
+        color: white;
+        cursor: pointer;
+        font-size: 1.2em;
+        margin: 20px auto;
+        padding: 10px 20px;
+        display: block;
+    }
+    .angy-button:hover {
+        background-color: #FF69B4;
+    }
+    footer {
+        background-color: #FFB6C1;
+        color: #FF1493;
+        text-align: center;
+        padding: 10px 0;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+    .eyebrow {
+        position: absolute;
+        width: 50px;
+        height: 8px;
+        background-color: #606060;
+        border-radius: 4px;
+        top: 70px;
+        transform-origin: center;
+        transform: rotate(0deg);
+        transition: transform 0.3s ease;
+        z-index: 2;
+    }
+    
+    .eyebrow-left {
+        left: 70px;
+    }
+    
+    .eyebrow-right {
+        right: 70px;
+    }
+</style>
+</head>
+<body>
+    <header>
+        <h1>Angy Kitty</h1>
+    </header>
+    <div class="container">
+        <div class="kitty-container">
+            <div class="kitty">
+                <div class="ear ear-left"></div>
+                <div class="ear ear-right"></div>
+                <div class="eyebrow eyebrow-left"></div>
+                <div class="eyebrow eyebrow-right"></div>
+                <div class="eye eye-left"><div class="pupil"></div></div>
+                <div class="eye eye-right"><div class="pupil"></div></div>
+                <div class="nose"></div>
+                <div class="mouth"></div>
+            </div>
+        </div>
+        <div class="angy-meter">
+            <div class="angy-level"></div>
+        </div>
+        <button class="angy-button" onclick="makeAngier()">Make Kitty Angier</button>
+    </div>
+    <footer>
+        <p>&copy; 2023 Angy Kitty Inc. All rights reserved. No pets allowed.</p>
+    </footer>
+
+<script>
+let angyLevel = 0;  
+
+function makeAngier() {
+    if (angyLevel < 100) {
+        angyLevel += 20;  
+        updateAngyMeter();
+        updateKittyFace();
+    }
+    if (angyLevel >= 100) {
+        alert("MAXIMUM ANGY ACHIEVED! 😾🙀");
+    }
+}
+
+function updateAngyMeter() {
+    const angyLevelElement = document.querySelector('.angy-level');
+    angyLevelElement.style.width = angyLevel + '%';
+}
+
+function updateKittyFace() {
+    const mouth = document.querySelector('.mouth');
+    const eyebrowLeft = document.querySelector('.eyebrow-left');
+    const eyebrowRight = document.querySelector('.eyebrow-right');
+
+    const angleChange = (angyLevel * 0.3);  
+    eyebrowLeft.style.transform = `rotate(${angleChange}deg)`;
+    eyebrowRight.style.transform = `rotate(${-angleChange}deg)`;
+
+    if (angyLevel < 50) {
+        mouth.style.borderRadius = "0 0 80px 80px";
+        mouth.style.borderTop = "none";
+        mouth.style.borderBottom = "8px solid #000";
+        mouth.style.height = "40px";
+    } else {
+        mouth.style.borderRadius = "80px 80px 0 0";
+        mouth.style.borderBottom = "none";
+        mouth.style.borderTop = "8px solid #000";
+        mouth.style.height = `${40 + ((angyLevel - 50) / 2)}px`;
+    }
+}
+
+updateKittyFace();
+</script>
+</body>
+</html>
